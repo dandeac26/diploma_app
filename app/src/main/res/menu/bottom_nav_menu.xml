@@ -1,0 +1,23 @@
+<!-- res/menu/bottom_nav_menu.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/pastry_48"
+        android:title="@string/home"
+        />
+    <item
+        android:id="@+id/nav_products"
+        android:icon="@drawable/pastry_48"
+        android:title="@string/products"
+        />
+    <item
+        android:id="@+id/nav_orders"
+        android:icon="@drawable/pastry_48"
+        android:title="@string/orders"
+        />
+    <item
+        android:id="@+id/nav_recipes"
+        android:icon="@drawable/pastry_48"
+        android:title="@string/recipes"
+        />
+</menu>
