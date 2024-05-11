@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/pastry_48"
+        android:icon="@drawable/home_48"
         android:title="@string/home"
         />
     <item
@@ -12,12 +12,12 @@
         />
     <item
         android:id="@+id/nav_orders"
-        android:icon="@drawable/pastry_48"
+        android:icon="@drawable/list_48"
         android:title="@string/orders"
         />
     <item
         android:id="@+id/nav_recipes"
-        android:icon="@drawable/pastry_48"
+        android:icon="@drawable/recipes_50"
         android:title="@string/recipes"
         />
 </menu>

@@ -10,9 +10,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.myapplication.activities.ProductActivity.Product
+import com.example.myapplication.fragments.ProductsFragment.Product
 import com.example.myapplication.R
-import com.example.myapplication.activities.ProductActivity
+import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.api.BakeryAPI
 import com.example.myapplication.dialog.ImagePreviewDialog
 import de.hdodenhof.circleimageview.CircleImageView
@@ -20,7 +20,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ProductAdapter(private val products: MutableList<Product>, private val bakeryAPI: BakeryAPI, private val productActivity: ProductActivity) : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
+class ProductAdapter(private val products: MutableList<Product>, private val bakeryAPI: BakeryAPI, private val fragment: ProductsFragment) : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
     inner class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val productName: TextView = itemView.findViewById(R.id.productName)
@@ -39,7 +39,7 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val product = products[position]
         holder.productName.text = product.name
-        holder.productPrice.text = product.price.toString()
+        holder.productPrice.text = product.price.toString() + " lei"
 
         if (product.imageUrl != null) {
             Glide.with(holder.productImage.context)
@@ -56,7 +56,7 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
         }
         holder.productImage.setOnClickListener {
             val dialog = ImagePreviewDialog.newInstance(product.imageUrl ?: "")
-            dialog.show(productActivity.supportFragmentManager, "ImagePreviewDialog")
+            dialog.show(fragment.parentFragmentManager, "ImagePreviewDialog")
         }
     }
 
@@ -82,7 +82,7 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
 
     private fun deleteProduct(position: Int) {
         val product = products[position]
-        AlertDialog.Builder(productActivity)
+        AlertDialog.Builder(fragment.requireContext())
             .setTitle("Delete Product")
             .setMessage("Are you sure you want to delete this product?")
             .setPositiveButton("Yes") { _, _ ->
@@ -109,7 +109,7 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
 
     private fun updateProduct(position: Int) {
         val product = products[position]
-        productActivity.openAddProductDialog(product)
+        fragment.openAddProductDialog(product)
     }
 
 }

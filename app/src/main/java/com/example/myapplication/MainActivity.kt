@@ -1,39 +1,19 @@
 package com.example.myapplication
 
-import android.annotation.SuppressLint
+import HomeFragment
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.EditText
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.myapplication.activities.ProductActivity
-import com.example.myapplication.adapters.ProductAdapter
-import com.example.myapplication.api.BakeryAPI
-import com.example.myapplication.entity.ProductDTO
+import com.example.myapplication.fragments.OrdersFragment
+import com.example.myapplication.fragments.ProductsFragment
+import com.example.myapplication.fragments.RecipesFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
-class MainActivity : BaseActivity() {
+class MainActivity : AppCompatActivity() {
 
-    private lateinit var recyclerView: RecyclerView
-
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -41,11 +21,29 @@ class MainActivity : BaseActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigation.setOnItemSelectedListener { item ->
+            val fragment = when (item.itemId) {
+                R.id.nav_home -> HomeFragment()
+                R.id.nav_products -> ProductsFragment()
+                R.id.nav_orders -> OrdersFragment()
+                R.id.nav_recipes -> RecipesFragment()
+                else -> null
+            }
 
-        val selectedItemId = intent.getIntExtra("selectedItemId", R.id.nav_home)
-        setupBottomNavigation(selectedItemId)
+            if (fragment != null) {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .commit()
+            }
+
+            true
+        }
+
+        // Set the initial fragment
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, HomeFragment())
+            .commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -56,14 +54,10 @@ class MainActivity : BaseActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_products -> {
-                val intent = Intent(this, ProductActivity::class.java)
-                startActivity(intent)
+                // do sth
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-    // MainActivity.kt
-
 }

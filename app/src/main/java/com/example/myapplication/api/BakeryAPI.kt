@@ -1,7 +1,6 @@
 package com.example.myapplication.api
 
-import com.example.myapplication.MainActivity
-import com.example.myapplication.activities.ProductActivity
+import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.entity.ProductDTO
 import retrofit2.Call
 import retrofit2.http.Body
@@ -13,7 +12,7 @@ import retrofit2.http.Path
 
 interface BakeryAPI {
     @GET("product")
-    fun getProducts(): Call<List<ProductActivity.Product>>
+    fun getProducts(): Call<List<ProductsFragment.Product>>
 
     @DELETE("product/{productId}")
     fun deleteProduct(@Path("productId") productId: String): Call<Void>

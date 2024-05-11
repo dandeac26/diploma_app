@@ -1,17 +1,18 @@
-package com.example.myapplication.activities
+package com.example.myapplication.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.myapplication.BaseActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.api.BakeryAPI
@@ -23,35 +24,38 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
-class ProductActivity : BaseActivity() {
+class ProductsFragment : Fragment() {
 
     private lateinit var productAdapter: ProductAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private var products = mutableListOf<Product>()
+    private val products = mutableListOf<Product>()
 
-    @SuppressLint("MissingInflatedId")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_product)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_products, container, false)
+    }
 
-        val selectedItemId = intent.getIntExtra("selectedItemId", R.id.nav_products)
-        setupBottomNavigation(selectedItemId)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         productAdapter = ProductAdapter(products, bakeryAPI, this)
 
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = productAdapter
 
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setOnRefreshListener {
             fetchProducts()
         }
 
         fetchProducts()
 
-        val addProductButton = findViewById<Button>(R.id.addProductButton)
+        val addProductButton = view.findViewById<Button>(R.id.addProductButton)
         addProductButton.setOnClickListener {
             openAddProductDialog()
         }
@@ -116,8 +120,8 @@ class ProductActivity : BaseActivity() {
 
     @SuppressLint("InflateParams", "MissingInflatedId")
     fun openAddProductDialog(product: Product? = null) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_product, null)
-        val builder = AlertDialog.Builder(this)
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_product, null)
+        val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setTitle(if (product == null) "Add Product" else "Update Product")
 

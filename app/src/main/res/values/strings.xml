@@ -2,7 +2,7 @@
     <string name="app_name">My Application</string>
     <string name="update">Update</string>
     <string name="delete">Delete</string>
-    <string name="add_product">Add Product</string>
+    <string name="add_product">New</string>
     <string name="recipes">Recipes</string>
     <string name="orders">Orders</string>
     <string name="products">Products</string>
