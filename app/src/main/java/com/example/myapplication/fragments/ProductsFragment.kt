@@ -1,13 +1,21 @@
 package com.example.myapplication.fragments
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewStub
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +25,7 @@ import com.example.myapplication.R
 import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.api.BakeryAPI
 import com.example.myapplication.entity.ProductDTO
+import com.facebook.shimmer.ShimmerFrameLayout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,14 +37,15 @@ class ProductsFragment : Fragment() {
 
     private lateinit var productAdapter: ProductAdapter
     private lateinit var recyclerView: RecyclerView
+    private lateinit var emptyView: ViewStub
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val products = mutableListOf<Product>()
+    private lateinit var shimmerViewContainer: ShimmerFrameLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_products, container, false)
     }
 
@@ -45,6 +55,7 @@ class ProductsFragment : Fragment() {
         productAdapter = ProductAdapter(products, bakeryAPI, this)
 
         recyclerView = view.findViewById(R.id.recyclerView)
+        emptyView = view.findViewById(R.id.emptyView)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = productAdapter
 
@@ -53,11 +64,20 @@ class ProductsFragment : Fragment() {
             fetchProducts()
         }
 
+        shimmerViewContainer = view.findViewById(R.id.shimmer_view_container)
+        shimmerViewContainer.startShimmer()
+
+
         fetchProducts()
 
         val addProductButton = view.findViewById<Button>(R.id.addProductButton)
         addProductButton.setOnClickListener {
             openAddProductDialog()
+        }
+
+        val deleteAllButton = view.findViewById<Button>(R.id.deleteAllButton)
+        deleteAllButton.setOnClickListener {
+            deleteAllProducts()
         }
     }
 
@@ -68,14 +88,20 @@ class ProductsFragment : Fragment() {
         val imageUrl: String
     )
 
-    val retrofit = Retrofit.Builder()
+    private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl("http://192.168.68.56:8080/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val bakeryAPI = retrofit.create(BakeryAPI::class.java)
+    private val bakeryAPI: BakeryAPI = retrofit.create(BakeryAPI::class.java)
 
-    // call method on the API interface to make request
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork ?: return false
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+    }
+
     fun fetchProducts() {
         val call = bakeryAPI.getProducts()
         call.enqueue(object : Callback<List<Product>> {
@@ -83,15 +109,36 @@ class ProductsFragment : Fragment() {
                 if (response.isSuccessful) {
                     val productsResponse = response.body()
                     if (productsResponse != null) {
-                        // Update the products list and notify the adapter
                         products.clear()
                         products.addAll(productsResponse)
-                        productAdapter.notifyDataSetChanged()
+                        products.reverse()
                     }
                 }
                 swipeRefreshLayout.isRefreshing = false
-            }
 
+                val fadeOut = AnimationUtils.loadAnimation(context, R.anim.fade_out)
+
+                fadeOut.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationStart(animation: Animation) {}
+                    @SuppressLint("NotifyDataSetChanged")
+                    override fun onAnimationEnd(animation: Animation) {
+                        shimmerViewContainer.visibility = View.GONE
+
+                        productAdapter.notifyDataSetChanged()
+
+                        if (recyclerView.adapter?.itemCount == 0) {
+                            recyclerView.visibility = View.GONE
+                            emptyView.visibility = View.VISIBLE
+                        } else {
+                            recyclerView.visibility = View.VISIBLE
+                            emptyView.visibility = View.GONE
+                        }
+                        recyclerView.visibility = View.VISIBLE
+                    }
+                    override fun onAnimationRepeat(animation: Animation) {}
+                })
+                shimmerViewContainer.startAnimation(fadeOut)
+            }
             override fun onFailure(call: Call<List<Product>>, t: Throwable) {
                 Log.e("Error", t.message.toString())
                 swipeRefreshLayout.isRefreshing = false
@@ -99,19 +146,20 @@ class ProductsFragment : Fragment() {
         })
     }
 
-    fun addProduct(newProduct: ProductDTO) {
+    private fun addProduct(newProduct: ProductDTO, callback: (String?) -> Unit) {
         val call = bakeryAPI.addProduct(newProduct)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
-                    // The product was created successfully
-                    // You might want to fetch the products again here to include the new one
+                    callback(null)
                     fetchProducts()
                 } else {
                     // Handle the error
+                    if (response.code() == 400) {
+                        callback(response.errorBody()?.string())
+                    }
                 }
             }
-
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 // Handle the error
             }
@@ -120,6 +168,10 @@ class ProductsFragment : Fragment() {
 
     @SuppressLint("InflateParams", "MissingInflatedId")
     fun openAddProductDialog(product: Product? = null) {
+        if (!isNetworkAvailable()) {
+            Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_product, null)
         val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -127,7 +179,6 @@ class ProductsFragment : Fragment() {
 
         val alertDialog = builder.show()
 
-        // If a product is passed, fill the form with its data
         if (product != null) {
             dialogView.findViewById<EditText>(R.id.nameInput).setText(product.name)
             dialogView.findViewById<EditText>(R.id.priceInput).setText(product.price.toString())
@@ -136,38 +187,84 @@ class ProductsFragment : Fragment() {
 
         dialogView.findViewById<Button>(R.id.saveButton).setOnClickListener {
             val name = dialogView.findViewById<EditText>(R.id.nameInput).text.toString()
-            val price = dialogView.findViewById<EditText>(R.id.priceInput).text.toString().toDouble()
+            val priceString = dialogView.findViewById<EditText>(R.id.priceInput).text.toString()
+
+            if (priceString.isEmpty()) {
+                Toast.makeText(context, "Price cannot be empty", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val price = priceString.toDouble()
             val imageUrl = dialogView.findViewById<EditText>(R.id.imageUrlInput).text.toString()
             val newProduct = ProductDTO(name, price, imageUrl)
 
             if (product == null) {
-                // If no product was passed, add a new product
-                addProduct(newProduct)
+                addProduct(newProduct) { errorMessage ->
+                    if (errorMessage != null) {
+                        val errorMessageTextView =
+                            dialogView.findViewById<TextView>(R.id.errorMessage)
+                        errorMessageTextView.text = errorMessage
+                        errorMessageTextView.visibility = View.VISIBLE
+                    } else {
+                        alertDialog.dismiss()
+                    }
+                }
             } else {
-                // If a product was passed, update the existing product
-                updateProduct(product.productId, newProduct)
+                updateProduct(product.productId, newProduct) { errorMessage ->
+                    if (errorMessage != null) {
+                        val errorMessageTextView =
+                            dialogView.findViewById<TextView>(R.id.errorMessage)
+                        errorMessageTextView.text = errorMessage
+                        errorMessageTextView.visibility = View.VISIBLE
+                    } else {
+                        alertDialog.dismiss()
+                    }
+                }
             }
-            alertDialog.dismiss()
         }
-
         dialogView.findViewById<Button>(R.id.cancelButton).setOnClickListener {
             alertDialog.dismiss()
         }
     }
 
-    fun updateProduct(productId: String, updatedProduct: ProductDTO) {
+    private fun deleteAllProducts(){
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("Delete All Products")
+            setMessage("Are you sure you want to delete all products?")
+
+            setPositiveButton("Yes") { dialog, _ ->
+                val call = bakeryAPI.deleteAllProducts()
+                call.enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            fetchProducts()
+                        }
+                    }
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        // Handle the error
+                    }
+                })
+                dialog.dismiss()
+            }
+            setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+        }.create().show()
+    }
+
+    private fun updateProduct(productId: String, updatedProduct: ProductDTO, callback: (String?) -> Unit) {
         val call = bakeryAPI.updateProduct(productId, updatedProduct)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
-                    // The product was updated successfully
-                    // You might want to fetch the products again here to get the updated one
+                    callback(null)
                     fetchProducts()
                 } else {
-                    // Handle the error
+                    if(response.code() == 400) {
+                        callback(response.errorBody()?.string())
+                    }
                 }
             }
-
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 // Handle the error
             }

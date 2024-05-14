@@ -1,12 +1,12 @@
 package com.example.myapplication
 
-import HomeFragment
-import android.content.Intent
+import com.example.myapplication.fragments.HomeFragment
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.fragments.RecipesFragment
@@ -32,17 +32,21 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (fragment != null) {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, fragment)
-                    .commit()
+                switchFragment(fragment)
             }
 
             true
         }
 
-        // Set the initial fragment
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, HomeFragment())
+            .commit()
+    }
+
+    fun switchFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .setCustomAnimations(R.anim.fade_in, 0, 0, 0)
+            .replace(R.id.fragment_container, fragment)
             .commit()
     }
 

@@ -24,12 +24,19 @@ class ImagePreviewDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val imageUrl = arguments?.getString("imageUrl")
-        Log.d("ImagePreviewDialog", "Image URL: $imageUrl") // Add this line
+        Log.d("ImagePreviewDialog", "Image URL: $imageUrl")
         val imageView = view.findViewById<ImageView>(R.id.previewImage)
+        // if image url is null, load placeholder image
+        if (imageUrl.isNullOrEmpty()) {
+            Glide.with(this)
+                .load(R.drawable.placeholder_50)
+                .into(imageView)
 
-        Glide.with(this)
-            .load(imageUrl)
-            .into(imageView)
+        }else{
+            Glide.with(this)
+                .load(imageUrl)
+                .into(imageView)
+        }
     }
 
     companion object {

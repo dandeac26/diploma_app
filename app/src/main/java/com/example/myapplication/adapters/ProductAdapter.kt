@@ -11,10 +11,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.myapplication.fragments.ProductsFragment.Product
-import com.example.myapplication.R
 import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.api.BakeryAPI
 import com.example.myapplication.dialog.ImagePreviewDialog
+import com.example.myapplication.R
 import de.hdodenhof.circleimageview.CircleImageView
 import retrofit2.Call
 import retrofit2.Callback
@@ -41,14 +41,10 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
         holder.productName.text = product.name
         holder.productPrice.text = product.price.toString() + " lei"
 
-        if (product.imageUrl != null) {
-            Glide.with(holder.productImage.context)
-                .load(product.imageUrl)
-                .placeholder(R.drawable.placeholder_img1)
-                .into(holder.productImage)
-        } else {
-            holder.productImage.setImageResource(R.drawable.placeholder_img1)
-        }
+        Glide.with(holder.productImage.context)
+            .load(product.imageUrl)
+            .placeholder(R.drawable.placeholder_50)
+            .into(holder.productImage)
 
         holder.itemView.setOnLongClickListener { v ->
             showPopupMenu(v, holder.adapterPosition)
@@ -57,6 +53,10 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
         holder.productImage.setOnClickListener {
             val dialog = ImagePreviewDialog.newInstance(product.imageUrl ?: "")
             dialog.show(fragment.parentFragmentManager, "ImagePreviewDialog")
+        }
+
+        holder.itemView.setOnClickListener {
+            fragment.openAddProductDialog(product)
         }
     }
 
@@ -90,14 +90,12 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
                 call.enqueue(object : Callback<Void> {
                     override fun onResponse(call: Call<Void>, response: Response<Void>) {
                         if (response.isSuccessful) {
-                            // remove the product from the list and notify the adapter
                             products.removeAt(position)
                             notifyItemRemoved(position)
                         } else {
                             // handle the error
                         }
                     }
-
                     override fun onFailure(call: Call<Void>, t: Throwable) {
                         // handle the error
                     }
@@ -111,5 +109,4 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
         val product = products[position]
         fragment.openAddProductDialog(product)
     }
-
 }

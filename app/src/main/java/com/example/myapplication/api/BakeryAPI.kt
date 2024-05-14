@@ -17,6 +17,9 @@ interface BakeryAPI {
     @DELETE("product/{productId}")
     fun deleteProduct(@Path("productId") productId: String): Call<Void>
 
+    @DELETE("product")
+    fun deleteAllProducts(): Call<Void>
+
     @POST("product")
     fun addProduct(@Body newProduct: ProductDTO): Call<Void>
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Pastry Central</string>
     <string name="update">Update</string>
     <string name="delete">Delete</string>
     <string name="add_product">New</string>
@@ -7,4 +7,8 @@
     <string name="orders">Orders</string>
     <string name="products">Products</string>
     <string name="home">Home</string>
+    <string name="delete_all">Delete All</string>
+    <string name="there_are_no_products">There are no products.</string>
+    <string name="no_products_image_description">No products image</string>
+    <string name="preview_image">Preview Image</string>
 </resources>

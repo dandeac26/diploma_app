@@ -8,4 +8,6 @@
     <color name="colorPrimary"> #f2ecf6 </color>
     <color name="colorBorder">#FF808080</color>
     <color name="myColorButton">#94D34C</color>
+    <color name="delete_all_button">#AF411E</color>
+    <color name="empty_text_color">#C5C5C5</color>
 </resources>

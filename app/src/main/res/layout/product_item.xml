@@ -13,13 +13,13 @@
         android:id="@+id/productImage"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/placeholder_img1"
+        android:src="@drawable/placeholder_50"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginEnd="8dp"
         android:scaleType="centerCrop"
-        tools:src="@drawable/placeholder_img1" />
+        tools:src="@drawable/placeholder_50" />
 
     <TextView
         android:id="@+id/productName"
