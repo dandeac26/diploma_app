@@ -16,6 +16,11 @@
         android:title="@string/orders"
         />
     <item
+        android:id="@+id/nav_clients"
+        android:icon="@drawable/recipes_50"
+        android:title="@string/clients"
+        />
+    <item
         android:id="@+id/nav_recipes"
         android:icon="@drawable/recipes_50"
         android:title="@string/recipes"

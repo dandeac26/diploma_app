@@ -11,4 +11,6 @@
     <string name="there_are_no_products">There are no products.</string>
     <string name="no_products_image_description">No products image</string>
     <string name="preview_image">Preview Image</string>
+    <string name="open_waze">Open Waze</string>
+    <string name="clients">Clients</string>
 </resources>

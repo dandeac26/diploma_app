@@ -7,6 +7,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import com.example.myapplication.fragments.ClientsFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.fragments.RecipesFragment
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_products -> ProductsFragment()
                 R.id.nav_orders -> OrdersFragment()
                 R.id.nav_recipes -> RecipesFragment()
+                R.id.nav_clients -> ClientsFragment()
                 else -> null
             }
 
