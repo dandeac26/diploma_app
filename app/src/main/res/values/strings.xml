@@ -13,4 +13,15 @@
     <string name="preview_image">Preview Image</string>
     <string name="open_waze">Open Waze</string>
     <string name="clients">Clients</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="image_url">Image URL</string>
+    <string name="price">Price</string>
+    <string name="name">Name</string>
+    <string name="firmname">FirmName</string>
+    <string name="phonenumber">PhoneNumber</string>
+    <string name="contactperson">ContactPerson</string>
+    <string name="address">Address</string>
+    <string name="coordinates">Coordinates</string>
+    <string name="firm_name">Firm name *</string>
 </resources>

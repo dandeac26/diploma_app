@@ -7,4 +7,5 @@
     <color name="myColorButton">#8BC34A</color>
     <color name="delete_all_button">#AF411E</color>
     <color name="empty_text_color">#FFD3D3D3</color>
+    <color name="mandatoryFieldAsterisk">#FF0000</color>
 </resources>

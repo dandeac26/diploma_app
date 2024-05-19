@@ -13,24 +13,39 @@
         android:visibility="gone" />
 
     <EditText
-        android:id="@+id/nameInput"
+        android:id="@+id/firmNameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/name" />
+        android:autofillHints="Firm Name"
+        android:hint="@string/firmname" />
 
     <EditText
-        android:id="@+id/priceInput"
+        android:id="@+id/phoneNumberInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/price"
-        android:inputType="numberDecimal" />
+        android:autofillHints="Phone Number"
+        android:hint="@string/phonenumber" />
 
     <EditText
-        android:id="@+id/imageUrlInput"
+        android:id="@+id/contactPersonInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/image_url" />
+        android:autofillHints="Contact Person"
+        android:hint="@string/contactperson" />
 
+    <EditText
+        android:id="@+id/locationInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints="Location"
+        android:hint="@string/address" />
+
+    <EditText
+        android:id="@+id/coordinatesInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autofillHints="Coordinates"
+        android:hint="@string/coordinates" />
 
     <LinearLayout
         android:layout_width="match_parent"

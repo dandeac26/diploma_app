@@ -10,4 +10,5 @@
     <color name="myColorButton">#94D34C</color>
     <color name="delete_all_button">#AF411E</color>
     <color name="empty_text_color">#C5C5C5</color>
+    <color name="mandatoryFieldAsterisk">#FF0000</color>
 </resources>
