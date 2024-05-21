@@ -1,10 +1,12 @@
 package com.example.myapplication.fragments
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Rect
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -238,6 +240,31 @@ class ClientsFragment : Fragment() {
             NetworkCapabilities.TRANSPORT_CELLULAR)
     }
 
+    fun fadeOutAnimation(){
+        val fadeOut = AnimationUtils.loadAnimation(context, R.anim.fade_out)
+
+        fadeOut.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {}
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onAnimationEnd(animation: Animation) {
+                shimmerViewContainer.visibility = View.GONE
+
+                clientAdapter.notifyDataSetChanged()
+
+                if (clientsRecyclerView.adapter?.itemCount == 0) {
+                    clientsRecyclerView.visibility = View.GONE
+                    emptyView.visibility = View.VISIBLE
+                } else {
+                    clientsRecyclerView.visibility = View.VISIBLE
+                    emptyView.visibility = View.GONE
+                }
+                clientsRecyclerView.visibility = View.VISIBLE
+            }
+            override fun onAnimationRepeat(animation: Animation) {}
+        })
+        shimmerViewContainer.startAnimation(fadeOut)
+    }
+
     @SuppressLint("NotifyDataSetChanged")
     fun fetchClients() {
         val call = clientAPI.getClients()
@@ -253,28 +280,7 @@ class ClientsFragment : Fragment() {
                 }
                 swipeRefreshLayout.isRefreshing = false
 
-                val fadeOut = AnimationUtils.loadAnimation(context, R.anim.fade_out)
-
-                fadeOut.setAnimationListener(object : Animation.AnimationListener {
-                    override fun onAnimationStart(animation: Animation) {}
-                    @SuppressLint("NotifyDataSetChanged")
-                    override fun onAnimationEnd(animation: Animation) {
-                        shimmerViewContainer.visibility = View.GONE
-
-                        clientAdapter.notifyDataSetChanged()
-
-                        if (clientsRecyclerView.adapter?.itemCount == 0) {
-                            clientsRecyclerView.visibility = View.GONE
-                            emptyView.visibility = View.VISIBLE
-                        } else {
-                            clientsRecyclerView.visibility = View.VISIBLE
-                            emptyView.visibility = View.GONE
-                        }
-                        clientsRecyclerView.visibility = View.VISIBLE
-                    }
-                    override fun onAnimationRepeat(animation: Animation) {}
-                })
-                shimmerViewContainer.startAnimation(fadeOut)
+                fadeOutAnimation()
             }
             override fun onFailure(call: Call<List<Client>>, t: Throwable) {
                 Log.e("Error", t.message.toString())
@@ -433,8 +439,5 @@ class ClientsFragment : Fragment() {
         val clip = ClipData.newPlainText("Phone Number", phoneNumberText)
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
             ?.setPrimaryClip(clip)
-        Toast.makeText(context, "Phone number copied to clipboard", Toast.LENGTH_SHORT).show()
     }
-
-
 }

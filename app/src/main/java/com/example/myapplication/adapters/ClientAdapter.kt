@@ -14,6 +14,7 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.fragments.ClientsFragment.Client
@@ -67,9 +68,15 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
         }
         // Inside your Activity or Fragment, or ViewHolder class if using RecyclerView
         holder.phoneNumberContainer.setOnClickListener {
-            // Get the phone number text from phoneNumberTextView
-           fragment.copyToClipboard(holder.phoneNumberTextView.text.toString())
+            holder.phoneNumberContainer.background = ContextCompat.getDrawable(fragment.requireContext(), R.drawable.rounded_phone_clicked)
+
+            holder.phoneNumberContainer.postDelayed({
+                holder.phoneNumberContainer.background = ContextCompat.getDrawable(fragment.requireContext(), R.drawable.rounded_phone) // Replace `android.R.color.transparent` with your original background color if needed
+            }, 100)
+
+            fragment.copyToClipboard(holder.phoneNumberTextView.text.toString())
         }
+
 
         if (holder.locationTextView.text.toString().trim().isEmpty()) {
             holder.locationTextView.visibility = View.GONE
