@@ -1,14 +1,20 @@
 package com.example.myapplication.adapters
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.fragments.ClientsFragment.Client
 import com.example.myapplication.fragments.ClientsFragment
@@ -22,10 +28,13 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
 
     class ClientViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val firmNameTextView: TextView = view.findViewById(R.id.firmNameTextView)
+        val contactLabel: TextView = view.findViewById(R.id.contactLabel)
         val contactPersonTextView: TextView = view.findViewById(R.id.contactPersonTextView)
         val phoneNumberTextView: TextView = view.findViewById(R.id.phoneNumberTextView)
+        val locationLabel: TextView = view.findViewById(R.id.addressLabel)
         val locationTextView: TextView = view.findViewById(R.id.locationTextView)
-        val btnOpenWaze: Button = view.findViewById(R.id.btnOpenWaze)
+        val btnOpenWaze: ImageButton = view.findViewById(R.id.btnOpenWaze)
+        val phoneNumberContainer: View = view.findViewById(R.id.phoneNumberContainer)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClientViewHolder {
@@ -39,7 +48,8 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
         holder.firmNameTextView.text = client.firmName
         holder.contactPersonTextView.text = client.contactPerson
         holder.phoneNumberTextView.text = client.phoneNumber
-        holder.locationTextView.text = client.location
+        val (locationName, _) = fragment.extractLocationAndUrl(client.location)
+        holder.locationTextView.text = locationName
         holder.btnOpenWaze.setOnClickListener {
             // open google maps with the client's location
             fragment.openWazeLocation(client.location)
@@ -57,6 +67,30 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
         }
         holder.itemView.setOnClickListener {
             fragment.openAddClientDialog(client)
+        }
+        // Inside your Activity or Fragment, or ViewHolder class if using RecyclerView
+        holder.phoneNumberContainer.setOnClickListener {
+            // Get the phone number text from phoneNumberTextView
+           fragment.copyToClipboard(holder.phoneNumberTextView.text.toString())
+        }
+
+        if (holder.locationTextView.text.toString().trim().isEmpty()) {
+            holder.locationTextView.visibility = View.GONE
+            holder.locationLabel.visibility = View.GONE
+            holder.btnOpenWaze.visibility = View.GONE
+        } else {
+            holder.locationTextView.visibility = View.VISIBLE
+            holder.locationLabel.visibility = View.VISIBLE
+            holder.btnOpenWaze.visibility = View.VISIBLE
+        }
+
+        // Hide contactPersonTextView if empty
+        if (holder.contactPersonTextView.text.toString().trim().isEmpty()) {
+            holder.contactPersonTextView.visibility = View.GONE
+            holder.contactLabel.visibility = View.GONE
+        } else {
+            holder.contactPersonTextView.visibility = View.VISIBLE
+            holder.contactLabel.visibility = View.VISIBLE
         }
     }
 

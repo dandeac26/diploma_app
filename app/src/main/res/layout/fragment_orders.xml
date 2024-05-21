@@ -2,8 +2,57 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:padding="10dp"
+        android:background="@color/product_header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
 
+        <EditText
+            android:id="@+id/searchBar"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
+            android:hint="@string/search_hint"
+            android:inputType="text"
+            android:padding="8dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/search_bar_background"
+            android:drawableStart="@drawable/search_small"
+            android:drawablePadding="8dp"
+            tools:ignore="RtlSymmetry"/>
+
+        <Button
+            android:id="@+id/addOrdersButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/new_50"
+            android:contentDescription="@string/add_product" />
+
+        <Button
+            android:id="@+id/deleteAllButton"
+            android:layout_marginTop="3dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/delete_all_img"
+            android:contentDescription="@string/delete_all_button"
+            android:text="" />
+
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

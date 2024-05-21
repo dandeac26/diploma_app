@@ -12,12 +12,14 @@ import android.view.ViewGroup
 import android.view.ViewStub
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -25,6 +27,8 @@ import com.example.myapplication.R
 import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.api.BakeryAPI
 import com.example.myapplication.entity.ProductDTO
+import com.example.myapplication.views.SharedViewModel
+import com.example.myapplication.views.SharedViewModelFactory
 import com.facebook.shimmer.ShimmerFrameLayout
 import retrofit2.Call
 import retrofit2.Callback
@@ -41,7 +45,7 @@ class ProductsFragment : Fragment() {
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val products = mutableListOf<Product>()
     private lateinit var shimmerViewContainer: ShimmerFrameLayout
-
+    private lateinit var sharedViewModel: SharedViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,6 +55,9 @@ class ProductsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val factory = SharedViewModelFactory()
+        sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
 
         productAdapter = ProductAdapter(products, bakeryAPI, this)
 
@@ -78,6 +85,20 @@ class ProductsFragment : Fragment() {
         val deleteAllButton = view.findViewById<Button>(R.id.deleteAllButton)
         deleteAllButton.setOnClickListener {
             deleteAllProducts()
+        }
+
+        sharedViewModel.refreshProductsTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
+            if (shouldRefresh) {
+                fetchProducts()
+            }
+        }
+        sharedViewModel.onBackPressed.observe(viewLifecycleOwner) {
+            val searchBar = view.findViewById<EditText>(R.id.searchBar)
+            if (searchBar.isFocused) {
+                searchBar.clearFocus()
+                val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                inputMethodManager?.hideSoftInputFromWindow(searchBar.windowToken, 0)
+            }
         }
     }
 

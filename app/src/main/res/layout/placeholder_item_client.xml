@@ -9,47 +9,47 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginStart="1dp"
-        android:padding="13dp">
+        android:layout_marginStart="2dp"
+        android:padding="12dp">
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="112dp"
             android:background="@drawable/rounded_corners_placeholder"/>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="112dp"
             android:background="@drawable/rounded_corners_placeholder"
             android:layout_marginTop="6dp"/>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="112dp"
             android:background="@drawable/rounded_corners_placeholder"
             android:layout_marginTop="6dp"/>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="112dp"
             android:background="@drawable/rounded_corners_placeholder"
             android:layout_marginTop="6dp"/>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="112dp"
             android:background="@drawable/rounded_corners_placeholder"
             android:layout_marginTop="6dp"/>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="112dp"
             android:background="@drawable/rounded_corners_placeholder"
             android:layout_marginTop="6dp"/>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="75dp"
+            android:layout_height="112dp"
             android:background="@drawable/rounded_corners_placeholder"
             android:layout_marginTop="6dp"/>
 

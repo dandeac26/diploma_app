@@ -8,7 +8,7 @@
     <string name="products">Products</string>
     <string name="home">Home</string>
     <string name="delete_all">Delete All</string>
-    <string name="there_are_no_products">There are no products.</string>
+    <string name="there_are_no_items">There are no items.</string>
     <string name="no_products_image_description">No products image</string>
     <string name="preview_image">Preview Image</string>
     <string name="open_waze">Open Waze</string>
@@ -18,10 +18,14 @@
     <string name="image_url">Image URL</string>
     <string name="price">Price</string>
     <string name="name">Name</string>
-    <string name="firmname">FirmName</string>
-    <string name="phonenumber">PhoneNumber</string>
-    <string name="contactperson">ContactPerson</string>
-    <string name="address">Address</string>
+    <string name="firm_name">Firm Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="contact_person">Contact Person</string>
+    <string name="address">Waze URL of location</string>
     <string name="coordinates">Coordinates</string>
-    <string name="firm_name">Firm name *</string>
+    <string name="firm_name_mandatory">Firm name *</string>
+    <string name="search_hint">Search</string>
+    <string name="delete_all_button">Delete All</string>
+    <string name="list_contact_person">Contact:</string>
+    <string name="location">Location:</string>
 </resources>
