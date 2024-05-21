@@ -17,4 +17,5 @@
     <color name="phone_container">#FFFFFF</color>
     <color name="item_button_color">#8C8C8C</color>
     <color name="client_list_item_background">#BCDFEAF4</color>
+    <color name="lineColor">#FFD3D3D3</color>
 </resources>

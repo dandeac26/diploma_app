@@ -35,6 +35,10 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
         val locationTextView: TextView = view.findViewById(R.id.locationTextView)
         val btnOpenWaze: ImageButton = view.findViewById(R.id.btnOpenWaze)
         val phoneNumberContainer: View = view.findViewById(R.id.phoneNumberContainer)
+        val dividerLine: View = view.findViewById(R.id.dividerLine)
+        val addressManualTextView: TextView = view.findViewById(R.id.addressManualTextView)
+        val addressManualLabel: TextView = view.findViewById(R.id.addressManualLabel)
+        val detailsContainer: View = view.findViewById(R.id.detailsContainer)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClientViewHolder {
@@ -51,16 +55,9 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
         val (locationName, _) = fragment.extractLocationAndUrl(client.location)
         holder.locationTextView.text = locationName
         holder.btnOpenWaze.setOnClickListener {
-            // open google maps with the client's location
             fragment.openWazeLocation(client.location)
-            // Open Waze with the client's location
-//            client.latitude?.let { latitude ->
-//                client.longitude?.let { longitude ->
-//                    fragment.openWaze(latitude, longitude)
-//
-//                }
-//            }
         }
+        holder.addressManualTextView.text = client.address
         holder.itemView.setOnLongClickListener { v ->
             showPopupMenu(v, holder.adapterPosition)
             true
@@ -91,6 +88,24 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
         } else {
             holder.contactPersonTextView.visibility = View.VISIBLE
             holder.contactLabel.visibility = View.VISIBLE
+        }
+
+        if(holder.addressManualTextView.text.toString().trim().isEmpty()) {
+            holder.addressManualTextView.visibility = View.GONE
+            holder.addressManualLabel.visibility = View.GONE
+        }
+        else {
+            holder.addressManualTextView.visibility = View.VISIBLE
+            holder.addressManualLabel.visibility = View.VISIBLE
+        }
+
+        if(holder.contactPersonTextView.text.toString().trim().isEmpty() && holder.locationTextView.text.toString().trim().isEmpty() && holder.addressManualTextView.text.toString().trim().isEmpty()) {
+            holder.dividerLine.visibility = View.GONE
+            holder.detailsContainer.visibility = View.GONE
+        }
+        else {
+            holder.dividerLine.visibility = View.VISIBLE
+            holder.detailsContainer.visibility = View.VISIBLE
         }
     }
 

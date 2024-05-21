@@ -188,7 +188,7 @@ class ClientsFragment : Fragment() {
                 val url = newMatchResult.value
                 // For the new format, the location name might need to be fetched or processed differently
                 // Here, we set it to null as a placeholder
-                val locationName: String? = null
+                val locationName = "Check Waze for location!"
                 Pair(locationName, url)
             }
             else -> Pair(null, null) // No match found
@@ -219,7 +219,8 @@ class ClientsFragment : Fragment() {
         val phoneNumber: String,
         val location: String,
         val latitude: Double,
-        val longitude: Double
+        val longitude: Double,
+        val address: String
     )
     
     private val retrofit: Retrofit = Retrofit.Builder()
@@ -320,7 +321,8 @@ class ClientsFragment : Fragment() {
             dialogView.findViewById<EditText>(R.id.phoneNumberInput).setText(client.phoneNumber.toString())
             dialogView.findViewById<EditText>(R.id.contactPersonInput).setText(client.contactPerson)
             dialogView.findViewById<EditText>(R.id.locationInput).setText(client.location)
-            dialogView.findViewById<EditText>(R.id.coordinatesInput).setText("${client.latitude},${client.longitude}")
+//            dialogView.findViewById<EditText>(R.id.coordinatesInput).setText("${client.latitude},${client.longitude}")
+            dialogView.findViewById<EditText>(R.id.addressInput).setText(client.address)
         }
 
         dialogView.findViewById<Button>(R.id.saveButton).setOnClickListener {
@@ -341,16 +343,18 @@ class ClientsFragment : Fragment() {
             val contactPerson = dialogView.findViewById<EditText>(R.id.contactPersonInput).text.toString()
             val location = dialogView.findViewById<EditText>(R.id.locationInput).text.toString()
 
-            val coordinates = dialogView.findViewById<EditText>(R.id.coordinatesInput).text.toString()
-            val coordinatesSplit = coordinates.split(",")
-            var latitude: Double? = null
-            var longitude: Double? = null
-            if (coordinatesSplit.size >= 2) {
-                latitude = coordinatesSplit[0].takeIf { it.isNotEmpty() }?.toDouble()
-                longitude = coordinatesSplit[1].takeIf { it.isNotEmpty() }?.toDouble()
-            }
+//            val coordinates = dialogView.findViewById<EditText>(R.id.coordinatesInput).text.toString()
+//            val coordinatesSplit = coordinates.split(",")
+            val latitude: Double? = null
+            val longitude: Double? = null
+//            if (coordinatesSplit.size >= 2) {
+//                latitude = coordinatesSplit[0].takeIf { it.isNotEmpty() }?.toDouble()
+//                longitude = coordinatesSplit[1].takeIf { it.isNotEmpty() }?.toDouble()
+//            }
 
-            val newClient = ClientDTO(firmName, contactPerson, phoneNumber, location, latitude ?: 0.0, longitude ?: 0.0)
+            val address = dialogView.findViewById<EditText>(R.id.addressInput).text.toString()
+
+            val newClient = ClientDTO(firmName, contactPerson, phoneNumber, location, latitude ?: 0.0, longitude ?: 0.0, address)
 
             if (client == null) {
                 addClient(newClient) { errorMessage ->

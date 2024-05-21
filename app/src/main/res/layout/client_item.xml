@@ -26,6 +26,22 @@
         tools:ignore="RtlSymmetry,SpUsage"
         tools:text="Client Firm Name" />
 
+    <View
+        android:id="@+id/dividerLine"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/lineColor"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/detailsContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/firmNameTextView" />
+
     <LinearLayout
         android:id="@+id/phoneNumberContainer"
         android:layout_width="wrap_content"
@@ -33,6 +49,7 @@
         android:orientation="horizontal"
         android:background="@drawable/rounded_phone"
         android:padding="4dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toBottomOf="@id/firmNameTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/firmNameTextView"
@@ -63,69 +80,110 @@
     </LinearLayout>
 
 
-    <TextView
-        android:id="@+id/addressLabel"
-        android:layout_width="80dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/detailsContainer"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_regular"
-        android:paddingStart="8dp"
-        android:text="@string/location"
-        android:textColor="@color/item_button_color"
-        android:textSize="15sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contactPersonTextView"
-        tools:ignore="RtlSymmetry" />
+        android:layout_marginTop="10dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/dividerLine"
+        app:layout_constraintStart_toStartOf="parent">
 
-    <TextView
-        android:id="@+id/locationTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:paddingStart="8dp"
-        android:textSize="15sp"
-        android:textStyle="normal"
-        app:layout_constraintEnd_toStartOf="@+id/btnOpenWaze"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/addressLabel"
-        app:layout_constraintTop_toBottomOf="@+id/contactPersonTextView"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/addressManualLabel"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/roboto_regular"
+            android:paddingStart="8dp"
+            android:text="Address:"
+            android:textColor="@color/item_button_color"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/contactLabel"
+            tools:ignore="RtlSymmetry" />
 
-    <TextView
-        android:id="@+id/contactLabel"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_regular"
-        android:text="@string/list_contact_person"
-        android:textColor="@color/item_button_color"
-        android:textSize="15sp"
-        android:paddingStart="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/firmNameTextView"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/addressManualTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:paddingStart="8dp"
+            android:textSize="15sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toStartOf="@+id/btnOpenWaze"
+            app:layout_constraintStart_toEndOf="@+id/addressManualLabel"
+            app:layout_constraintTop_toBottomOf="@+id/contactPersonTextView"
+            tools:ignore="RtlSymmetry" />
 
-    <TextView
-        android:id="@+id/contactPersonTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_regular"
-        android:paddingStart="8dp"
-        android:paddingBottom="3dp"
-        android:textSize="15sp"
-        android:textStyle="normal"
-        app:layout_constraintEnd_toEndOf="@+id/locationTextView"
-        app:layout_constraintStart_toEndOf="@+id/contactLabel"
-        app:layout_constraintTop_toBottomOf="@+id/firmNameTextView"
-        tools:ignore="RtlSymmetry" />
+        <TextView
+            android:id="@+id/addressLabel"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:fontFamily="@font/roboto_regular"
+            android:paddingStart="8dp"
+            android:text="@string/location"
+            android:textColor="@color/item_button_color"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/addressManualLabel"
+            tools:ignore="RtlSymmetry" />
 
-    <ImageButton
-        android:id="@+id/btnOpenWaze"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="?android:attr/selectableItemBackground"
-        android:contentDescription="@string/open_waze"
-        android:scaleType="fitCenter"
-        android:src="@drawable/waze_lightblue"
-        app:layout_constraintBottom_toBottomOf="@+id/locationTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contactPersonTextView" />
+        <TextView
+            android:id="@+id/locationTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:paddingStart="8dp"
+            android:textSize="15sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toStartOf="@+id/btnOpenWaze"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/addressLabel"
+            app:layout_constraintTop_toBottomOf="@+id/addressManualLabel"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/contactLabel"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_regular"
+            android:paddingStart="8dp"
+            android:text="@string/list_contact_person"
+            android:textColor="@color/item_button_color"
+            android:textSize="15sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/detailsContainer"
+            tools:ignore="RtlSymmetry" />
+
+        <TextView
+            android:id="@+id/contactPersonTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_regular"
+            android:paddingStart="8dp"
+            android:textSize="15sp"
+            android:textStyle="normal"
+            app:layout_constraintEnd_toEndOf="@+id/locationTextView"
+            app:layout_constraintStart_toEndOf="@+id/contactLabel"
+            app:layout_constraintTop_toTopOf="@+id/detailsContainer"
+            tools:ignore="RtlSymmetry" />
+
+        <ImageButton
+            android:id="@+id/btnOpenWaze"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="16dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="@string/open_waze"
+            android:scaleType="fitCenter"
+            android:src="@drawable/waze_lightblue"
+            app:layout_constraintBottom_toBottomOf="@+id/locationTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/locationTextView"
+            app:layout_constraintVertical_bias="0.55" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
