@@ -33,6 +33,7 @@
             android:layout_marginEnd="8dp"
             android:background="@drawable/search_bar_background"
             android:drawableStart="@drawable/search_small"
+            android:drawableEnd="@drawable/close_16"
             android:drawablePadding="8dp"
             tools:ignore="RtlSymmetry"/>
 

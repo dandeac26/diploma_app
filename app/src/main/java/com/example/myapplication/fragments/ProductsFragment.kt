@@ -109,8 +109,11 @@ class ProductsFragment : Fragment() {
         val imageUrl: String
     )
 
+    private val baseUrlHome = "http://192.168.68.56:8080/"
+    private val baseUrlMobile = "http://192.168.197.62:8080"
+
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.68.56:8080/")
+        .baseUrl(baseUrlMobile)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 

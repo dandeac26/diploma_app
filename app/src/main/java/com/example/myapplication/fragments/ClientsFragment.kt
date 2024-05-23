@@ -14,8 +14,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
@@ -57,6 +60,9 @@ class ClientsFragment : Fragment() {
     private val clients = mutableListOf<Client>()
     private lateinit var shimmerViewContainer: ShimmerFrameLayout
     private lateinit var sharedViewModel: SharedViewModel
+
+    private val allClients = mutableListOf<Client>()
+    private val displayedClients = mutableListOf<Client>()
 
 
     override fun onCreateView(
@@ -123,7 +129,53 @@ class ClientsFragment : Fragment() {
             }
         }
 
+        val searchBar = view.findViewById<EditText>(R.id.searchBar)
+        searchBar.setOnTouchListener { v, event ->
+            val DRAWABLE_RIGHT = 2
 
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableStart = searchBar.right - searchBar.compoundDrawables[DRAWABLE_RIGHT].bounds.width() - 50 // Subtract 50 or any other value that works for you
+                if (event.rawX >= drawableStart) {
+                    searchBar.text.clear()
+                    searchBar.clearFocus() // Clear focus
+                    val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    inputMethodManager?.hideSoftInputFromWindow(searchBar.windowToken, 0) // Hide keyboard
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
+        searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                // No action needed here
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                // No action needed here
+            }
+
+            override fun afterTextChanged(s: Editable) {
+                filterClients(s.toString())
+            }
+        })
+
+
+    }
+
+    fun removeClientFromSearchLists(clientId: String) {
+        allClients.removeAll { it.clientId == clientId }
+        displayedClients.removeAll { it.clientId == clientId }
+    }
+    private fun filterClients(query: String) {
+        val filteredClients = allClients.filter { client ->
+            client.firmName.contains(query, ignoreCase = true) ||
+            client.contactPerson.contains(query, ignoreCase = true) ||
+            client.address.contains(query, ignoreCase = true)
+        }
+
+        displayedClients.clear()
+        displayedClients.addAll(filteredClients)
+        clientAdapter.updateClientsAfterSearch(displayedClients)
     }
 
     fun openWaze(latitude: Double, longitude: Double) {
@@ -224,9 +276,10 @@ class ClientsFragment : Fragment() {
         val longitude: Double,
         val address: String
     )
-    
+    private val baseUrlHome = "http://192.168.68.56:8080/"
+    private val baseUrlMobile = "http://192.168.197.62:8080"
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.68.56:8080/")
+        .baseUrl(baseUrlMobile)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
@@ -273,9 +326,16 @@ class ClientsFragment : Fragment() {
                 if (response.isSuccessful) {
                     val clientsResponse = response.body()
                     if (clientsResponse != null) {
-                        clients.clear()
-                        clients.addAll(clientsResponse)
-                        clients.reverse()
+                        allClients.clear()
+                        allClients.addAll(clientsResponse)
+                        allClients.reverse()
+
+                        displayedClients.clear()
+                        displayedClients.addAll(allClients)
+                        clientAdapter.updateClientsAfterSearch(displayedClients)
+
+                        val searchBar = view?.findViewById<EditText>(R.id.searchBar)
+                        searchBar?.text?.clear()
                     }
                 }
                 swipeRefreshLayout.isRefreshing = false
@@ -318,7 +378,7 @@ class ClientsFragment : Fragment() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_client, null)
         val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
-            .setTitle(if (client == null) "Add Client" else "Update Client")
+            .setTitle(if (client == null) "Add Client" else "Client Information")
 
         val alertDialog = builder.show()
 
@@ -440,4 +500,6 @@ class ClientsFragment : Fragment() {
         ContextCompat.getSystemService(requireContext(), ClipboardManager::class.java)
             ?.setPrimaryClip(clip)
     }
+
+
 }

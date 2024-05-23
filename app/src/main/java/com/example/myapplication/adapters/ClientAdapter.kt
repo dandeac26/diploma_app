@@ -150,6 +150,8 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
                         if (response.isSuccessful) {
                             clients.removeAt(position)
                             notifyItemRemoved(position)
+
+                            fragment.removeClientFromSearchLists(client.clientId)
                         } else {
                             // handle the error
                         }
@@ -166,5 +168,12 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
     private fun updateClient(position: Int) {
         val client = clients[position]
         fragment.openAddClientDialog(client)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateClientsAfterSearch(newClients: List<Client>) {
+        clients.clear()
+        clients.addAll(newClients)
+        notifyDataSetChanged()
     }
 }
