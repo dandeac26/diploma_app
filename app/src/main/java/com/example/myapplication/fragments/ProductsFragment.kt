@@ -113,7 +113,7 @@ class ProductsFragment : Fragment() {
     private val baseUrlMobile = "http://192.168.197.62:8080"
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(baseUrlMobile)
+        .baseUrl(baseUrlHome)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 

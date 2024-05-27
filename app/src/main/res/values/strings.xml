@@ -29,4 +29,5 @@
     <string name="delete_all_button">Delete All</string>
     <string name="list_contact_person">Contact:</string>
     <string name="location">Location:</string>
+    <string name="upload_excel_file">Upload Excel File</string>
 </resources>
