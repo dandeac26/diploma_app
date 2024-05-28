@@ -48,7 +48,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val closeSettingsPreference = findPreference<Preference>("closeSettings")
         closeSettingsPreference?.setOnPreferenceClickListener {
-            parentFragmentManager.popBackStack()
+            activity?.onBackPressed()
             true
         }
     }

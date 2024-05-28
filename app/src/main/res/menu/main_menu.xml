@@ -6,16 +6,4 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/menu_home"
-        android:title="Home" />
-    <item
-        android:id="@+id/menu_products"
-        android:title="Products" />
-    <item
-        android:id="@+id/menu_orders"
-        android:title="Orders" />
-    <item
-        android:id="@+id/menu_recipes"
-        android:title="Recipes" />
 </menu>

@@ -28,6 +28,7 @@ import com.example.myapplication.fragments.SettingsFragment
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.util.LinkedList
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +36,16 @@ class MainActivity : AppCompatActivity() {
     private var currentFragment: Fragment? = null
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
+    private val fragmentToMenuItem = mapOf(
+        HomeFragment::class.java to R.id.nav_home,
+        ProductsFragment::class.java to R.id.nav_products,
+        OrdersFragment::class.java to R.id.nav_orders,
+        RecipesFragment::class.java to R.id.nav_recipes,
+        ClientsFragment::class.java to R.id.nav_clients
+    )
+
+    private val fragmentHistory = LinkedList<Fragment>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -78,6 +89,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun switchFragment(fragment: Fragment) {
+        if (fragmentHistory.isEmpty() || fragment::class.java != fragmentHistory.last::class.java) {
+            // If the fragment is not the current fragment, add it to the history
+            fragmentHistory.add(fragment)
+        }
+
+
         val fragmentTag = fragment::class.java.simpleName
 
         val transaction = supportFragmentManager.beginTransaction()
@@ -92,7 +109,7 @@ class MainActivity : AppCompatActivity() {
         if (newFragment == null) {
             // If not found, add it
             transaction.add(R.id.fragment_container, fragment, fragmentTag)
-                .addToBackStack(null)
+
             newFragment = fragment
         } else {
             // If found, show it
@@ -140,10 +157,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            R.id.menu_products -> {
-                // do sth
-                true
-            }
             R.id.action_settings -> {
                 switchFragment(SettingsFragment())
                 true
@@ -171,5 +184,24 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
         sharedViewModel.handleBackPress()
+        if (fragmentHistory.size > 1) {
+            // Remove the current fragment from the history
+            fragmentHistory.removeLast()
+
+            // Get the previous fragment
+            val previousFragment = fragmentHistory.last
+
+            switchFragment(previousFragment)
+
+            val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+            val menuItemId = fragmentToMenuItem[previousFragment::class.java]
+            if (menuItemId != null) {
+                bottomNavigation.selectedItemId = menuItemId
+            }
+
+        } else {
+            // If there's only one fragment in the history, let the system handle the back press
+            super.onBackPressed()
+        }
     }
 }
