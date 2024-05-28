@@ -30,4 +30,5 @@
     <string name="list_contact_person">Contact:</string>
     <string name="location">Location:</string>
     <string name="upload_excel_file">Upload Excel File</string>
+    <string name="action_settings">Settings</string>
 </resources>

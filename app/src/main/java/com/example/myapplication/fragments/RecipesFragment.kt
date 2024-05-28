@@ -20,6 +20,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import com.example.myapplication.api.IngredientAPI
+import com.example.myapplication.config.RetrofitInstance
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -35,7 +36,7 @@ import java.io.FileOutputStream
 class RecipesFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
     private val FILE_PICKER_REQUEST = 1
-
+    private lateinit var ingredientAPI: IngredientAPI
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -87,17 +88,6 @@ class RecipesFragment : Fragment() {
         }
     }
 
-    object RetrofitInstance {
-        private val baseUrlHome = "http://192.168.68.56:8080/"
-        private val baseUrlMobile = "http://192.168.197.62:8080"
-
-        val instance: Retrofit by lazy {
-            Retrofit.Builder()
-                .baseUrl(baseUrlHome)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-        }
-    }
     private fun uploadFile(fileUri: Uri) {
         val parcelFileDescriptor = requireContext().contentResolver.openFileDescriptor(fileUri, "r", null)
         val inputStream = FileInputStream(parcelFileDescriptor?.fileDescriptor)
@@ -107,7 +97,9 @@ class RecipesFragment : Fragment() {
 
         val requestFile = file.asRequestBody("multipart/form-data".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
-        val ingredientAPI = RetrofitInstance.instance.create(IngredientAPI::class.java)
+
+        ingredientAPI = RetrofitInstance.getInstance(requireContext()).create(IngredientAPI::class.java)
+
         val call = ingredientAPI.uploadIngredientsFile(body)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {

@@ -48,6 +48,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import androidx.lifecycle.ViewModelProvider
+import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.views.SharedViewModelFactory
 
 
@@ -64,6 +65,7 @@ class ClientsFragment : Fragment() {
     private val allClients = mutableListOf<Client>()
     private val displayedClients = mutableListOf<Client>()
 
+    private lateinit var clientAPI: ClientAPI
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,6 +78,7 @@ class ClientsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        clientAPI = RetrofitInstance.getInstance(requireContext()).create(ClientAPI::class.java)
 
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
@@ -201,21 +204,6 @@ class ClientsFragment : Fragment() {
         }
     }
 
-//    fun extractLocationAndUrl(sharedText: String): Pair<String?, String?> {
-//        val regexPattern = "https://waze.com/ul\\S+".toRegex()
-//        val matchResult = regexPattern.find(sharedText)
-//
-//        val url = matchResult?.value
-//        val prefix = "Use Waze to drive to "
-//        val suffix = ":"
-//
-//        val locationName = matchResult?.range?.let { range ->
-//            sharedText.substring(0, range.first).trim().removePrefix(prefix).removeSuffix(suffix)
-//        }
-//
-//        return Pair(locationName, url)
-//    }
-
     fun extractLocationAndUrl(sharedText: String): Pair<String?, String?> {
         // Regex for old format
         val oldFormatRegex = "https://waze.com/ul\\S+".toRegex()
@@ -276,14 +264,9 @@ class ClientsFragment : Fragment() {
         val longitude: Double,
         val address: String
     )
-    private val baseUrlHome = "http://192.168.68.56:8080/"
-    private val baseUrlMobile = "http://192.168.197.62:8080"
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(baseUrlHome)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 
-    private val clientAPI: ClientAPI = retrofit.create(ClientAPI::class.java)
+
+
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

@@ -26,6 +26,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.R
 import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.api.BakeryAPI
+import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.entity.ProductDTO
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
@@ -46,6 +47,9 @@ class ProductsFragment : Fragment() {
     private val products = mutableListOf<Product>()
     private lateinit var shimmerViewContainer: ShimmerFrameLayout
     private lateinit var sharedViewModel: SharedViewModel
+
+    private lateinit var bakeryAPI: BakeryAPI
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -55,6 +59,8 @@ class ProductsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        bakeryAPI = RetrofitInstance.getInstance(requireContext()).create(BakeryAPI::class.java)
 
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
@@ -109,15 +115,8 @@ class ProductsFragment : Fragment() {
         val imageUrl: String
     )
 
-    private val baseUrlHome = "http://192.168.68.56:8080/"
-    private val baseUrlMobile = "http://192.168.197.62:8080"
 
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(baseUrlHome)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 
-    private val bakeryAPI: BakeryAPI = retrofit.create(BakeryAPI::class.java)
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

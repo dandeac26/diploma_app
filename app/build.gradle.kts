@@ -50,6 +50,7 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     implementation("com.github.bumptech.glide:glide:4.12.0")
+    implementation(libs.androidx.preference.ktx)
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
 
     implementation("com.facebook.shimmer:shimmer:0.5.0")

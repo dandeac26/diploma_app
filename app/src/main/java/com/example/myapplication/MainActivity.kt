@@ -3,7 +3,9 @@ package com.example.myapplication
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Rect
+import android.net.ConnectivityManager
 import com.example.myapplication.fragments.HomeFragment
 import android.os.Bundle
 import android.view.Menu
@@ -16,10 +18,13 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.myapplication.config.NetworkChangeReceiver
+import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.fragments.ClientsFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.fragments.RecipesFragment
+import com.example.myapplication.fragments.SettingsFragment
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -29,7 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     private var currentFragment: Fragment? = null
     private lateinit var sharedViewModel: SharedViewModel
-
+    private lateinit var networkChangeReceiver: NetworkChangeReceiver
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -37,6 +42,9 @@ class MainActivity : AppCompatActivity() {
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(this, factory).get(SharedViewModel::class.java)
 
+        networkChangeReceiver = NetworkChangeReceiver {
+            RetrofitInstance.getInstance(applicationContext)
+        }
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -84,6 +92,7 @@ class MainActivity : AppCompatActivity() {
         if (newFragment == null) {
             // If not found, add it
             transaction.add(R.id.fragment_container, fragment, fragmentTag)
+                .addToBackStack(null)
             newFragment = fragment
         } else {
             // If found, show it
@@ -135,6 +144,10 @@ class MainActivity : AppCompatActivity() {
                 // do sth
                 true
             }
+            R.id.action_settings -> {
+                switchFragment(SettingsFragment())
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -146,6 +159,12 @@ class MainActivity : AppCompatActivity() {
         sharedViewModel.refreshOrdersTrigger.value = true
         sharedViewModel.refreshRecipesTrigger.value = true
         sharedViewModel.refreshHomeTrigger.value = true
+        registerReceiver(networkChangeReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
     }
 
     @Deprecated("Deprecated in Java")
