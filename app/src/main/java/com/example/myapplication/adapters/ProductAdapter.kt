@@ -15,12 +15,13 @@ import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.api.BakeryAPI
 import com.example.myapplication.dialog.ImagePreviewDialog
 import com.example.myapplication.R
+import com.example.myapplication.fragments.ClientsFragment
 import de.hdodenhof.circleimageview.CircleImageView
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ProductAdapter(private val products: MutableList<Product>, private val bakeryAPI: BakeryAPI, private val fragment: ProductsFragment) : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
+class ProductAdapter(private val products: MutableList<Product>, private val bakeryAPI: BakeryAPI, private val fragment: ProductsFragment, private val onProductClickListener: OnProductClickListener) : RecyclerView.Adapter<ProductAdapter.ProductViewHolder>() {
 
     inner class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val productName: TextView = itemView.findViewById(R.id.productName)
@@ -31,6 +32,10 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.product_item, parent, false)
         return ProductViewHolder(itemView)
+    }
+
+    interface OnProductClickListener {
+        fun onProductClick(product: Product)
     }
 
     override fun getItemCount() = products.size
@@ -56,7 +61,8 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
         }
 
         holder.itemView.setOnClickListener {
-            fragment.openAddProductDialog(product)
+//            fragment.openAddProductDialog(product)
+            onProductClickListener.onProductClick(product)
         }
     }
 
@@ -92,6 +98,8 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
                         if (response.isSuccessful) {
                             products.removeAt(position)
                             notifyItemRemoved(position)
+
+                            fragment.removeProductFromSearchLists(product.productId)
                         } else {
                             // handle the error
                         }
@@ -105,8 +113,15 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
             .show()
     }
 
-    private fun updateProduct(position: Int) {
+    fun updateProduct(position: Int) {
         val product = products[position]
         fragment.openAddProductDialog(product)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateProductsAfterSearch(newProducts: List<Product>) {
+        products.clear()
+        products.addAll(newProducts)
+        notifyDataSetChanged()
     }
 }

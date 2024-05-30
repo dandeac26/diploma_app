@@ -1,29 +1,23 @@
 package com.example.myapplication
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Rect
 import android.net.ConnectivityManager
 import com.example.myapplication.fragments.HomeFragment
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.config.NetworkChangeReceiver
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.fragments.ClientsFragment
 import com.example.myapplication.fragments.OrdersFragment
+import com.example.myapplication.fragments.ProductDetailsFragment
 import com.example.myapplication.fragments.ProductsFragment
-import com.example.myapplication.fragments.RecipesFragment
+import com.example.myapplication.fragments.StocksFragment
 import com.example.myapplication.fragments.SettingsFragment
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
@@ -40,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         HomeFragment::class.java to R.id.nav_home,
         ProductsFragment::class.java to R.id.nav_products,
         OrdersFragment::class.java to R.id.nav_orders,
-        RecipesFragment::class.java to R.id.nav_recipes,
+        StocksFragment::class.java to R.id.nav_stocks,
         ClientsFragment::class.java to R.id.nav_clients
     )
 
@@ -66,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home -> HomeFragment()
                 R.id.nav_products -> ProductsFragment()
                 R.id.nav_orders -> OrdersFragment()
-                R.id.nav_recipes -> RecipesFragment()
+                R.id.nav_stocks -> StocksFragment()
                 R.id.nav_clients -> ClientsFragment()
                 else -> null
             }
@@ -84,16 +78,18 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun addFragmentToHistory(fragment: Fragment) {
+        fragmentHistory.add(fragment)
+    }
     fun updateTopNavTitle(title: String) {
         supportActionBar?.title = title
     }
-
+//    private var removedLast = false
     fun switchFragment(fragment: Fragment) {
         if (fragmentHistory.isEmpty() || fragment::class.java != fragmentHistory.last::class.java) {
             // If the fragment is not the current fragment, add it to the history
             fragmentHistory.add(fragment)
         }
-
 
         val fragmentTag = fragment::class.java.simpleName
 
@@ -105,6 +101,12 @@ class MainActivity : AppCompatActivity() {
 
         // Try to find the fragment in the FragmentManager
         var newFragment = supportFragmentManager.findFragmentByTag(fragmentTag)
+
+        if (newFragment != null && newFragment is ProductDetailsFragment) {
+            // If the fragment is a ProductDetailsFragment, remove it
+            transaction.remove(newFragment)
+            newFragment = null
+        }
 
         if (newFragment == null) {
             // If not found, add it
@@ -132,9 +134,9 @@ class MainActivity : AppCompatActivity() {
                 updateTopNavTitle("Orders")
             }
 
-            is RecipesFragment -> {
-                sharedViewModel.refreshRecipesTrigger.value = true
-                updateTopNavTitle("Recipes")
+            is StocksFragment -> {
+                sharedViewModel.refreshStocksTrigger.value = true
+                updateTopNavTitle("Stocks")
             }
 
             is ProductsFragment -> {
@@ -170,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         sharedViewModel.refreshClientsTrigger.value = true
         sharedViewModel.refreshProductsTrigger.value = true
         sharedViewModel.refreshOrdersTrigger.value = true
-        sharedViewModel.refreshRecipesTrigger.value = true
+        sharedViewModel.refreshStocksTrigger.value = true
         sharedViewModel.refreshHomeTrigger.value = true
         registerReceiver(networkChangeReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
     }
@@ -185,13 +187,20 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         sharedViewModel.handleBackPress()
         if (fragmentHistory.size > 1) {
+
             // Remove the current fragment from the history
+
             fragmentHistory.removeLast()
 
+            if(fragmentHistory.last is ProductDetailsFragment) {
+                fragmentHistory.removeLast()
+            }
             // Get the previous fragment
             val previousFragment = fragmentHistory.last
 
             switchFragment(previousFragment)
+
+
 
             val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
             val menuItemId = fragmentToMenuItem[previousFragment::class.java]

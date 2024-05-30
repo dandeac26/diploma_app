@@ -27,13 +27,11 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
 
-class RecipesFragment : Fragment() {
+class StocksFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
     private val FILE_PICKER_REQUEST = 1
     private lateinit var ingredientAPI: IngredientAPI
@@ -41,7 +39,7 @@ class RecipesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_recipes, container, false)
+        return inflater.inflate(R.layout.fragment_stocks, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,7 +50,7 @@ class RecipesFragment : Fragment() {
 
         sharedViewModel.refreshProductsTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {
-                fetchRecipes()
+                fetchStocks()
             }
         }
         sharedViewModel.onBackPressed.observe(viewLifecycleOwner) {
@@ -72,7 +70,7 @@ class RecipesFragment : Fragment() {
         }
     }
 
-    private fun fetchRecipes() {
+    private fun fetchStocks() {
 //        TODO("Not yet implemented")
     }
 

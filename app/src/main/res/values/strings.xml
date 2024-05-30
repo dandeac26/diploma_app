@@ -3,7 +3,7 @@
     <string name="update">Update</string>
     <string name="delete">Delete</string>
     <string name="add_product">New</string>
-    <string name="recipes">Recipes</string>
+    <string name="stocks">Stocks</string>
     <string name="orders">Orders</string>
     <string name="products">Products</string>
     <string name="home">Home</string>
@@ -31,4 +31,8 @@
     <string name="location">Location:</string>
     <string name="upload_excel_file">Upload Excel File</string>
     <string name="action_settings">Settings</string>
+    <string name="product_image">Product Image</string>
+    <string name="back_button">Back</string>
+    <string name="lei">lei</string>
+    <string name="edit_button">Edit Product</string>
 </resources>

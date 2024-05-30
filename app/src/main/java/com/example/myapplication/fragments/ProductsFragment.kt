@@ -5,8 +5,11 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
@@ -23,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.api.BakeryAPI
@@ -36,9 +40,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.Serializable
 
 
-class ProductsFragment : Fragment() {
+class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
 
     private lateinit var productAdapter: ProductAdapter
     private lateinit var recyclerView: RecyclerView
@@ -50,6 +55,9 @@ class ProductsFragment : Fragment() {
 
     private lateinit var bakeryAPI: BakeryAPI
 
+    private val allProducts = mutableListOf<Product>()
+    private val displayedProducts = mutableListOf<Product>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,6 +65,7 @@ class ProductsFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_products, container, false)
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -65,7 +74,7 @@ class ProductsFragment : Fragment() {
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
 
-        productAdapter = ProductAdapter(products, bakeryAPI, this)
+        productAdapter = ProductAdapter(products, bakeryAPI, this,  this)
 
         recyclerView = view.findViewById(R.id.recyclerView)
         emptyView = view.findViewById(R.id.emptyView)
@@ -106,16 +115,46 @@ class ProductsFragment : Fragment() {
                 inputMethodManager?.hideSoftInputFromWindow(searchBar.windowToken, 0)
             }
         }
+
+
+
+        val searchBar = view.findViewById<EditText>(R.id.searchBar)
+        searchBar.setOnTouchListener { v, event ->
+            val DRAWABLE_RIGHT = 2
+
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableStart = searchBar.right - searchBar.compoundDrawables[DRAWABLE_RIGHT].bounds.width() - 50
+                if (event.rawX >= drawableStart) {
+                    searchBar.text.clear()
+                    searchBar.clearFocus()
+                    val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    inputMethodManager?.hideSoftInputFromWindow(searchBar.windowToken, 0)
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
+        searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                // No action needed here
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                // No action needed here
+            }
+
+            override fun afterTextChanged(s: Editable) {
+                filterProducts(s.toString())
+            }
+        })
     }
 
     data class Product(
         val productId: String,
-        val name: String,
-        val price: Double,
-        val imageUrl: String
-    )
-
-
+        var name: String,
+        var price: Double,
+        var imageUrl: String
+    ):Serializable
 
 
     private fun isNetworkAvailable(): Boolean {
@@ -125,6 +164,40 @@ class ProductsFragment : Fragment() {
         return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
     }
 
+    private fun filterProducts(query: String) {
+        val filteredProducts = allProducts.filter { product ->
+            product.name.contains(query, ignoreCase = true) ||
+                    product.price.toString().contains(query, ignoreCase = true)
+        }
+
+        displayedProducts.clear()
+        displayedProducts.addAll(filteredProducts)
+        productAdapter.updateProductsAfterSearch(displayedProducts)
+    }
+
+    fun removeProductFromSearchLists(productId: String) {
+        allProducts.removeAll { it.productId == productId }
+        displayedProducts.removeAll { it.productId == productId }
+    }
+
+//    override fun onProductClick(product: Product) {
+//        val productDetailsFragment = ProductDetailsFragment().apply {
+//            arguments = Bundle().apply {
+//                putSerializable("product", product)
+//            }
+//        }
+//        MainActivity.switchFragment(productDetailsFragment)
+//    }
+    override fun onProductClick(product: Product) {
+        val productDetailsFragment = ProductDetailsFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable("product", product)
+            }
+        }
+//        (activity as MainActivity).addFragmentToHistory(productDetailsFragment)
+        (activity as MainActivity).switchFragment(productDetailsFragment)
+    }
+
     fun fetchProducts() {
         val call = bakeryAPI.getProducts()
         call.enqueue(object : Callback<List<Product>> {
@@ -132,9 +205,16 @@ class ProductsFragment : Fragment() {
                 if (response.isSuccessful) {
                     val productsResponse = response.body()
                     if (productsResponse != null) {
-                        products.clear()
-                        products.addAll(productsResponse)
-                        products.reverse()
+                        allProducts.clear()
+                        allProducts.addAll(productsResponse)
+                        allProducts.reverse()
+
+                        displayedProducts.clear()
+                        displayedProducts.addAll(allProducts)
+                        productAdapter.updateProductsAfterSearch(displayedProducts)
+
+                        val searchBar = view?.findViewById<EditText>(R.id.searchBar)
+                        searchBar?.text?.clear()
                     }
                 }
                 swipeRefreshLayout.isRefreshing = false
