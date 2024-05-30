@@ -139,7 +139,7 @@
             app:layout_constraintEnd_toStartOf="@+id/btnOpenWaze"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toEndOf="@+id/addressLabel"
-            app:layout_constraintTop_toBottomOf="@+id/addressManualLabel"
+            app:layout_constraintTop_toBottomOf="@+id/addressManualTextView"
             tools:ignore="RtlSymmetry" />
 
         <TextView
