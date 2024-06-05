@@ -44,6 +44,7 @@ package com.example.myapplication.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
@@ -58,6 +59,7 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>, privat
         val providerNameTextView: TextView = itemView.findViewById(R.id.providerNameTextView)
         val quantityTextView: TextView = itemView.findViewById(R.id.quantityTextView)
         val priceTextView: TextView = itemView.findViewById(R.id.priceTextView)
+        val stockProgressBar: ProgressBar = itemView.findViewById(R.id.stockProgressBar)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StockViewHolder {
@@ -73,5 +75,8 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>, privat
         holder.providerNameTextView.text = stock.providerName
         holder.quantityTextView.text = stock.quantity.toString()
         holder.priceTextView.text = stock.price
+
+        holder.stockProgressBar.max = stock.maxQuantity
+        holder.stockProgressBar.progress = stock.quantity
     }
 }

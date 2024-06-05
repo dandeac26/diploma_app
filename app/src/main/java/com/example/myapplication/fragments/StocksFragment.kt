@@ -132,7 +132,8 @@ class StocksFragment : Fragment() {
         val providerId: String,
         val providerName: String,
         var quantity: Int,
-        var price: String
+        var price: String,
+        var maxQuantity: Int
     ):Serializable
 
     private fun isNetworkAvailable(): Boolean {
