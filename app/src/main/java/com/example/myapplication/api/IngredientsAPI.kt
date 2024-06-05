@@ -1,6 +1,7 @@
 package com.example.myapplication.api
 
 import com.example.myapplication.entity.IngredientDTO
+import com.example.myapplication.fragments.StocksFragment
 //import com.example.myapplication.fragments.IngredientsFragment
 import retrofit2.Call
 import retrofit2.http.Body
@@ -11,8 +12,8 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface IngredientsAPI {
-//    @GET("ingredients")
-//    fun getIngredients(): Call<List<IngredientsFragment.Ingredient>>
+    @GET("ingredients")
+    fun getIngredients(): Call<List<StocksFragment.Ingredient>>
 
     @DELETE("ingredients/{ingredientId}")
     fun deleteIngredient(@Path("ingredientId") ingredientsId: String): Call<Void>

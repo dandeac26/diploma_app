@@ -17,6 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+
         <EditText
             android:id="@+id/searchBar"
             android:layout_width="0dp"
@@ -30,6 +31,7 @@
             android:layout_marginEnd="8dp"
             android:background="@drawable/search_bar_background"
             android:drawableStart="@drawable/search_small"
+            android:drawableEnd="@drawable/close_16"
             android:drawablePadding="8dp"
             tools:ignore="RtlSymmetry"/>
 
@@ -37,21 +39,22 @@
             android:id="@+id/addStockButton"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginStart="4dp"
             android:layout_marginTop="3dp"
+            android:layout_marginStart="4dp"
             android:layout_marginEnd="10dp"
             android:background="@drawable/new_50"
             android:contentDescription="@string/add_product" />
 
         <Button
             android:id="@+id/deleteAllButton"
+            android:layout_marginTop="3dp"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginTop="3dp"
             android:layout_marginEnd="6dp"
             android:background="@drawable/delete_all_img"
             android:contentDescription="@string/delete_all_button"
             android:text="" />
+
 
     </LinearLayout>
 
