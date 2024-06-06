@@ -208,6 +208,7 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
                         allProducts.clear()
                         allProducts.addAll(productsResponse)
                         allProducts.reverse()
+                        recyclerView.scrollToPosition(0)
 
                         displayedProducts.clear()
                         displayedProducts.addAll(allProducts)

@@ -1,9 +1,14 @@
 package com.example.myapplication.adapters
 
+import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.View
@@ -26,7 +31,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, private val clientAPI: ClientAPI, private val fragment: ClientsFragment) : RecyclerView.Adapter<ClientAdapter.ClientViewHolder>() {
-
+    private var highlightedPosition = -1
     class ClientViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val firmNameTextView: TextView = view.findViewById(R.id.firmNameTextView)
         val contactLabel: TextView = view.findViewById(R.id.contactLabel)
