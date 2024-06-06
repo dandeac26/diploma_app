@@ -404,12 +404,12 @@ class StocksFragment : Fragment() {
             } else {
                 val oldStock = stocks.find { it.ingredientId == ingredientId && it.providerId == providerId }
 
-                if (oldStock != null && oldStock.quantity == quantityInt && oldStock.price == priceDouble.toString() && oldStock.maxQuantity == maxQuantityInt) {
+                if (oldStock != null && newStock.providerId == oldStock.providerId && oldStock.quantity == quantityInt && oldStock.price == priceDouble.toString() && oldStock.maxQuantity == maxQuantityInt) {
                     // The stock data hasn't changed, so skip the update and the animation
                     alertDialog.dismiss()
                     return@setOnClickListener
                 }
-                updateStock(stock.ingredientId, stock.providerId, newStock) { errorMessage ->
+                updateStock(newStock.ingredientId, newStock.providerId, newStock) { errorMessage ->
                     if (errorMessage != null) {
                         val errorMessageTextView =
                             dialogView.findViewById<TextView>(R.id.errorMessage)
