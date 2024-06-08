@@ -198,7 +198,7 @@ class StocksFragment : Fragment() {
     }
 
 
-    fun fetchStocks() {
+    fun fetchStocks(callback: (() -> Unit)? = null) {
         val call = stockAPI.getStocks()
         call.enqueue(object : Callback<Map<String, List<Stock>>> {
             override fun onResponse(call: Call<Map<String, List<Stock>>>, response: Response<Map<String, List<Stock>>>) {
@@ -421,6 +421,10 @@ class StocksFragment : Fragment() {
                         errorMessageTextView.text = errorMessage
                         errorMessageTextView.visibility = View.VISIBLE
                     } else {
+//                        if (updatingStockPosition != -1) {
+//                            stockAdapter.highlightItem(updatingStockPosition)
+//                            updatingStockPosition = -1  // Reset the position
+//                        }
                         alertDialog.dismiss()
                     }
                 }
@@ -463,16 +467,19 @@ class StocksFragment : Fragment() {
                 if (response.isSuccessful) {
                     callback(null)
                     fetchStocks()
-                    if (updatingStockPosition != -1) {
-                        stockAdapter.highlightItem(updatingStockPosition)
-                        updatingStockPosition = -1  // Reset the position
-                    }
+                    // notify the user the update was successful
+                    Toast.makeText(context, "Stock updated successfully", Toast.LENGTH_SHORT).show()
+//                    if (updatingStockPosition != -1) {
+//                        stockAdapter.highlightItem(updatingStockPosition)
+//                        updatingStockPosition = -1  // Reset the position
+//                    }
                 } else {
-                    if(response.code() == 400) {
+                    if (response.code() == 400) {
                         callback(response.errorBody()?.string())
                     }
                 }
             }
+
             override fun onFailure(call: Call<Void>, t: Throwable) {
                 // Handle the error
             }

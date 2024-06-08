@@ -17,7 +17,7 @@
 
     <Preference
         app:key="restartApp"
-        app:title="Restart App" />
+        app:title="Apply" />
 
     <Preference
         app:key="closeSettings"
