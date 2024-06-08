@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import com.example.myapplication.R
 import com.example.myapplication.adapters.ClientAdapter
 import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.api.BakeryAPI
+import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.entity.ProductDTO
 import com.example.myapplication.fragments.ProductsFragment.Product
@@ -36,6 +38,7 @@ class ProductDetailsFragment : Fragment() {
     private lateinit var productPrice: TextView
     private lateinit var recipeTable: TableLayout
     private lateinit var bakeryAPI: BakeryAPI
+    private lateinit var recipeAPI: RecipeAPI
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -43,6 +46,9 @@ class ProductDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_product_details, container, false)
+
+        bakeryAPI = RetrofitInstance.getInstance(requireContext()).create(BakeryAPI::class.java)
+        recipeAPI = RetrofitInstance.getInstance(requireContext()).create(RecipeAPI::class.java)
 
         productImage = view.findViewById(R.id.productImage)
         productName = view.findViewById(R.id.productName)
@@ -64,7 +70,6 @@ class ProductDetailsFragment : Fragment() {
             requireActivity().onBackPressed()
         }
 
-        bakeryAPI = RetrofitInstance.getInstance(requireContext()).create(BakeryAPI::class.java)
 
         val editButton = view.findViewById<View>(R.id.editButton)
         editButton.setOnClickListener {
@@ -76,6 +81,16 @@ class ProductDetailsFragment : Fragment() {
             deleteProduct(product!!) 
         }
     }
+
+    data class Recipe (
+        val productId: String,
+        val ingredientId: String,
+        val ingredientName: String,
+        val quantity: Double,
+        val ingredientMeasurementUnit: String
+    )
+
+
     fun setProductDetails(product: Product) {
         Glide.with(productImage.context)
             .load(product.imageUrl)
@@ -85,7 +100,32 @@ class ProductDetailsFragment : Fragment() {
         productPrice.text = product.price.toString()
 
         // Populate the recipeTable with the recipe information
-        // This depends on the structure of your Product and Recipe classes
+        val call = recipeAPI.getRecipeOfProduct(product.productId)
+        call.enqueue(object : Callback<List<Recipe>> {
+            @SuppressLint("MissingInflatedId", "InflateParams")
+            override fun onResponse(call: Call<List<Recipe>>, response: Response<List<Recipe>>) {
+                if (response.isSuccessful) {
+                    Log.d("API_RESPONSE", "Response Body: ${response.body()}")
+
+                    val recipes = response.body()
+                    if (!recipes.isNullOrEmpty()) {
+                        for (recipe in recipes) {
+                            val row = layoutInflater.inflate(R.layout.recipe_row, null)
+                            row.findViewById<TextView>(R.id.ingredientName).text = recipe.ingredientName // replace with function to get ingredient name
+                            row.findViewById<TextView>(R.id.quantity).text = recipe.quantity.toString()
+                            row.findViewById<TextView>(R.id.measurementUnit).text = recipe.ingredientMeasurementUnit
+                            recipeTable.addView(row)
+                        }
+                    } else {
+                        val recipeTitle = view?.findViewById<TextView>(R.id.recipeTitle)
+                        recipeTitle?.text = "No recipe yet"
+                    }
+                }
+            }
+            override fun onFailure(call: Call<List<Recipe>>, t: Throwable) {
+                // Handle the error
+            }
+        })
     }
 
     @SuppressLint("InflateParams", "MissingInflatedId")

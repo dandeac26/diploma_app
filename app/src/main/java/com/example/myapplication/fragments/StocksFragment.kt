@@ -295,6 +295,8 @@ class StocksFragment : Fragment() {
         val ingredientSpinner = dialogView.findViewById<Spinner>(R.id.ingredientNameInput)
         val providerSpinner = dialogView.findViewById<Spinner>(R.id.providerNameInput)
 
+
+
         // Fetch the ingredients and set them to the ingredientSpinner
         val ingredientCall = ingredientsAPI.getIngredients()
         ingredientCall.enqueue(object : Callback<List<Ingredient>> {
@@ -347,6 +349,9 @@ class StocksFragment : Fragment() {
         })
 
         if (stock != null) {
+            ingredientSpinner.isEnabled = false
+            providerSpinner.isEnabled = false
+
             dialogView.findViewById<EditText>(R.id.quantityInput).setText(stock.quantity.toString())
             dialogView.findViewById<EditText>(R.id.priceInput).setText(stock.price)
             dialogView.findViewById<EditText>(R.id.maxQuantityInput).setText(stock.maxQuantity.toString())
