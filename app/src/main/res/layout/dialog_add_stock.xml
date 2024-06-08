@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -10,46 +11,126 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/holo_red_dark"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/ingredientNameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Ingredient Name: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/errorMessage" />
 
     <Spinner
         android:id="@+id/ingredientNameInput"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/name" />
+        android:hint="@string/name"
+        app:layout_constraintBottom_toBottomOf="@id/ingredientNameLabel"
+        app:layout_constraintStart_toEndOf="@id/ingredientNameLabel"
+        app:layout_constraintTop_toTopOf="@id/ingredientNameLabel" />
+
+    <TextView
+        android:id="@+id/providerNameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Provider Name: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ingredientNameLabel" />
 
     <Spinner
         android:id="@+id/providerNameInput"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
         android:hint="@string/provider"
-         />
+        app:layout_constraintBottom_toBottomOf="@id/providerNameLabel"
+        app:layout_constraintStart_toEndOf="@id/providerNameLabel"
+        app:layout_constraintTop_toTopOf="@id/providerNameLabel" />
+
+    <TextView
+        android:id="@+id/stockQuantityLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Quantity: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/providerNameLabel" />
 
     <EditText
         android:id="@+id/quantityInput"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="39dp"
         android:hint="@string/quantity"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toBottomOf="@id/stockQuantityLabel"
+        app:layout_constraintStart_toEndOf="@id/stockQuantityLabel"
+        app:layout_constraintTop_toTopOf="@id/stockQuantityLabel"
+        app:layout_constraintVertical_bias="0.478" />
+
+    <TextView
+        android:id="@+id/stockPriceLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Price per unit: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stockQuantityLabel" />
 
     <EditText
         android:id="@+id/priceInput"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
         android:hint="@string/price"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toBottomOf="@id/stockPriceLabel"
+        app:layout_constraintStart_toEndOf="@id/stockPriceLabel"
+        app:layout_constraintTop_toTopOf="@id/stockPriceLabel"
+        app:layout_constraintVertical_bias="0.521" />
+
+    <TextView
+        android:id="@+id/stockMaxQuantityLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Max Quantity: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stockPriceLabel" />
 
     <EditText
         android:id="@+id/maxQuantityInput"
-        android:layout_width="match_parent"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
         android:hint="@string/max_quantity"
-        android:inputType="numberDecimal" />
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toBottomOf="@id/stockMaxQuantityLabel"
+        app:layout_constraintStart_toEndOf="@id/stockMaxQuantityLabel"
+        app:layout_constraintTop_toTopOf="@id/stockMaxQuantityLabel"
+        app:layout_constraintVertical_bias="0.521" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@id/stockMaxQuantityLabel"
         android:gravity="end">
 
         <Button
@@ -67,4 +148,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

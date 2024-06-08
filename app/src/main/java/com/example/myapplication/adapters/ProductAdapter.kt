@@ -44,7 +44,7 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val product = products[position]
         holder.productName.text = product.name
-        holder.productPrice.text = product.price.toString() + " lei"
+        holder.productPrice.text = product.price.toString()
 
         Glide.with(holder.productImage.context)
             .load(product.imageUrl)

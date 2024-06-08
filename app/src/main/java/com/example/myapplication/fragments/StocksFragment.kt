@@ -19,6 +19,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
@@ -100,9 +102,48 @@ class StocksFragment : Fragment() {
             openAddStockDialog()
         }
 
-        val deleteAllButton = view.findViewById<Button>(R.id.deleteAllButton)
-        deleteAllButton.setOnClickListener {
-            deleteAllStocks()
+//        val deleteAllButton = view.findViewById<Button>(R.id.deleteAllButton)
+//        deleteAllButton.setOnClickListener {
+//            deleteAllStocks()
+//        }
+        val menuButton = view.findViewById<ImageButton>(R.id.menuButton)
+        menuButton.setOnClickListener {
+            val popupMenu = PopupMenu(requireContext(), it)
+            popupMenu.menuInflater.inflate(R.menu.stocks_action_menu, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.deleteAll -> {
+                        deleteAllStocks()
+                        true
+                    }
+                    R.id.clearAll -> {
+                        // Implement clearAll functionality
+                        true
+                    }
+                    R.id.clearSelected -> {
+                        // Implement clearSelected functionality
+                        true
+                    }
+                    R.id.ingredients -> {
+                        // Navigate to IngredientsFragment
+                        true
+                    }
+                    R.id.providers -> {
+                        // Navigate to ProvidersFragment
+                        true
+                    }
+                    R.id.refill -> {
+                        // Implement refill functionality
+                        true
+                    }
+                    R.id.predictions -> {
+                        // Navigate to PredictionsFragment
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popupMenu.show()
         }
 
         sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
@@ -214,7 +255,6 @@ class StocksFragment : Fragment() {
                         displayedStocks.clear()
                         displayedStocks.addAll(allStocks)
                         stockAdapter.updateStocksAfterSearch(displayedStocks)
-
 
                         val searchBar = view?.findViewById<EditText>(R.id.searchBar)
                         searchBar?.text?.clear()
@@ -378,11 +418,20 @@ class StocksFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            try {
+                val quantityInt = quantityString.toInt()
+                val price = priceString.toDouble()
+                val maxQuantity = maxQuantityString.toInt()
+            } catch (e: NumberFormatException) {
+                Toast.makeText(context, "Input number is too large", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             val quantityInt = quantityString.toInt()
             val priceDouble = priceString.toDouble()
             val maxQuantityInt = maxQuantityString.toInt()
 
-            // get ingredientId from ingredientName
+
             val ingredientId = allStocks.find { it.ingredientName == ingredientNameString }?.ingredientId
             if (ingredientId == null) {
                 Toast.makeText(context, "Ingredient not found", Toast.LENGTH_SHORT).show()
@@ -404,6 +453,7 @@ class StocksFragment : Fragment() {
                         errorMessageTextView.text = errorMessage
                         errorMessageTextView.visibility = View.VISIBLE
                     } else {
+                        Toast.makeText(context, "Stock added successfully", Toast.LENGTH_SHORT).show()
                         alertDialog.dismiss()
                     }
                 }
@@ -411,7 +461,6 @@ class StocksFragment : Fragment() {
                 val oldStock = stocks.find { it.ingredientId == ingredientId && it.providerId == providerId }
 
                 if (oldStock != null && newStock.providerId == oldStock.providerId && oldStock.quantity == quantityInt && oldStock.price == priceDouble.toString() && oldStock.maxQuantity == maxQuantityInt) {
-                    // The stock data hasn't changed, so skip the update and the animation
                     alertDialog.dismiss()
                     return@setOnClickListener
                 }
@@ -422,10 +471,6 @@ class StocksFragment : Fragment() {
                         errorMessageTextView.text = errorMessage
                         errorMessageTextView.visibility = View.VISIBLE
                     } else {
-//                        if (updatingStockPosition != -1) {
-//                            stockAdapter.highlightItem(updatingStockPosition)
-//                            updatingStockPosition = -1  // Reset the position
-//                        }
                         alertDialog.dismiss()
                     }
                 }
@@ -470,10 +515,6 @@ class StocksFragment : Fragment() {
                     fetchStocks()
                     // notify the user the update was successful
                     Toast.makeText(context, "Stock updated successfully", Toast.LENGTH_SHORT).show()
-//                    if (updatingStockPosition != -1) {
-//                        stockAdapter.highlightItem(updatingStockPosition)
-//                        updatingStockPosition = -1  // Reset the position
-//                    }
                 } else {
                     if (response.code() == 400) {
                         callback(response.errorBody()?.string())

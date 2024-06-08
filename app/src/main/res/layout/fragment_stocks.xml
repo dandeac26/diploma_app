@@ -45,14 +45,14 @@
             android:background="@drawable/new_50"
             android:contentDescription="@string/add_product" />
 
-        <Button
-            android:id="@+id/deleteAllButton"
-            android:layout_marginTop="3dp"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+        <ImageButton
+            android:id="@+id/menuButton"
+            android:layout_marginTop="7dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginEnd="6dp"
-            android:background="@drawable/delete_all_img"
-            android:contentDescription="@string/delete_all_button"
+            android:background="@drawable/menu_50"
+            android:contentDescription="@string/open_menu"
             android:text="" />
 
 

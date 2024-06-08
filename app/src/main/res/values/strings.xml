@@ -45,4 +45,5 @@
     <string name="edit_recipe">Edit Recipe</string>
     <string name="no_recipe_yet">No recipe yet</string>
     <string name="delete_recipe">delete recipe</string>
+    <string name="open_menu">Open Menu</string>
 </resources>

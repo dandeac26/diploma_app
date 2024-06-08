@@ -72,6 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="3dp"
+                android:maxLength="7"
                 android:textSize="22sp"
                 app:layout_constraintEnd_toStartOf="@+id/currencyPrice"
                 app:layout_constraintTop_toTopOf="@+id/productName" />

@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/deleteAll"
+        android:title="Delete All" />
+    <item
+        android:id="@+id/clearAll"
+        android:title="Clear All" />
+    <item
+        android:id="@+id/clearSelected"
+        android:title="Clear Selected" />
+    <item
+        android:id="@+id/ingredients"
+        android:title="Ingredients" />
+    <item
+        android:id="@+id/providers"
+        android:title="Providers" />
+    <item
+        android:id="@+id/refill"
+        android:title="Refill" />
+    <item
+        android:id="@+id/predictions"
+        android:title="Predictions" />
+</menu>

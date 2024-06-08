@@ -26,28 +26,46 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/roboto_bold"
-        android:textSize="18sp"
+        android:gravity="center_vertical"
         android:paddingStart="8dp"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/productImage"
         app:layout_constraintStart_toEndOf="@id/productImage"
         app:layout_constraintEnd_toStartOf="@id/productPrice"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/productImage"
-        android:gravity="center_vertical"
-        tools:text="Product Name"
-        tools:ignore="RtlSymmetry,SpUsage" />
+        app:layout_constraintTop_toTopOf="@id/productImage"
+        tools:ignore="RtlSymmetry,SpUsage"
+        tools:text="Product Name" />
 
     <TextView
         android:id="@+id/productPrice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:ellipsize="end"
         android:fontFamily="@font/roboto_regular"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/productName"
-        app:layout_constraintBottom_toBottomOf="@id/productName"
         android:gravity="center_vertical"
+        android:maxLength="7"
+        android:paddingEnd="5dp"
+        android:singleLine="true"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/productName"
+        app:layout_constraintEnd_toStartOf="@+id/productPriceLabel"
+        app:layout_constraintTop_toTopOf="@id/productName"
+        tools:ignore="RtlSymmetry,SpUsage"
+        tools:text="$10.00" />
+
+    <TextView
+        android:id="@+id/productPriceLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_regular"
         android:paddingEnd="8dp"
-        tools:text="$10.00"
+        android:singleLine="true"
+        android:text="lei"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/productPrice"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/productPrice"
         tools:ignore="RtlSymmetry,SpUsage" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
