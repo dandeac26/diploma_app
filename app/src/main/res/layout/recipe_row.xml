@@ -26,4 +26,12 @@
         android:layout_weight="1"
         android:textSize="16sp" />
 
+    <ImageButton
+        android:id="@+id/recipeDeleteButton"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/recipe_delete_30"
+        android:background="?android:attr/selectableItemBackground"
+        android:contentDescription="@string/delete_recipe" />
+
 </LinearLayout>

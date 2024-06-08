@@ -38,8 +38,11 @@
     <string name="provider">Provider</string>
     <string name="quantity">Quantity</string>
     <string name="max_quantity">Max Quantity</string>
-    <string name="recipe">Recipe:</string>
+    <string name="recipe">Recipe</string>
     <string name="leiprog">lei /</string>
     <string name="max_prog">max:</string>
     <string name="lei_unit">lei / unit</string>
+    <string name="edit_recipe">Edit Recipe</string>
+    <string name="no_recipe_yet">No recipe yet</string>
+    <string name="delete_recipe">delete recipe</string>
 </resources>
