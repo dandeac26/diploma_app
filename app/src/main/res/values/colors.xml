@@ -19,4 +19,8 @@
     <color name="client_list_item_background">#BCDFEAF4</color>
     <color name="lineColor">#FFD3D3D3</color>
     <color name="phone_container_clicked">#FFD3D3D3</color>
+    <color name="light_gray_progress">#636363</color>
+    <color name="progress_color">#00E3A1</color>
+    <color name="progress_empty_color">#D3D3D3</color>
+    <color name="light_grey_progress_provider">#A1A1A1</color>
 </resources>

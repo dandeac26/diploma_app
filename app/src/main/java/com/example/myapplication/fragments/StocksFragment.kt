@@ -157,7 +157,8 @@ class StocksFragment : Fragment() {
         val providerName: String,
         var quantity: Int,
         var price: String,
-        var maxQuantity: Int
+        var maxQuantity: Int,
+        var packaging: String
     ):Serializable
 
     data class Ingredient(

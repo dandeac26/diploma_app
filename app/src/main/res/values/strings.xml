@@ -39,4 +39,7 @@
     <string name="quantity">Quantity</string>
     <string name="max_quantity">Max Quantity</string>
     <string name="recipe">Recipe:</string>
+    <string name="leiprog">lei /</string>
+    <string name="max_prog">max:</string>
+    <string name="lei_unit">lei / unit</string>
 </resources>

@@ -29,6 +29,8 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>, privat
         val quantityTextView: TextView = itemView.findViewById(R.id.quantityTextView)
         val priceTextView: TextView = itemView.findViewById(R.id.priceTextView)
         val stockProgressBar: ProgressBar = itemView.findViewById(R.id.stockProgressBar)
+        val maxQuantityTextView: TextView = itemView.findViewById(R.id.maxQuantityTextView)
+        val packagingProgressLabel: TextView = itemView.findViewById(R.id.packagingProgressLabel)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StockViewHolder {
@@ -44,6 +46,8 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>, privat
         holder.providerNameTextView.text = stock.providerName
         holder.quantityTextView.text = stock.quantity.toString()
         holder.priceTextView.text = stock.price
+        holder.maxQuantityTextView.text = stock.maxQuantity.toString()
+        holder.packagingProgressLabel.text = stock.packaging;
 
         holder.stockProgressBar.max = stock.maxQuantity
         holder.stockProgressBar.progress = stock.quantity
