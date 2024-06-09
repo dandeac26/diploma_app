@@ -13,6 +13,7 @@ import android.view.animation.Animation
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -108,6 +109,52 @@ class ProvidersFragment : Fragment() {
             (activity as MainActivity).switchFragment(stocksFragment)
         }
         fetchProviders()
+
+        val menuButton = view.findViewById<ImageButton>(R.id.menuButton)
+        menuButton.setOnClickListener {
+            val alphaAnimation = AlphaAnimation(1.0f, 0.5f)
+            alphaAnimation.duration = 200
+            alphaAnimation.repeatCount = 1
+            alphaAnimation.repeatMode = Animation.REVERSE
+
+
+            it.startAnimation(alphaAnimation)
+
+            val popupMenu = PopupMenu(requireContext(), it)
+            popupMenu.menuInflater.inflate(R.menu.stocks_action_menu, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.deleteAll -> {
+                        deleteAllProviders()
+                        true
+                    }
+                    R.id.clearAll -> {
+                        // Implement clearAll functionality
+                        true
+                    }
+                    R.id.clearSelected -> {
+                        // Implement clearSelected functionality
+                        true
+                    }
+                    R.id.ingredients -> {
+                        val ingredientsFragment = IngredientsFragment()
+                        (activity as MainActivity).switchFragment(ingredientsFragment)
+                        true
+                    }
+                    R.id.providers -> {
+                        val stocksFragment = StocksFragment()
+                        (activity as MainActivity).switchFragment(stocksFragment)
+                        true
+                    }
+                    R.id.predictions -> {
+                        // Navigate to PredictionsFragment
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popupMenu.show()
+        }
     }
 
     private fun fetchProviders() {

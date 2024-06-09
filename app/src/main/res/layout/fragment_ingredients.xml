@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="4dp"
         android:padding="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -63,8 +63,20 @@
             android:id="@+id/deleteAllIngredientsButton"
             android:layout_width="30dp"
             android:layout_height="30dp"
+            android:layout_marginEnd="10dp"
             android:background="@drawable/trash_48"
-            android:contentDescription="@string/add_ingredient"
+            android:contentDescription="@string/add_provider"
+            app:layout_constraintBottom_toBottomOf="@id/ingredientsTitle"
+            app:layout_constraintEnd_toStartOf="@id/menuButton"
+            app:layout_constraintTop_toTopOf="@id/ingredientsTitle" />
+
+        <ImageButton
+            android:id="@+id/menuButton"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/menu_50"
+            android:contentDescription="@string/add_provider"
             app:layout_constraintBottom_toBottomOf="@id/ingredientsTitle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/ingredientsTitle" />
@@ -85,7 +97,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:layout_marginBottom="20dp"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="3dp"
             android:stretchColumns="*"
 
             >

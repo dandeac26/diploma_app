@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="0dp"
-    android:paddingEnd="10dp"
     android:background="@drawable/table_row_bg_highlight"
     tools:ignore="RtlSymmetry">
 
@@ -33,6 +32,7 @@
         android:padding="7dp"
         android:background="@drawable/table_column_border"
         android:paddingBottom="0dp"
+        android:paddingEnd="0dp"
         android:textSize="16sp" />
 
 </TableRow>

@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.Spinner
 import android.widget.TableLayout
 import android.widget.TextView
@@ -110,6 +111,56 @@ class IngredientsFragment : Fragment() {
             (activity as MainActivity).switchFragment(stocksFragment)
         }
         fetchIngredients()
+
+        val menuButton = view.findViewById<ImageButton>(R.id.menuButton)
+        menuButton.setOnClickListener {
+            val alphaAnimation = AlphaAnimation(1.0f, 0.5f)
+            alphaAnimation.duration = 200
+            alphaAnimation.repeatCount = 1
+            alphaAnimation.repeatMode = Animation.REVERSE
+
+
+            it.startAnimation(alphaAnimation)
+
+            val popupMenu = PopupMenu(requireContext(), it)
+            popupMenu.menuInflater.inflate(R.menu.stocks_action_menu, popupMenu.menu)
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.deleteAll -> {
+                        deleteAllIngredients()
+                        true
+                    }
+                    R.id.clearAll -> {
+                        // Implement clearAll functionality
+                        true
+                    }
+                    R.id.clearSelected -> {
+                        // Implement clearSelected functionality
+                        true
+                    }
+                    R.id.ingredients -> {
+                        val stocksFragment = StocksFragment()
+                        (activity as MainActivity).switchFragment(stocksFragment)
+                        true
+                    }
+                    R.id.providers -> {
+                        val providersFragment = ProvidersFragment()
+                        (activity as MainActivity).switchFragment(providersFragment)
+                        true
+                    }
+                    R.id.refill -> {
+                        // Implement refill functionality
+                        true
+                    }
+                    R.id.predictions -> {
+                        // Navigate to PredictionsFragment
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popupMenu.show()
+        }
     }
 
     private fun fetchIngredients() {
