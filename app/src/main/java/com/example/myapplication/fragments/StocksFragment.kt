@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.StockAdapter
 import com.example.myapplication.api.IngredientsAPI
@@ -102,10 +103,7 @@ class StocksFragment : Fragment() {
             openAddStockDialog()
         }
 
-//        val deleteAllButton = view.findViewById<Button>(R.id.deleteAllButton)
-//        deleteAllButton.setOnClickListener {
-//            deleteAllStocks()
-//        }
+
         val menuButton = view.findViewById<ImageButton>(R.id.menuButton)
         menuButton.setOnClickListener {
             val popupMenu = PopupMenu(requireContext(), it)
@@ -125,7 +123,8 @@ class StocksFragment : Fragment() {
                         true
                     }
                     R.id.ingredients -> {
-                        // Navigate to IngredientsFragment
+                        val ingredientsFragment = IngredientsFragment()
+                        (activity as MainActivity).switchFragment(ingredientsFragment)
                         true
                     }
                     R.id.providers -> {

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ingredient"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:padding="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/back_65"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:contentDescription="@string/back_button" />
+
+        <TextView
+            android:id="@+id/ingredientsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/backButton"
+            app:layout_constraintTop_toTopOf="@id/backButton"
+            app:layout_constraintBottom_toBottomOf="@id/backButton"
+            android:text="@string/ingredients"
+            android:layout_marginStart="10dp"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+        <ImageButton
+            android:id="@+id/refreshButton"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/refresh_60"
+            android:contentDescription="@string/add_ingredient"
+            app:layout_constraintBottom_toBottomOf="@id/ingredientsTitle"
+            app:layout_constraintStart_toEndOf="@id/ingredientsTitle"
+            app:layout_constraintTop_toTopOf="@id/ingredientsTitle" />
+
+        <ImageButton
+            android:id="@+id/addIngredientButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/add_48"
+            android:contentDescription="@string/add_ingredient"
+            app:layout_constraintBottom_toBottomOf="@id/ingredientsTitle"
+            app:layout_constraintEnd_toStartOf="@id/deleteAllIngredientsButton"
+            app:layout_constraintTop_toTopOf="@id/ingredientsTitle" />
+
+        <ImageButton
+            android:id="@+id/deleteAllIngredientsButton"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/trash_48"
+            android:contentDescription="@string/add_ingredient"
+            app:layout_constraintBottom_toBottomOf="@id/ingredientsTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/ingredientsTitle" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header"
+        android:paddingBottom="55dp">
+
+        <TableLayout
+            android:id="@+id/ingredientsTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="10dp"
+            android:stretchColumns="*"
+
+            >
+
+        </TableLayout>
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,4 +20,5 @@
     <color name="progress_color">#01956A</color>
     <color name="progress_empty_color">#FFFFFF</color>
     <color name="light_grey_progress_provider">#9A9A9A</color>
+    <color name="table_row_highlight">#424242</color>
 </resources>
