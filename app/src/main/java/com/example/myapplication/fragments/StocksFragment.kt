@@ -13,6 +13,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewStub
+import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils.*
 import android.view.inputmethod.InputMethodManager
@@ -100,12 +101,27 @@ class StocksFragment : Fragment() {
 
         val addStockButton = view.findViewById<Button>(R.id.addStockButton)
         addStockButton.setOnClickListener {
+            val alphaAnimation = AlphaAnimation(1.0f, 0.5f)
+            alphaAnimation.duration = 200
+            alphaAnimation.repeatCount = 1
+            alphaAnimation.repeatMode = Animation.REVERSE
+
+
+            it.startAnimation(alphaAnimation)
             openAddStockDialog()
         }
 
 
         val menuButton = view.findViewById<ImageButton>(R.id.menuButton)
         menuButton.setOnClickListener {
+            val alphaAnimation = AlphaAnimation(1.0f, 0.5f)
+            alphaAnimation.duration = 200
+            alphaAnimation.repeatCount = 1
+            alphaAnimation.repeatMode = Animation.REVERSE
+
+
+            it.startAnimation(alphaAnimation)
+
             val popupMenu = PopupMenu(requireContext(), it)
             popupMenu.menuInflater.inflate(R.menu.stocks_action_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener { menuItem ->
@@ -128,7 +144,8 @@ class StocksFragment : Fragment() {
                         true
                     }
                     R.id.providers -> {
-                        // Navigate to ProvidersFragment
+                        val providersFragment = ProvidersFragment()
+                        (activity as MainActivity).switchFragment(providersFragment)
                         true
                     }
                     R.id.refill -> {

@@ -51,4 +51,7 @@
     <string name="ingredient">Ingredient</string>
     <string name="m_u">M.U</string>
     <string name="packaging">Packaging</string>
+    <string name="refresh">refresh</string>
+    <string name="add_provider">Add Provider</string>
+    <string name="providers">Providers</string>
 </resources>
