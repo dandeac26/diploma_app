@@ -6,31 +6,13 @@ import android.content.Context
 import android.util.Log
 import com.example.myapplication.config.ConfigLoader
 
-//object RetrofitInstance {
-//    private var retrofit: Retrofit? = null
-//
-//    fun getInstance(context: Context): Retrofit {
-//        if (retrofit == null) {
-//            val configManager = ConfigManager(context)
-//            val baseUrl = if (configManager.useHomeUrl) configManager.baseUrlHome else configManager.baseUrlMobile
-//            retrofit = Retrofit.Builder()
-//                .baseUrl(baseUrl)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build()
-//        }
-//        return retrofit!!
-//    }
-//}
-
 
 //object RetrofitInstance {
-//    private lateinit var retrofit: Retrofit
-//
 //    fun getInstance(context: Context): Retrofit {
 //        val configManager = ConfigManager(context)
 //        val baseUrl = if (configManager.useHomeUrl) configManager.baseUrlHome else configManager.baseUrlMobile
 //        Log.d("RetrofitInstance", "baseUrl: $baseUrl")
-//        retrofit = Retrofit.Builder()
+//        val retrofit = Retrofit.Builder()
 //            .baseUrl(baseUrl)
 //            .addConverterFactory(GsonConverterFactory.create())
 //            .build()
@@ -40,12 +22,13 @@ import com.example.myapplication.config.ConfigLoader
 //}
 
 object RetrofitInstance {
-    fun getInstance(context: Context): Retrofit {
+    fun getInstance(context: Context, port: Int): Retrofit {
         val configManager = ConfigManager(context)
         val baseUrl = if (configManager.useHomeUrl) configManager.baseUrlHome else configManager.baseUrlMobile
-        Log.d("RetrofitInstance", "baseUrl: $baseUrl")
+        val fullUrl = "$baseUrl:$port/" // Append the port number to the base URL with a slash before the port
+        Log.d("RetrofitInstance", "baseUrl: $fullUrl")
         val retrofit = Retrofit.Builder()
-            .baseUrl(baseUrl)
+            .baseUrl(fullUrl)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 

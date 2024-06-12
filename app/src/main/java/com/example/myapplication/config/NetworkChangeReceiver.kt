@@ -6,11 +6,23 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+//class NetworkChangeReceiver(private val onNetworkChange: () -> Unit) : BroadcastReceiver() {
+//    override fun onReceive(context: Context, intent: Intent) {
+//        if (isNetworkChanged(context)) {
+//            onNetworkChange()
+//        }
+//    }
 
 class NetworkChangeReceiver(private val onNetworkChange: () -> Unit) : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (isNetworkChanged(context)) {
-            onNetworkChange()
+            CoroutineScope(Dispatchers.IO).launch {
+                onNetworkChange()
+            }
         }
     }
 

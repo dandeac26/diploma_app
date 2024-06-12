@@ -75,9 +75,9 @@ class StocksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        stockAPI = RetrofitInstance.getInstance(requireContext()).create(StockAPI::class.java)
-        ingredientsAPI = RetrofitInstance.getInstance(requireContext()).create(IngredientsAPI::class.java)
-        providerAPI = RetrofitInstance.getInstance(requireContext()).create(ProviderAPI::class.java)
+        stockAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(StockAPI::class.java)
+        ingredientsAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(IngredientsAPI::class.java)
+        providerAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ProviderAPI::class.java)
 
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)

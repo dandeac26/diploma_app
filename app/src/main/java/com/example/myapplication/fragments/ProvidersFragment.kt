@@ -43,7 +43,7 @@ class ProvidersFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_providers, container, false)
 
-        providersAPI = RetrofitInstance.getInstance(requireContext()).create(ProviderAPI::class.java)
+        providersAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ProviderAPI::class.java)
 
         providersTable = view.findViewById(R.id.providersTable)
         deleteAllButton = view.findViewById(R.id.deleteAllProvidersButton)

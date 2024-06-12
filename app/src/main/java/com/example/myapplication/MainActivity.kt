@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         sharedViewModel = ViewModelProvider(this, factory).get(SharedViewModel::class.java)
 
         networkChangeReceiver = NetworkChangeReceiver {
-            RetrofitInstance.getInstance(applicationContext)
+            RetrofitInstance.getInstance(applicationContext, 8080)
         }
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)

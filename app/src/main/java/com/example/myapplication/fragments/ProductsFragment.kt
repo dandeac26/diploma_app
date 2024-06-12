@@ -69,7 +69,7 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        bakeryAPI = RetrofitInstance.getInstance(requireContext()).create(BakeryAPI::class.java)
+        bakeryAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(BakeryAPI::class.java)
 
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)

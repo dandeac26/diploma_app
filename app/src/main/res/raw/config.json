@@ -1,5 +1,5 @@
 {
-  "baseUrlHome": "http://192.168.68.56:8080/",
-  "baseUrlMobile": "http://192.168.197.62:8080",
+  "baseUrlHome": "http://192.168.68.56",
+  "baseUrlMobile": "http://192.168.197.62",
   "useHomeUrl": true
 }
