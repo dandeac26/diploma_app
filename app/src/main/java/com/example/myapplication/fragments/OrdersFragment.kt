@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.R
@@ -35,6 +36,7 @@ class OrdersFragment : Fragment() {
     private lateinit var orderAPI: OrderAPI
     private var webSocket: WebSocket? = null
     private lateinit var button : Button
+    private lateinit var textOrders: TextView
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -80,6 +82,8 @@ class OrdersFragment : Fragment() {
                 }
             }
         }
+
+        textOrders = view.findViewById(R.id.ordersTextView)
     }
 
     private fun connectWebSocket() {
@@ -130,6 +134,11 @@ class OrdersFragment : Fragment() {
     private fun fetchOrders() {
 //        TODO("Not yet implemented")
         Log.d("OrdersFragment", "Fetching orders")
+        textOrders.text = "fetched orders"
+        // after 1 second set text back to Orders
+        textOrders.postDelayed({
+            textOrders.text = "Orders"
+        }, 1000)
     }
 
     private fun addOrder(newOrder: OrderDTO, callback: (String?) -> Unit) {
