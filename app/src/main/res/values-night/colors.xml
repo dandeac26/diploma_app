@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="list_item_background">#333333</color>
+    <color name="rounded_corner_button_color">#494949</color>
     <color name="product_header">#1c1b1f</color>
     <color name="colorPrimary">#FF000000</color>
     <color name="colorBorder">#3e3c45</color>

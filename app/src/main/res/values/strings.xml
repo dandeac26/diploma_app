@@ -54,4 +54,5 @@
     <string name="refresh">refresh</string>
     <string name="add_provider">Add Provider</string>
     <string name="providers">Providers</string>
+    <string name="create_order">Create Order</string>
 </resources>

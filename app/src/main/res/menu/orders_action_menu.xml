@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/history"
+        android:title="History" />
+    <item
+        android:id="@+id/showCompleted"
+        android:title="Show Completed" />
+    <item
+        android:id="@+id/centralizator"
+        android:title="Centralizator" />
+</menu>

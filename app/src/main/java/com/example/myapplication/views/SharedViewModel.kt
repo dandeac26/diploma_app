@@ -8,8 +8,9 @@ class SharedViewModel : ViewModel() {
     val refreshProductsTrigger = MutableLiveData<Boolean>()
     val refreshOrdersTrigger = MutableLiveData<Boolean>()
     val refreshStocksTrigger = MutableLiveData<Boolean>()
+    val refreshDailyOrdersTrigger = MutableLiveData<Boolean>()
     val refreshHomeTrigger = MutableLiveData<Boolean>()
-
+    val selectedDate: MutableLiveData<String> = MutableLiveData()
     val onBackPressed = MutableLiveData<Boolean>()
     fun handleBackPress() {
         onBackPressed.value = true

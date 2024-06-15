@@ -180,21 +180,12 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
         displayedProducts.removeAll { it.productId == productId }
     }
 
-//    override fun onProductClick(product: Product) {
-//        val productDetailsFragment = ProductDetailsFragment().apply {
-//            arguments = Bundle().apply {
-//                putSerializable("product", product)
-//            }
-//        }
-//        MainActivity.switchFragment(productDetailsFragment)
-//    }
     override fun onProductClick(product: Product) {
         val productDetailsFragment = ProductDetailsFragment().apply {
             arguments = Bundle().apply {
                 putSerializable("product", product)
             }
         }
-//        (activity as MainActivity).addFragmentToHistory(productDetailsFragment)
         (activity as MainActivity).switchFragment(productDetailsFragment)
     }
 

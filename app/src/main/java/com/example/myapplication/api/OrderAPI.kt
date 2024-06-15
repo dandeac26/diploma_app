@@ -24,5 +24,5 @@ public interface OrderAPI {
     fun addOrder(@Body newOrder: OrderDTO): Call<Void>
 
     @PUT("orders/{orderId}")
-    fun updateOrder(@Path("orderId")orderId: String, @Body updatedOrder: OrderDTO): Call<Void>
+    fun updateOrder(@Path("orderId") orderId: String, @Body updatedOrder: OrderDTO): Call<Void>
 }
