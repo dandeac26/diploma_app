@@ -32,7 +32,7 @@
         android:ellipsize="end"
         android:fontFamily="@font/roboto_regular"
         android:gravity="center_vertical"
-        android:maxLength="7"
+        android:maxLength="8"
         android:paddingEnd="5dp"
         android:singleLine="true"
         android:textSize="18sp"
@@ -40,6 +40,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/dayTextView"
         tools:ignore="RtlSymmetry,SpUsage"
-        tools:text="12.06.23" />
+        tools:text="12.06.24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

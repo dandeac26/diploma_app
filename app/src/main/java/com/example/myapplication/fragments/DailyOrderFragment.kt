@@ -116,7 +116,7 @@ class DailyOrderFragment : Fragment() {
         }
 
         shimmerViewContainer = view.findViewById(R.id.shimmer_view_container)
-        shimmerViewContainer.startShimmer()
+//        shimmerViewContainer.startShimmer()
 
         sharedViewModel.refreshDailyOrdersTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {
