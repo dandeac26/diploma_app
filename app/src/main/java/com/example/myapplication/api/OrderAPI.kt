@@ -14,6 +14,9 @@ public interface OrderAPI {
     @GET("orders")
     fun getOrders(): Call<List<OrdersFragment.Order>>
 
+    @GET("orders/byDate/{completionDate}")
+    fun getOrdersByDate(@Path("completionDate") completionDate: String): Call<List<OrdersFragment.Order>>
+
     @DELETE("orders/{orderId}")
     fun deleteOrder(@Path("orderId") orderId: String): Call<Void>
 

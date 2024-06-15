@@ -36,6 +36,8 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class DailyOrderFragment : Fragment() {
@@ -57,6 +59,8 @@ class DailyOrderFragment : Fragment() {
     private val allOrders = mutableListOf<OrdersFragment.Order>()
     private val displayedOrders = mutableListOf<OrdersFragment.Order>()
 
+    private lateinit var dayDate : String
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -69,9 +73,28 @@ class DailyOrderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         orderAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(OrderAPI::class.java)
-        
+
+
+
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
+
+
+        dayTitle = view.findViewById(R.id.dayTitle)
+
+        sharedViewModel.selectedDate.observe(viewLifecycleOwner) { date ->
+            dayTitle.text = date
+            val splitDate = date.split(" ")
+            if (splitDate.size > 1) {
+                val originalDate = splitDate[1]
+                dayDate = convertDateFormat(originalDate).toString()
+            }
+
+            fetchDailyOrders()
+        }
+
+
+
 
         orderAdapter = OrderAdapter(orders, orderAPI, this, sharedViewModel)
 
@@ -84,6 +107,7 @@ class DailyOrderFragment : Fragment() {
         })
 
 
+
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
         swipeRefreshLayout.setOnRefreshListener {
@@ -93,8 +117,6 @@ class DailyOrderFragment : Fragment() {
 
         shimmerViewContainer = view.findViewById(R.id.shimmer_view_container)
         shimmerViewContainer.startShimmer()
-
-        fetchDailyOrders()
 
         sharedViewModel.refreshDailyOrdersTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {
@@ -111,11 +133,7 @@ class DailyOrderFragment : Fragment() {
         }
 
 
-        dayTitle = view.findViewById(R.id.dayTitle)
 
-        sharedViewModel.selectedDate.observe(viewLifecycleOwner) { date ->
-            dayTitle.text = date
-        }
 
 
         /// SEARCH BAR LOGIC
@@ -152,6 +170,13 @@ class DailyOrderFragment : Fragment() {
 
     }
 
+    private fun convertDateFormat(inputDate: String): String? {
+        val originalFormat = SimpleDateFormat("dd.MM.yy", Locale.US)
+        val targetFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        val date = originalFormat.parse(inputDate)
+        return date?.let { targetFormat.format(it) }
+    }
+
     private fun filterOrders(query: String) {
         val filteredOrders = allOrders.filter { order ->
             order.clientName.contains(query, ignoreCase = true) ||
@@ -179,7 +204,10 @@ class DailyOrderFragment : Fragment() {
                 return@runOnUiThread
             }
             // fetch orders by date
-            val call = orderAPI.getOrders()
+
+
+
+            val call = orderAPI.getOrdersByDate(dayDate)
             call.enqueue(object : Callback<List<OrdersFragment.Order>> {
                 override fun onResponse(
                     call: Call<List<OrdersFragment.Order>>,
