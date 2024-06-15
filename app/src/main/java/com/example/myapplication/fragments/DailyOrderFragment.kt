@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.OrderAdapter
 import com.example.myapplication.api.ClientAPI
@@ -46,7 +47,6 @@ class DailyOrderFragment : Fragment() {
     private lateinit var shimmerViewContainer: ShimmerFrameLayout
     private lateinit var orderRecyclerView: RecyclerView
     private lateinit var orderAdapter: OrderAdapter
-    private val orderItems = mutableListOf<OrderListItem>()
 
     private lateinit var emptyView : ViewStub
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -116,7 +116,7 @@ class DailyOrderFragment : Fragment() {
         }
 
         shimmerViewContainer = view.findViewById(R.id.shimmer_view_container)
-//        shimmerViewContainer.startShimmer()
+        shimmerViewContainer.startShimmer()
 
         sharedViewModel.refreshDailyOrdersTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {
@@ -179,8 +179,8 @@ class DailyOrderFragment : Fragment() {
 
     private fun filterOrders(query: String) {
         val filteredOrders = allOrders.filter { order ->
-            order.clientName.contains(query, ignoreCase = true) ||
-                    order.clientLocation.contains(query, ignoreCase = true) ||
+            order.clientName?.contains(query, ignoreCase = true) == true ||
+                    order.clientLocation?.contains(query, ignoreCase = true) == true ||
                     order.price.toString().contains(query, ignoreCase = true)
         }
 
@@ -219,7 +219,6 @@ class DailyOrderFragment : Fragment() {
                         if (ordersResponse != null) {
                             allOrders.clear()
                             ordersResponse.forEach { allOrders.add(it) }
-                            allOrders.reverse()
 
                             displayedOrders.clear()
                             displayedOrders.addAll(allOrders)
@@ -309,4 +308,10 @@ class DailyOrderFragment : Fragment() {
         })
     }
 
+
+    fun switchToOrderDetailsFragment(selectedOrder : OrdersFragment.Order, selectedDate : String) {
+        sharedViewModel.selectedOrder.value = selectedOrder
+        sharedViewModel.selectedDate.value = selectedDate
+        (activity as MainActivity).switchFragment(OrderDetailsFragment())
+    }
 }

@@ -42,6 +42,7 @@ import okhttp3.Request
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
+import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -241,7 +242,7 @@ class OrdersFragment : Fragment() {
         val clientName: String,
         val clientLocation: String,
         val orderDetails: List<OrderDetail>
-    )
+    ) : Serializable
 
     data class OrderDetail(
         val orderId: String,

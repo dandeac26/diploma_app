@@ -22,6 +22,7 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
         val orderTotalTextView : TextView = view.findViewById(R.id.orderTotalTextView)
         val completeOrderButton : RadioButton = view.findViewById(R.id.completeOrderButton)
         val totalPriceLabel : TextView = view.findViewById(R.id.totalPriceLabel)
+        val orderTimeTextView : TextView = view.findViewById(R.id.orderTimeTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
@@ -34,7 +35,7 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
         holder.orderClientNameTextView.text = order.clientName
         holder.orderTotalTextView.text = order.price.toString()
         holder.totalPriceLabel.text = "lei"
-
+        holder.orderTimeTextView.text = order.completionTime
         holder.itemView.alpha = if (order.completed) 0.5f else 1.0f
         holder.completeOrderButton.isChecked = order.completed
 
@@ -48,6 +49,9 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
                 holder.completeOrderButton.isChecked = true;
                 holder.itemView.alpha = 0.5f
             }
+        }
+        holder.itemView.setOnClickListener {
+            fragment.switchToOrderDetailsFragment(order, sharedViewModel.selectedDate.value.toString())
         }
     }
 
