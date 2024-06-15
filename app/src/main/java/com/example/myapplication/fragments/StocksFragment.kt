@@ -27,6 +27,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -87,7 +88,11 @@ class StocksFragment : Fragment() {
         recyclerView = view.findViewById(R.id.stocksRecyclerView)
         emptyView = view.findViewById(R.id.emptyView)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = stockAdapter
+
+        sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner, Observer {
+            recyclerView.adapter = stockAdapter
+        })
+
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setOnRefreshListener {

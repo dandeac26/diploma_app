@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -77,7 +78,11 @@ class DailyOrderFragment : Fragment() {
         orderRecyclerView = view.findViewById(R.id.ordersRecyclerView)
         emptyView = view.findViewById(R.id.emptyView)
         orderRecyclerView.layoutManager = LinearLayoutManager(context)
-        orderRecyclerView.adapter = orderAdapter
+
+        sharedViewModel.refreshOrdersTrigger.observe(viewLifecycleOwner, Observer {
+            orderRecyclerView.adapter = orderAdapter
+        })
+
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 

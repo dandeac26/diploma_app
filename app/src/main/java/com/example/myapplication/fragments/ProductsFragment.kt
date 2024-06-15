@@ -22,6 +22,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -79,7 +80,10 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
         recyclerView = view.findViewById(R.id.recyclerView)
         emptyView = view.findViewById(R.id.emptyView)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = productAdapter
+
+        sharedViewModel.refreshProductsTrigger.observe(viewLifecycleOwner, Observer {
+            recyclerView.adapter = productAdapter
+        })
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setOnRefreshListener {

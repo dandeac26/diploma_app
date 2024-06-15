@@ -27,6 +27,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -86,7 +87,11 @@ class ClientsFragment : Fragment() {
         clientsRecyclerView = view.findViewById(R.id.clientsRecyclerView)
         emptyView = view.findViewById(R.id.emptyView)
         clientsRecyclerView.layoutManager = LinearLayoutManager(context)
-        clientsRecyclerView.adapter = clientAdapter
+
+        sharedViewModel.refreshClientsTrigger.observe(viewLifecycleOwner, Observer {
+            clientsRecyclerView.adapter = clientAdapter
+        })
+
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setOnRefreshListener {

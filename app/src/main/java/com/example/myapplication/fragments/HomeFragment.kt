@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 
 import com.example.myapplication.R
@@ -31,6 +32,11 @@ class HomeFragment : Fragment() {
                 fetchHome()
             }
         }
+
+        sharedViewModel.refreshHomeTrigger.observe(viewLifecycleOwner, Observer {
+//            recycleview.adapter = homeAdapter
+        })
+
     }
 
     private fun fetchHome() {

@@ -59,11 +59,10 @@
         app:layout_constraintTop_toTopOf="@id/orderClientNameTextView"
         tools:ignore="RtlSymmetry,SpUsage"/>
 
-    <ToggleButton
+    <RadioButton
         android:id="@+id/completeOrderButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/toggle_selector"
         app:layout_constraintBottom_toBottomOf="@id/orderClientNameTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/orderClientNameTextView" />

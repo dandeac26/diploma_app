@@ -4,10 +4,8 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.RadioButton
 import android.widget.TextView
-import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.api.OrderAPI
@@ -22,7 +20,7 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
     inner class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val orderClientNameTextView : TextView = view.findViewById(R.id.orderClientNameTextView)
         val orderTotalTextView : TextView = view.findViewById(R.id.orderTotalTextView)
-        val completeOrderButton : ToggleButton = view.findViewById(R.id.completeOrderButton)
+        val completeOrderButton : RadioButton = view.findViewById(R.id.completeOrderButton)
         val totalPriceLabel : TextView = view.findViewById(R.id.totalPriceLabel)
     }
 
@@ -38,23 +36,17 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
         holder.totalPriceLabel.text = "lei"
 
         holder.itemView.alpha = if (order.completed) 0.5f else 1.0f
-
-        // Remove the OnCheckedChangeListener before setting the checked state
-        holder.completeOrderButton.setOnCheckedChangeListener(null)
         holder.completeOrderButton.isChecked = order.completed
 
-        // Re-attach the OnCheckedChangeListener after setting the checked state
-        holder.completeOrderButton.setOnCheckedChangeListener { buttonView, isChecked ->
-            if (buttonView.isPressed) {
-                if (isChecked) {
-                    // Perform action X when the ToggleButton is checked
-                    fragment.updateOrderCompleted(order, true)
-                    holder.itemView.alpha = 0.5f
-                } else {
-                    // Perform action Y when the ToggleButton is unchecked
-                    fragment.updateOrderCompleted(order, false)
-                    holder.itemView.alpha = 1.0f
-                }
+        holder.completeOrderButton.setOnClickListener {
+            if (holder.itemView.alpha == 0.5f) {
+                fragment.updateOrderCompleted(order, false)
+                holder.completeOrderButton.isChecked = false;
+                holder.itemView.alpha = 1.0f
+            } else {
+                fragment.updateOrderCompleted(order, true)
+                holder.completeOrderButton.isChecked = true;
+                holder.itemView.alpha = 0.5f
             }
         }
     }
