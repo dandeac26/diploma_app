@@ -98,7 +98,9 @@ class MainActivity : AppCompatActivity() {
             .setCustomAnimations(R.anim.fade_in, 0, 0, 0)
 
         // Hide the current fragment
-        currentFragment?.let { transaction.hide(it) }
+        currentFragment?.let { transaction.hide(it)
+        it.userVisibleHint = false
+        }
 
         // Try to find the fragment in the FragmentManager
         var newFragment = supportFragmentManager.findFragmentByTag(fragmentTag)
@@ -117,6 +119,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             // If found, show it
             transaction.show(newFragment)
+            newFragment.userVisibleHint = true
         }
 
         transaction.commit()
