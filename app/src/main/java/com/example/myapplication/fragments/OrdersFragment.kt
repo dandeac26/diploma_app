@@ -241,6 +241,7 @@ class OrdersFragment : Fragment() {
         var completed: Boolean,
         val clientName: String,
         val clientLocation: String,
+        val clientPhoneNumber: String,
         val orderDetails: List<OrderDetail>
     ) : Serializable
 

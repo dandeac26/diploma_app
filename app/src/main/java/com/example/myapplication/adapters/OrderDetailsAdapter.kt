@@ -1,5 +1,6 @@
 package com.example.myapplication.adapters
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +12,8 @@ import com.example.myapplication.fragments.OrdersFragment
 class OrderDetailsAdapter(private val orderDetails: List<OrdersFragment.OrderDetail>) : RecyclerView.Adapter<OrderDetailsAdapter.OrderDetailViewHolder>() {
 
     inner class OrderDetailViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val productNameTextView: TextView = view.findViewById(R.id.orderDetailsProductNameTextView)
-        val productQuantityTextView: TextView = view.findViewById(R.id.orderDetailsProductQuantityTextView)
-        val productPriceTextView: TextView = view.findViewById(R.id.orderDetailsProductPriceTextView)
-        val productTotalPriceTextView: TextView = view.findViewById(R.id.orderDetailsProductTotalPriceTextView)
+        val orderDetailsProductNameTextView: TextView = view.findViewById(R.id.orderDetailsProductNameTextView)
+        val orderDetailsQuantityTextView: TextView = view.findViewById(R.id.orderDetailsQuantityTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderDetailViewHolder {
@@ -22,12 +21,19 @@ class OrderDetailsAdapter(private val orderDetails: List<OrdersFragment.OrderDet
         return OrderDetailViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n", "DefaultLocale")
     override fun onBindViewHolder(holder: OrderDetailViewHolder, position: Int) {
         val orderDetail = orderDetails[position]
-        holder.productNameTextView.text = orderDetail.product.name
-        holder.productQuantityTextView.text = orderDetail.quantity.toString()
-        holder.productPriceTextView.text = orderDetail.product.price.toString()
-        holder.productTotalPriceTextView.text = (orderDetail.product.price * orderDetail.quantity).toString()
+
+//        val productPrice = orderDetail.product.price
+//        val productPriceText = if (productPrice % 1 == 0.0) {
+//            "${productPrice.toInt()}"
+//        } else {
+//            String.format("%.2f", productPrice)
+//        }
+        holder.orderDetailsProductNameTextView.text = orderDetail.product.name
+        holder.orderDetailsQuantityTextView.text = orderDetail.quantity.toString()
+
     }
 
     override fun getItemCount() = orderDetails.size

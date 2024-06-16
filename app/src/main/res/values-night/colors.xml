@@ -3,6 +3,7 @@
     <color name="list_item_background">#333333</color>
     <color name="rounded_corner_button_color">#494949</color>
     <color name="product_header">#1c1b1f</color>
+    <color name="order_details_header">#302E35</color>
     <color name="colorPrimary">#FF000000</color>
     <color name="colorBorder">#3e3c45</color>
     <color name="myColorButton">#8BC34A</color>
@@ -13,6 +14,7 @@
     <color name="search_bar_stroke">#8E8E8E</color>
     <color name="light_gray">#9A9A9A</color>
     <color name="phone_container">#404040</color>
+    <color name="order_phone_container">#3F3C45</color>
     <color name="phone_container_clicked">#4C4C4C</color>
     <color name="item_button_color">#9A9A9A</color>
     <color name="client_list_item_background">#333333</color>
@@ -22,4 +24,5 @@
     <color name="progress_empty_color">#FFFFFF</color>
     <color name="light_grey_progress_provider">#9A9A9A</color>
     <color name="table_row_highlight">#424242</color>
+    <color name="delivery_client_location_color">#2196F3</color>
 </resources>

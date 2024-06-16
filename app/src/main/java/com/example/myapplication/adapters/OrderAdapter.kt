@@ -30,10 +30,16 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
         return OrderViewHolder(view)
     }
 
+    @SuppressLint("DefaultLocale")
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
         val order = orders[position]
         holder.orderClientNameTextView.text = order.clientName
-        holder.orderTotalTextView.text = order.price.toString()
+        val price = if (order.price % 1 == 0.0) {
+            String.format("%.0f", order.price)
+        } else {
+            String.format("%.2f", order.price)
+        }
+        holder.orderTotalTextView.text = price
         holder.totalPriceLabel.text = "lei"
         holder.orderTimeTextView.text = order.completionTime
         holder.itemView.alpha = if (order.completed) 0.5f else 1.0f
