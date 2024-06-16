@@ -190,6 +190,12 @@ class OrdersFragment : Fragment() {
             val dayOfWeek = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
             val date = SimpleDateFormat("dd.MM.yy", Locale.getDefault()).format(calendar.time)
             dayOfWeek?.let { DateItem(it, date) }?.let { dates.add(it) }
+
+            // If the day of the week is Sunday, add a "NextWeek" item
+            if (dayOfWeek == "Sunday") {
+                dates.add(DateItem("NextWeek", ""))
+            }
+
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
 
