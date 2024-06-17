@@ -1,10 +1,13 @@
 package com.example.myapplication.fragments
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -17,6 +20,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -133,7 +137,10 @@ class DailyOrderFragment : Fragment() {
         }
 
 
-
+        val addDayOrderButton: ImageButton = view.findViewById(R.id.addDayOrderButton)
+        addDayOrderButton.setOnClickListener {
+//            openContacts()
+        }
 
 
         /// SEARCH BAR LOGIC
@@ -306,6 +313,57 @@ class DailyOrderFragment : Fragment() {
                 // handle the error
             }
         })
+    }
+
+
+    // Open contacts fragment
+
+    private fun openContacts() {
+        val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+        startActivityForResult(intent, REQUEST_CODE_PICK_CONTACT)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_PICK_CONTACT && resultCode == Activity.RESULT_OK) {
+            data?.data?.let { uri ->
+                val projection = arrayOf(ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME)
+
+                requireActivity().contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val idIndex = cursor.getColumnIndex(ContactsContract.Contacts._ID)
+                        val nameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+
+                        val id = cursor.getString(idIndex)
+                        val name = cursor.getString(nameIndex)
+
+                        // Query the phone number
+                        val phoneCursor = requireActivity().contentResolver.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                            arrayOf(id),
+                            null
+                        )
+
+                        if (phoneCursor?.moveToFirst() == true) {
+                            val numberIndex = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            val number = phoneCursor.getString(numberIndex)
+
+                            Log.d("ContactInfo", "Name: $name, Number: $number")
+                        }
+
+                        phoneCursor?.close()
+                    }
+                }
+            }
+        }
+    }
+
+    companion object {
+        const val REQUEST_CODE_PICK_CONTACT = 1
     }
 
 
