@@ -41,11 +41,14 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import androidx.lifecycle.ViewModelProvider
+import com.example.myapplication.MainActivity
+import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.config.RetrofitInstance
+import com.example.myapplication.fragments.ProductsFragment.Product
 import com.example.myapplication.views.SharedViewModelFactory
 
 
-class ClientsFragment : Fragment() {
+class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
 
     private lateinit var clientsRecyclerView: RecyclerView
     private lateinit var clientAdapter: ClientAdapter
@@ -59,6 +62,15 @@ class ClientsFragment : Fragment() {
     private val displayedClients = mutableListOf<Client>()
 
     private lateinit var clientAPI: ClientAPI
+
+    interface ClientSelectionListener {
+        fun onClientSelected(client: ClientsFragment.Client)
+    }
+
+    private var clientSelectionListener: ClientSelectionListener? = null
+
+
+    var isClientSelectionListenerActive: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -82,7 +94,7 @@ class ClientsFragment : Fragment() {
             }
         }
 
-        clientAdapter = ClientAdapter(clients, clientAPI, this)
+        clientAdapter = ClientAdapter(clients, clientAPI, this, this)
 
         clientsRecyclerView = view.findViewById(R.id.clientsRecyclerView)
         emptyView = view.findViewById(R.id.emptyView)
@@ -160,6 +172,31 @@ class ClientsFragment : Fragment() {
         })
 
 
+        sharedViewModel.isClientSelectionListenerActive.observe(viewLifecycleOwner, Observer { isActive ->
+            isClientSelectionListenerActive = isActive
+        })
+
+    }
+
+    override fun onClientClick(client: Client) {
+        if (isClientSelectionListenerActive) {
+            Log.d("Client", client.toString())
+            clientSelectionListener?.onClientSelected(client)
+
+            sharedViewModel.selectedClient.value = client
+
+            sharedViewModel.isClientSelectionListenerActive.value = false
+
+            val orderDialog = OrderDialogFragment()
+            (activity as MainActivity).switchFragment(orderDialog)
+        }
+        else{
+            openAddClientDialog(client)
+        }
+    }
+
+    fun setClientSelectionListener(listener: ClientSelectionListener) {
+        this.clientSelectionListener = listener
     }
 
     fun removeClientFromSearchLists(clientId: String) {

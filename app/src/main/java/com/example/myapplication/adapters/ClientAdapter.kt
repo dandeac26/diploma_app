@@ -26,11 +26,16 @@ import com.example.myapplication.fragments.ClientsFragment.Client
 import com.example.myapplication.fragments.ClientsFragment
 import com.example.myapplication.api.ClientAPI
 import com.example.myapplication.R
+import com.example.myapplication.adapters.ProductAdapter.OnProductClickListener
+import com.example.myapplication.fragments.ClientsFragment.ClientSelectionListener
+import com.example.myapplication.fragments.ProductsFragment.Product
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, private val clientAPI: ClientAPI, private val fragment: ClientsFragment) : RecyclerView.Adapter<ClientAdapter.ClientViewHolder>() {
+class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, private val clientAPI: ClientAPI,
+                    private val fragment: ClientsFragment, private val onClientClickListener: OnClientClickListener
+) : RecyclerView.Adapter<ClientAdapter.ClientViewHolder>() {
     private var highlightedPosition = -1
     class ClientViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val firmNameTextView: TextView = view.findViewById(R.id.firmNameTextView)
@@ -45,6 +50,10 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
         val addressManualTextView: TextView = view.findViewById(R.id.addressManualTextView)
         val addressManualLabel: TextView = view.findViewById(R.id.addressManualLabel)
         val detailsContainer: View = view.findViewById(R.id.detailsContainer)
+    }
+
+    interface OnClientClickListener {
+        fun onClientClick(client: Client)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ClientViewHolder {
@@ -68,8 +77,11 @@ class ClientAdapter(private val clients: MutableList<ClientsFragment.Client>, pr
             showPopupMenu(v, holder.adapterPosition)
             true
         }
+
         holder.itemView.setOnClickListener {
-            fragment.openAddClientDialog(client)
+            onClientClickListener.onClientClick(client)
+//            clientSelectionListener?.onClientSelected(client)
+//            fragment.openAddClientDialog(client)
         }
         // Inside your Activity or Fragment, or ViewHolder class if using RecyclerView
         holder.phoneNumberContainer.setOnClickListener {

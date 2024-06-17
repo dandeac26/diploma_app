@@ -14,7 +14,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.config.NetworkChangeReceiver
 import com.example.myapplication.config.RetrofitInstance
+import com.example.myapplication.fragments.ClientsFragment.ClientSelectionListener
 import com.example.myapplication.fragments.ClientsFragment
+import com.example.myapplication.fragments.CreateOrderFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductDetailsFragment
 import com.example.myapplication.fragments.ProductsFragment
@@ -59,10 +61,27 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.setOnItemSelectedListener { item ->
             val fragment = when (item.itemId) {
                 R.id.nav_home -> HomeFragment()
-                R.id.nav_products -> ProductsFragment()
+                R.id.nav_products -> ProductsFragment().apply {
+                    setProductSelectionListener(object : ProductsFragment.ProductsSelectionListener {
+                        override fun onProductSelected(product: ProductsFragment.Product) {
+                            sharedViewModel.selectedProduct.value = product
+                            isProductSelectionListenerActive = false
+                        }
+                    })
+                }
                 R.id.nav_orders -> OrdersFragment()
                 R.id.nav_stocks -> StocksFragment()
-                R.id.nav_clients -> ClientsFragment()
+                R.id.nav_clients -> ClientsFragment().apply {
+                    setClientSelectionListener(object : ClientSelectionListener {
+                        override fun onClientSelected(client: ClientsFragment.Client) {
+                            sharedViewModel.selectedClient.value = client
+                            isClientSelectionListenerActive = false
+//                            // Create a new instance of CreateOrderFragment
+//                            val createOrderFragment = CreateOrderFragment()
+//                            (activity as MainActivity).switchFragment(createOrderFragment)
+                        }
+                    })
+                }
                 else -> null
             }
 

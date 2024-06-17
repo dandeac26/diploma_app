@@ -44,6 +44,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.Serializable
 
 
+
 class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
 
     private lateinit var productAdapter: ProductAdapter
@@ -58,6 +59,17 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
 
     private val allProducts = mutableListOf<Product>()
     private val displayedProducts = mutableListOf<Product>()
+
+
+
+    interface ProductsSelectionListener {
+        fun onProductSelected(product: ProductsFragment.Product)
+    }
+
+    var isProductSelectionListenerActive: Boolean = false
+
+    private var productSelectionListener: ProductsSelectionListener? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -120,7 +132,9 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
             }
         }
 
-
+        sharedViewModel.isProductSelectionListenerActive.observe(viewLifecycleOwner, Observer { isActive ->
+            isProductSelectionListenerActive = isActive
+        })
 
         val searchBar = view.findViewById<EditText>(R.id.searchBar)
         searchBar.setOnTouchListener { v, event ->
@@ -151,6 +165,10 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
                 filterProducts(s.toString())
             }
         })
+    }
+
+    fun setProductSelectionListener(listener: ProductsSelectionListener) {
+        this.productSelectionListener = listener
     }
 
     data class Product(
@@ -185,12 +203,25 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
     }
 
     override fun onProductClick(product: Product) {
-        val productDetailsFragment = ProductDetailsFragment().apply {
-            arguments = Bundle().apply {
-                putSerializable("product", product)
-            }
+        if (isProductSelectionListenerActive) {
+            Log.d("Product", product.toString())
+            productSelectionListener?.onProductSelected(product)
+
+            sharedViewModel.selectedProduct.value = product
+
+            sharedViewModel.isProductSelectionListenerActive.value = false
+
+            val orderDialog = OrderDialogFragment()
+            (activity as MainActivity).switchFragment(orderDialog)
         }
-        (activity as MainActivity).switchFragment(productDetailsFragment)
+        else{
+            val productDetailsFragment = ProductDetailsFragment().apply {
+                arguments = Bundle().apply {
+                    putSerializable("product", product)
+                }
+            }
+            (activity as MainActivity).switchFragment(productDetailsFragment)
+        }
     }
 
     fun fetchProducts() {

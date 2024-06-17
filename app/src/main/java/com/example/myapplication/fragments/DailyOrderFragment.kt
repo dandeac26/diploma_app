@@ -45,7 +45,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-class DailyOrderFragment : Fragment() {
+class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var shimmerViewContainer: ShimmerFrameLayout
@@ -139,7 +139,17 @@ class DailyOrderFragment : Fragment() {
 
         val addDayOrderButton: ImageButton = view.findViewById(R.id.addDayOrderButton)
         addDayOrderButton.setOnClickListener {
+//
+            val orderDialogFragment = OrderDialogFragment()
+            (activity as MainActivity).switchFragment(orderDialogFragment)
+        }
+
+        val addOrderButton = view.findViewById<ImageButton>(R.id.addOrderButton)
+        addOrderButton.setOnClickListener {
 //            openContacts()
+            val clientsFragment = ClientsFragment()
+            clientsFragment.setClientSelectionListener(this)
+            (activity as MainActivity).switchFragment(clientsFragment)
         }
 
 
@@ -194,6 +204,20 @@ class DailyOrderFragment : Fragment() {
         displayedOrders.clear()
         displayedOrders.addAll(filteredOrders)
         orderAdapter.updateOrdersAfterSearch(displayedOrders)
+    }
+
+    override fun onClientSelected(client: ClientsFragment.Client) {
+
+        Log.d("Client", client.toString())
+
+        sharedViewModel.selectedClient.value = client
+
+        val createOrderFragment = CreateOrderFragment()
+        (activity as MainActivity).switchFragment(createOrderFragment)
+
+//        val createOrderV2Fragment = CreateOrderV2Fragment()
+//        (activity as MainActivity).switchFragment(createOrderV2Fragment)
+
     }
 
     fun removeOrderFromSearchLists(orderId: String) {
