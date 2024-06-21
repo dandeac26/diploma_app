@@ -1,6 +1,7 @@
 package com.example.myapplication.fragments
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -9,6 +10,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -386,7 +388,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         })
     }
     @SuppressLint("InflateParams", "MissingInflatedId", "SetTextI18n")
-    fun openAddClientDialog(client: Client? = null) {
+    fun openAddClientDialog(client: Client? = null, contactName: String? = null, phoneNumber: String? = null) {
         if (!isNetworkAvailable()) {
             Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
             return
@@ -399,15 +401,29 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
 
         val alertDialog = builder.show()
 
-        if (client != null) {
-            dialogView.findViewById<EditText>(R.id.firmNameInput).setText(client.firmName)
-            dialogView.findViewById<EditText>(R.id.phoneNumberInput).setText(client.phoneNumber.toString())
-            dialogView.findViewById<EditText>(R.id.contactPersonInput).setText(client.contactPerson)
-            dialogView.findViewById<EditText>(R.id.locationInput).setText(client.location)
-//            dialogView.findViewById<EditText>(R.id.coordinatesInput).setText("${client.latitude},${client.longitude}")
-            dialogView.findViewById<EditText>(R.id.addressInput).setText(client.address)
+
+        if (contactName != null) {
+            dialogView.findViewById<EditText>(R.id.firmNameInput).setText(contactName)
+        }
+        if (phoneNumber != null) {
+            dialogView.findViewById<EditText>(R.id.phoneNumberInput).setText(phoneNumber)
         }
 
+        if (client != null) {
+
+            dialogView.findViewById<EditText>(R.id.firmNameInput).setText(client.firmName)
+            dialogView.findViewById<EditText>(R.id.phoneNumberInput).setText(client.phoneNumber)
+            dialogView.findViewById<EditText>(R.id.contactPersonInput).setText(client.contactPerson)
+            dialogView.findViewById<EditText>(R.id.locationInput).setText(client.location)
+            dialogView.findViewById<EditText>(R.id.addressInput).setText(client.address)
+        }
+        else{
+            dialogView.findViewById<Button>(R.id.addFromContactsButton).visibility = View.VISIBLE
+        }
+        dialogView.findViewById<Button>(R.id.addFromContactsButton).setOnClickListener {
+            openContacts()
+            alertDialog.dismiss()
+        }
         dialogView.findViewById<Button>(R.id.saveButton).setOnClickListener {
             val firmName = dialogView.findViewById<EditText>(R.id.firmNameInput).text.toString()
 
@@ -416,9 +432,9 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
                 return@setOnClickListener
             }
 
-            val phoneNumber = dialogView.findViewById<EditText>(R.id.phoneNumberInput).text.toString()
+            val newPhoneNumber = dialogView.findViewById<EditText>(R.id.phoneNumberInput).text.toString()
 
-            if (phoneNumber.isEmpty()) {
+            if (newPhoneNumber.isEmpty()) {
                 Toast.makeText(context, "Phone number cannot be empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -437,7 +453,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
 
             val address = dialogView.findViewById<EditText>(R.id.addressInput).text.toString()
 
-            val newClient = ClientDTO(firmName, contactPerson, phoneNumber, location, latitude ?: 0.0, longitude ?: 0.0, address)
+            val newClient = ClientDTO(firmName, contactPerson, newPhoneNumber, location, latitude ?: 0.0, longitude ?: 0.0, address)
 
             if (client == null) {
                 addClient(newClient) { errorMessage ->
@@ -518,5 +534,65 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
             ?.setPrimaryClip(clip)
     }
 
+    // Open contacts fragment
+
+    private fun openContacts() {
+        val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+        startActivityForResult(intent, REQUEST_CODE_PICK_CONTACT)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == REQUEST_CODE_PICK_CONTACT && resultCode == Activity.RESULT_OK) {
+            data?.data?.let { uri ->
+                val projection = arrayOf(ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME)
+
+                requireActivity().contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val idIndex = cursor.getColumnIndex(ContactsContract.Contacts._ID)
+                        val nameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+
+                        val id = cursor.getString(idIndex)
+                        val name = cursor.getString(nameIndex)
+
+                        // Query the phone number
+                        val phoneCursor = requireActivity().contentResolver.query(
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                            null,
+                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                            arrayOf(id),
+                            null
+                        )
+
+                        if (phoneCursor?.moveToFirst() == true) {
+                            val numberIndex = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            val number = phoneCursor.getString(numberIndex)
+
+                            Log.d("ContactInfo", "Name: $name, Number: $number")
+
+                            /// make sure number has 10 digits and no spaces
+                            val numberDigits = number.filter { it.isDigit() }
+                            if (numberDigits.length == 10) {
+                                openAddClientDialog(null, name, numberDigits)
+                            } else {
+                                // delete all spaces and take only last 10 digits of number
+                                val newNumber = number.filter { it.isDigit() }.takeLast(10)
+                                openAddClientDialog(null, name, newNumber)
+                            }
+//                            openAddClientDialog(null, name, number)
+                        }
+
+                        phoneCursor?.close()
+                    }
+                }
+            }
+        }
+    }
+
+    companion object {
+        const val REQUEST_CODE_PICK_CONTACT = 1
+    }
 
 }

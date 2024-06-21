@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -51,6 +52,10 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         sharedViewModel.selectedProduct.observe(viewLifecycleOwner) { product ->
             val lineItemProduct =
                 LineItemProduct(product.productId, product.name, 0, product.imageUrl)
+
+            if (selectedProducts.contains(lineItemProduct)) {
+                return@observe
+            }
             selectedProducts.add(lineItemProduct)
             selectedProductsAdapter.notifyItemInserted(selectedProducts.size - 1)
         }
@@ -76,6 +81,7 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun mainInterfaceActions(view: View){
         //////////// ADD CLIENT BUTTON //////////////////
         val addClientButton = view.findViewById<Button>(R.id.selectClientButton)
@@ -104,7 +110,7 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
 
         //////////// ADD BUTTON //////////////////
-        val addProductsButton = view.findViewById<Button>(R.id.addProductsButton)
+        val addProductsButton = view.findViewById<ImageButton>(R.id.addProductsButton)
         addProductsButton.setOnClickListener {
             val productsFragment = ProductsFragment().apply {
                 setProductSelectionListener(object : ProductsFragment.ProductsSelectionListener {

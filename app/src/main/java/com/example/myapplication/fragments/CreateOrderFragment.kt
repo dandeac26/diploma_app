@@ -51,7 +51,7 @@ class CreateOrderFragment : Fragment() {
             val productNameTextView = tableRow.findViewById<TextView>(R.id.createOrderProductName)
             productNameTextView.text = productName
 
-            val productQuantityEditText = tableRow.findViewById<EditText>(R.id.createOrderQuantity) // Replace 'yourEditTextId' with the actual ID of your EditText
+            val productQuantityEditText = tableRow.findViewById<EditText>(R.id.createOrderQuantity)
             productQuantityEditText.inputType = InputType.TYPE_CLASS_NUMBER
             if (index % 2 == 0) {
                 tableRow.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.order_details_header))

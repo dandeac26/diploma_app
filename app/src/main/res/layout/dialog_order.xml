@@ -4,54 +4,91 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:paddingTop="0dp"
+    >
 
     <TextView
         android:id="@+id/selectedClientTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Selected Client: None"
-        android:textSize="18sp"
+        android:text="Please select a client:"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/selectClientButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/selectClientButton"
+        app:layout_constraintBottom_toBottomOf="@id/selectClientButton" />
 
     <Button
         android:id="@+id/selectClientButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Client"
+        android:text="select"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/selectedClientTextView"
-        app:layout_constraintTop_toTopOf="@+id/selectedClientTextView"
-        app:layout_constraintBottom_toBottomOf="@id/selectedClientTextView"/>
+        app:layout_constraintTop_toTopOf="parent"/>
 
+    <View
+        android:id="@+id/dividerLine"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/lineColor"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/productsTitleTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selectClientButton" />
 
-
-    <Button
-        android:id="@+id/addProductsButton"
+    <TextView
+        android:id="@+id/productsTitleTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Add Product"
+        android:layout_marginTop="20dp"
+        android:text="Products:"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@id/addProductsButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/selectClientButton" />
+        app:layout_constraintTop_toBottomOf="@+id/dividerLine" />
+
+    <ImageButton
+        android:id="@+id/addProductsButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="15dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:background="@color/product_header"
+        android:contentDescription="@string/add_product"
+        android:src="@drawable/add_48"
+        android:tooltipText="Add product to order"
+        app:layout_constraintBottom_toBottomOf="@id/productsTitleTextView"
+        app:layout_constraintEnd_toStartOf="@id/createOrderButton"
+        app:layout_constraintStart_toEndOf="@id/productsTitleTextView"
+        app:layout_constraintTop_toTopOf="@id/productsTitleTextView" />
+
 
     <Button
         android:id="@+id/createOrderButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Create Order"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Create"
+        app:layout_constraintBottom_toBottomOf="@id/productsTitleTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/addProductsButton"
+        app:layout_constraintTop_toTopOf="@id/productsTitleTextView"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/productLineItemRecycleView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/createOrderButton"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addProductsButton" />
 

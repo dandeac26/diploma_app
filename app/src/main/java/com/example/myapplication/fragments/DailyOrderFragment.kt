@@ -340,55 +340,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
     }
 
 
-    // Open contacts fragment
 
-    private fun openContacts() {
-        val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
-        startActivityForResult(intent, REQUEST_CODE_PICK_CONTACT)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == REQUEST_CODE_PICK_CONTACT && resultCode == Activity.RESULT_OK) {
-            data?.data?.let { uri ->
-                val projection = arrayOf(ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME)
-
-                requireActivity().contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
-                    if (cursor.moveToFirst()) {
-                        val idIndex = cursor.getColumnIndex(ContactsContract.Contacts._ID)
-                        val nameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
-
-                        val id = cursor.getString(idIndex)
-                        val name = cursor.getString(nameIndex)
-
-                        // Query the phone number
-                        val phoneCursor = requireActivity().contentResolver.query(
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                            null,
-                            ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                            arrayOf(id),
-                            null
-                        )
-
-                        if (phoneCursor?.moveToFirst() == true) {
-                            val numberIndex = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                            val number = phoneCursor.getString(numberIndex)
-
-                            Log.d("ContactInfo", "Name: $name, Number: $number")
-                        }
-
-                        phoneCursor?.close()
-                    }
-                }
-            }
-        }
-    }
-
-    companion object {
-        const val REQUEST_CODE_PICK_CONTACT = 1
-    }
 
 
     fun switchToOrderDetailsFragment(selectedOrder : OrdersFragment.Order, selectedDate : String) {
