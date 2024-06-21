@@ -60,6 +60,7 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
     private val allProducts = mutableListOf<Product>()
     private val displayedProducts = mutableListOf<Product>()
 
+    private var selectedProductObserver: Observer<Product>? = null
 
 
     interface ProductsSelectionListener {
@@ -207,7 +208,9 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
             Log.d("Product", product.toString())
             productSelectionListener?.onProductSelected(product)
 
-            sharedViewModel.selectedProduct.value = product
+
+            sharedViewModel.selectProduct(product)
+
 
             sharedViewModel.isProductSelectionListenerActive.value = false
 

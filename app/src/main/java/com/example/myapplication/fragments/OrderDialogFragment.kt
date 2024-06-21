@@ -30,6 +30,8 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
     private lateinit var selectedProductsAdapter: OrderDialogProductAdapter
     private val selectedProducts = mutableListOf<LineItemProduct>()
 
+    private var selectedProductObserver: Observer<ProductsFragment.Product>? = null
+
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.dialog_order, container, false)
@@ -50,14 +52,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
         productLineItemRecycleView.adapter = selectedProductsAdapter
 
-        sharedViewModel.selectedProduct.observe(viewLifecycleOwner, Observer { product ->
-            // create line item product
-            val lineItemProduct = LineItemProduct(product.productId, product.name, 0)
-            Log.d("OrderDialogFragment", "Selected product: $lineItemProduct")
-
-            selectedProducts.add(lineItemProduct)
-            selectedProductsAdapter.notifyItemInserted(selectedProducts.size - 1)
-        })
 
 
         val selectClientButton = view.findViewById<Button>(R.id.selectClientButton)
@@ -87,13 +81,30 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
             // Call createOrder function with selectedClient and selectedProducts
         }
 
+        selectedProductObserver = Observer { product ->
+            // create line item product
+            val lineItemProduct = LineItemProduct(product.productId, product.name, 0, product.imageUrl)
+            Log.d("OrderDialogFragment", "Selected product: $lineItemProduct")
+            selectedProducts.add(lineItemProduct)
+            selectedProductsAdapter.notifyItemInserted(selectedProducts.size - 1)
+        }
+
+        sharedViewModel.selectedProduct.observe(viewLifecycleOwner, selectedProductObserver!!)
+
+
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        sharedViewModel.selectedProduct.removeObserver(selectedProductObserver!!)
     }
 
     data class LineItemProduct(
         var id: String,
         var name: String,
-        var quantity: Int = 0
+        var quantity: Int = 0,
+        var imageUrl: String
     )
 
     override fun onClientSelected(client: ClientsFragment.Client) {

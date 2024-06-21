@@ -28,6 +28,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
@@ -42,6 +43,7 @@ class OrderDetailsFragment : Fragment() {
     private lateinit var shimmerViewContainer: ShimmerFrameLayout
 
     private val REQUEST_READ_CONTACTS = 1
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -107,6 +109,8 @@ class OrderDetailsFragment : Fragment() {
         sharedViewModel.selectedDate.observe(viewLifecycleOwner) { date ->
             view.findViewById<TextView>(R.id.dayTitle).text = date
         }
+
+
     }
 
 

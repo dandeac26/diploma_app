@@ -6,9 +6,10 @@
     android:padding="16dp">
 
     <ImageView
-        android:id="@+id/item_image"
+        android:id="@+id/productImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:contentDescription="Product Image"
         android:src="@drawable/ic_launcher_background" />
 
     <TextView

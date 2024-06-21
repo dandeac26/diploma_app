@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.fragments.OrderDialogFragment
 import com.example.myapplication.fragments.ProductsFragment.Product
@@ -18,6 +20,7 @@ class OrderDialogProductAdapter(private val productList: List<OrderDialogFragmen
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val productName: TextView = itemView.findViewById(R.id.productName)
         val quantityEditText: EditText = itemView.findViewById(R.id.quantityEditText)
+        val productImage: ImageView = itemView.findViewById(R.id.productImage)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -28,6 +31,10 @@ class OrderDialogProductAdapter(private val productList: List<OrderDialogFragmen
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val currentProduct = productList[position]
         holder.productName.text = currentProduct.name
+
+        Glide.with(holder.productImage.context)
+            .load(currentProduct.imageUrl)
+            .into(holder.productImage)
 
         holder.quantityEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {

@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_products -> ProductsFragment().apply {
                     setProductSelectionListener(object : ProductsFragment.ProductsSelectionListener {
                         override fun onProductSelected(product: ProductsFragment.Product) {
-                            sharedViewModel.selectedProduct.value = product
+                            sharedViewModel.selectProduct(product)
                             isProductSelectionListenerActive = false
                         }
                     })
