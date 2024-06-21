@@ -1,5 +1,7 @@
 package com.example.myapplication.adapters
 
+import android.app.AlertDialog
+import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -15,7 +17,7 @@ import com.example.myapplication.fragments.OrderDialogFragment
 import com.example.myapplication.fragments.ProductsFragment.Product
 import de.hdodenhof.circleimageview.CircleImageView
 
-class OrderDialogProductAdapter(private val productList: List<OrderDialogFragment.LineItemProduct>) :
+class OrderDialogProductAdapter(private val productList: MutableList<OrderDialogFragment.LineItemProduct>) :
     RecyclerView.Adapter<OrderDialogProductAdapter.ProductViewHolder>() {
 
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -54,6 +56,23 @@ class OrderDialogProductAdapter(private val productList: List<OrderDialogFragmen
                 }
             }
         })
+
+        holder.itemView.setOnLongClickListener {
+            showDeleteConfirmationDialog(holder.itemView.context, position)
+            true
+        }
+    }
+
+    private fun showDeleteConfirmationDialog(context: Context, position: Int) {
+        AlertDialog.Builder(context).apply {
+            setTitle("Delete Product")
+            setMessage("Are you sure you want to remove this product from the order?")
+            setPositiveButton("Yes") { _, _ ->
+                productList.removeAt(position)
+                notifyItemRemoved(position)
+            }
+            setNegativeButton("No", null)
+        }.show()
     }
 
     override fun getItemCount() = productList.size
