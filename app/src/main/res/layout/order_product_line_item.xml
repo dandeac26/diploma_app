@@ -2,15 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:padding="16dp">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/productImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:contentDescription="Product Image"
-        android:src="@drawable/ic_launcher_background" />
+        android:src="@drawable/placeholder_50"
+        android:layout_marginEnd="8dp"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/placeholder_50" />
 
     <TextView
         android:id="@+id/productName"

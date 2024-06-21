@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_clients -> ClientsFragment().apply {
                     setClientSelectionListener(object : ClientSelectionListener {
                         override fun onClientSelected(client: ClientsFragment.Client) {
-                            sharedViewModel.selectedClient.value = client
+                            sharedViewModel.selectClient(client)
                             isClientSelectionListenerActive = false
 //                            // Create a new instance of CreateOrderFragment
 //                            val createOrderFragment = CreateOrderFragment()

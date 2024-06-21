@@ -210,7 +210,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
         Log.d("Client", client.toString())
 
-        sharedViewModel.selectedClient.value = client
+        sharedViewModel.selectClient(client)
 
         val createOrderFragment = CreateOrderFragment()
         (activity as MainActivity).switchFragment(createOrderFragment)

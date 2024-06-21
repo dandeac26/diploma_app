@@ -181,11 +181,10 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
     override fun onClientClick(client: Client) {
         if (isClientSelectionListenerActive) {
             Log.d("Client", client.toString())
-            clientSelectionListener?.onClientSelected(client)
 
-            sharedViewModel.selectedClient.value = client
+            sharedViewModel.selectClient(client)
 
-            sharedViewModel.isClientSelectionListenerActive.value = false
+            isClientSelectionListenerActive = false
 
             val orderDialog = OrderDialogFragment()
             (activity as MainActivity).switchFragment(orderDialog)

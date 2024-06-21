@@ -11,12 +11,6 @@ class SharedViewModel : ViewModel() {
 
 
 
-    private val _selectedProduct = MutableLiveData<ProductsFragment.Product>()
-    val selectedProduct: LiveData<ProductsFragment.Product> get() = _selectedProduct
-
-    fun selectProduct(product: ProductsFragment.Product) {
-        _selectedProduct.value = product
-    }
 
 
     val refreshOrderDetailsTrigger: MutableLiveData<Boolean> = MutableLiveData()
@@ -26,14 +20,33 @@ class SharedViewModel : ViewModel() {
     val refreshStocksTrigger = MutableLiveData<Boolean>()
     val refreshDailyOrdersTrigger = MutableLiveData<Boolean>()
     val refreshHomeTrigger = MutableLiveData<Boolean>()
+
     val selectedDate: MutableLiveData<String> = MutableLiveData()
     val selectedOrder = MutableLiveData<OrdersFragment.Order>()
-    val selectedClient = MutableLiveData<ClientsFragment.Client>()
-//    val selectedProduct = MutableLiveData<ProductsFragment.Product>()
-    val onBackPressed = MutableLiveData<Boolean>()
+
+
+
+
+
+    private val _selectedProduct = MutableLiveData<ProductsFragment.Product>()
+    val selectedProduct: LiveData<ProductsFragment.Product> get() = _selectedProduct
+
+    fun selectProduct(product: ProductsFragment.Product) {
+        _selectedProduct.value = product
+    }
+
+    private val _selectedClient = MutableLiveData<ClientsFragment.Client>()
+    val selectedClient: LiveData<ClientsFragment.Client> get() = _selectedClient
+
+    fun selectClient(client: ClientsFragment.Client) {
+        _selectedClient.value = client
+    }
 
     val isClientSelectionListenerActive = MutableLiveData<Boolean>()
     val isProductSelectionListenerActive = MutableLiveData<Boolean>()
+
+
+    val onBackPressed = MutableLiveData<Boolean>()
 
     fun handleBackPress() {
         onBackPressed.value = true

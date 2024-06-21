@@ -60,8 +60,6 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
     private val allProducts = mutableListOf<Product>()
     private val displayedProducts = mutableListOf<Product>()
 
-    private var selectedProductObserver: Observer<Product>? = null
-
 
     interface ProductsSelectionListener {
         fun onProductSelected(product: ProductsFragment.Product)
@@ -206,13 +204,10 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
     override fun onProductClick(product: Product) {
         if (isProductSelectionListenerActive) {
             Log.d("Product", product.toString())
-            productSelectionListener?.onProductSelected(product)
-
 
             sharedViewModel.selectProduct(product)
 
-
-            sharedViewModel.isProductSelectionListenerActive.value = false
+            isProductSelectionListenerActive = false
 
             val orderDialog = OrderDialogFragment()
             (activity as MainActivity).switchFragment(orderDialog)

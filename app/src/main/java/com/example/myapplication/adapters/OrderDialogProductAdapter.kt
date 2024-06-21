@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.fragments.OrderDialogFragment
 import com.example.myapplication.fragments.ProductsFragment.Product
+import de.hdodenhof.circleimageview.CircleImageView
 
 class OrderDialogProductAdapter(private val productList: List<OrderDialogFragment.LineItemProduct>) :
     RecyclerView.Adapter<OrderDialogProductAdapter.ProductViewHolder>() {
@@ -20,7 +21,7 @@ class OrderDialogProductAdapter(private val productList: List<OrderDialogFragmen
     class ProductViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val productName: TextView = itemView.findViewById(R.id.productName)
         val quantityEditText: EditText = itemView.findViewById(R.id.quantityEditText)
-        val productImage: ImageView = itemView.findViewById(R.id.productImage)
+        val productImage: CircleImageView = itemView.findViewById(R.id.productImage)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
