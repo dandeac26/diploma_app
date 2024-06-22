@@ -110,6 +110,10 @@ class OrderDetailsFragment : Fragment() {
             view.findViewById<TextView>(R.id.dayTitle).text = date
         }
 
+        val backButton = view.findViewById<ImageButton>(R.id.backButton)
+        backButton.setOnClickListener {
+            requireActivity().onBackPressed()
+        }
 
     }
 

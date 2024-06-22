@@ -13,9 +13,7 @@ import android.view.ViewGroup
 import android.view.ViewStub
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -29,13 +27,8 @@ import com.example.myapplication.R
 import com.example.myapplication.adapters.DateItemAdapter
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.entity.OrderDTO
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
-import com.facebook.shimmer.ShimmerFrameLayout
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -251,11 +244,31 @@ class OrdersFragment : Fragment() {
         val orderDetails: List<OrderDetail>
     ) : Serializable
 
+    data class OrderReq (
+        val orderId: String,
+        val clientId: String,
+        val deliveryNeeded: Boolean,
+        val completionDate: String,
+        val completionTime: String,
+        val price: Double,
+        val completed: Boolean,
+        val clientName: String,
+        val clientLocation: String,
+        val clientPhoneNumber: String,
+        val orderDetails: Any?
+    ) : Serializable
+
     data class OrderDetail(
         val orderId: String,
         val productId: String,
         val quantity: Int,
         val product: Product
+    )
+
+    data class OrderDetailProduct(
+        val orderId: String,
+        val productId: String,
+        val quantity: Int,
     )
 
     data class Product(
@@ -275,25 +288,7 @@ class OrdersFragment : Fragment() {
         }
     }
 
-    private fun addOrder(newOrder: OrderDTO, callback: (String?) -> Unit) {
-        val call = orderAPI.addOrder(newOrder)
-        call.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    callback(null)
-                    fetchOrders()
-                } else {
-                    // Handle the error
-                    if (response.code() == 400) {
-                        callback(response.errorBody()?.string())
-                    }
-                }
-            }
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                // Handle the error
-            }
-        })
-    }
+
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

@@ -24,7 +24,10 @@ public interface OrderAPI {
     fun deleteAllOrders(): Call<Void>
 
     @POST("orders")
-    fun addOrder(@Body newOrder: OrderDTO): Call<Void>
+    fun addOrder(@Body newOrder: OrderDTO): Call<OrdersFragment.OrderReq>
+
+    @POST("orders/{orderId}/details")
+    fun addOrderDetails(@Path("orderId") orderId: String, @Body orderDetails: OrdersFragment.OrderDetailProduct): Call<Void>
 
     @PUT("orders/{orderId}")
     fun updateOrder(@Path("orderId") orderId: String, @Body updatedOrder: OrderDTO): Call<Void>
