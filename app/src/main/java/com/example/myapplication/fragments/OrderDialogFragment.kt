@@ -140,6 +140,9 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
                                 // Add products to the order
 
+                                val productCount = selectedProducts.count { it.quantity > 0 }
+                                var successfulCalls = 0
+
                                 for (product in selectedProducts) {
 //                                    Log.d("OrderDialogFragment", "Adding order detail for product: ${product.name}")
                                     if(product.quantity > 0){
@@ -149,18 +152,18 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                                                 // Handle the error
                                                 Log.e("OrderDialogFragment", "Error adding order detail: $errorr")
                                             } else {
+//                                                notifyServerAboutNewOrderDetail(OrdersFragment.OrderDetailProduct(orderId, product.id, product.quantity))
                                                 Log.d("OrderDialogFragment", "Order detail added successfully")
+//                                                successfulCalls++
+//                                                if (successfulCalls == productCount) {
+//                                                    // Notify the server about the new order
+//                                                    notifyServerAboutNewOrder(order)
+//                                                }
                                             }
                                         }
                                     }
                                 }
 
-
-
-
-
-
-                                // Notify the server about the new order
                                 notifyServerAboutNewOrder(order)
 
                                 hideKeyboard(it)
@@ -173,6 +176,13 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                                 Toast.makeText(context, "Order added successfully", Toast.LENGTH_SHORT).show()
                                 val dailyOrderFragment = DailyOrderFragment()
                                 (activity as MainActivity).switchFragment(dailyOrderFragment)
+
+
+
+                                // Notify the server about the new order
+
+
+
                             }
                         }
 
@@ -233,7 +243,7 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
     private fun addOrderDetail(orderId: String, productId: String, quantity: Int, callback: (String?) -> Unit) {
         val orderDetail = OrdersFragment.OrderDetailProduct(orderId, productId, quantity)
-        val call = orderDetailsAPI.addOrderDetails(orderId, orderDetail)
+        val call = orderAPI.addOrderDetails(orderId, orderDetail)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
@@ -313,6 +323,14 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
         // Send the orderJson string to the server over the WebSocket connection
         webSocket?.send(orderJson)
+    }
+
+    private fun notifyServerAboutNewOrderDetail(orderDetail: OrdersFragment.OrderDetailProduct) {
+        // Convert the order to a JSON string
+        val orderDetailJson = Gson().toJson(orderDetail)
+
+        // Send the orderJson string to the server over the WebSocket connection
+        webSocket?.send(orderDetailJson)
     }
 
     private fun connectWebSocket() {
