@@ -8,11 +8,11 @@
     android:paddingTop="0dp"
     >
 
-    <TextView
+    <EditText
         android:id="@+id/selectedClientTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Please select a client:"
+        android:hint="Client name:"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@+id/selectClientButton"
@@ -29,21 +29,6 @@
         app:layout_constraintStart_toEndOf="@+id/selectedClientTextView"
         app:layout_constraintTop_toTopOf="parent"/>
 
-    <View
-        android:id="@+id/dividerLine"
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="10dp"
-        android:background="@color/lineColor"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:paddingBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/productsTitleTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/selectClientButton" />
 
     <TextView
         android:id="@+id/productsTitleTextView"
@@ -54,7 +39,7 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@id/addProductsButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dividerLine" />
+        app:layout_constraintTop_toBottomOf="@+id/selectClientButton" />
 
     <ImageButton
         android:id="@+id/addProductsButton"

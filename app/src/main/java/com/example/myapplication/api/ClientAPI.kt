@@ -24,6 +24,9 @@ public interface ClientAPI {
     @POST("client")
     fun addClient(@Body newClient:ClientDTO): Call<Void>
 
+    @POST("client")
+    fun addClientAndReturnId(@Body newClient:ClientDTO): Call<ClientsFragment.Client>
+
     @PUT("client/{clientId}")
     fun updateClient(@Path("clientId")clientId: String, @Body updatedClient: ClientDTO): Call<Void>
 }

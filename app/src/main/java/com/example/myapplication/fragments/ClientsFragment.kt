@@ -44,9 +44,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.MainActivity
-import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.fragments.ProductsFragment.Product
 import com.example.myapplication.views.SharedViewModelFactory
 
 

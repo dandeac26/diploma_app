@@ -10,13 +10,11 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.config.NetworkChangeReceiver
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.fragments.ClientsFragment.ClientSelectionListener
 import com.example.myapplication.fragments.ClientsFragment
-import com.example.myapplication.fragments.CreateOrderFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductDetailsFragment
 import com.example.myapplication.fragments.ProductsFragment
@@ -132,6 +130,7 @@ class MainActivity : AppCompatActivity() {
 
         if (newFragment == null) {
             // If not found, add it
+
             transaction.add(R.id.fragment_container, fragment, fragmentTag)
 
             newFragment = fragment

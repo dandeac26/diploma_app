@@ -1,13 +1,10 @@
 package com.example.myapplication.fragments
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -31,13 +28,17 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.OrderAdapter
-import com.example.myapplication.api.ClientAPI
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.entity.OrderDTO
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.facebook.shimmer.ShimmerFrameLayout
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import okio.ByteString
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -77,7 +78,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
         super.onViewCreated(view, savedInstanceState)
 
         orderAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(OrderAPI::class.java)
-
+        connectWebSocket()
 
 
         val factory = SharedViewModelFactory()
@@ -139,18 +140,23 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
         val addDayOrderButton: ImageButton = view.findViewById(R.id.addDayOrderButton)
         addDayOrderButton.setOnClickListener {
-//
-            val orderDialogFragment = OrderDialogFragment()
+
+            val orderDialogFragment = OrderDialogFragment().apply {
+                // send selectedDate to OrderDialogFragment
+                arguments = Bundle().apply {
+                    putString("selectedDateString", dayDate)
+                }
+            }
             (activity as MainActivity).switchFragment(orderDialogFragment)
         }
 
-        val addOrderButton = view.findViewById<ImageButton>(R.id.addOrderButton)
-        addOrderButton.setOnClickListener {
-//            openContacts()
-            val clientsFragment = ClientsFragment()
-            clientsFragment.setClientSelectionListener(this)
-            (activity as MainActivity).switchFragment(clientsFragment)
-        }
+//        val addOrderButton = view.findViewById<ImageButton>(R.id.addOrderButton)
+//        addOrderButton.setOnClickListener {
+////            openContacts()
+//            val clientsFragment = ClientsFragment()
+//            clientsFragment.setClientSelectionListener(this)
+//            (activity as MainActivity).switchFragment(clientsFragment)
+//        }
 
 
         /// SEARCH BAR LOGIC
@@ -185,6 +191,48 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             }
         })
 
+        val backButton = view.findViewById<View>(R.id.backButton)
+        backButton.setOnClickListener {
+            // swtich to OrdersFragment
+            (activity as MainActivity).switchFragment(OrdersFragment())
+        }
+
+    }
+
+    private fun connectWebSocket() {
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url("ws://192.168.68.56:8000/ws")
+            .build()
+
+        val listener = object : WebSocketListener() {
+            override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
+                // Connection opened
+                Log.i("WebSocket", "Connection opened")
+            }
+
+            override fun onMessage(webSocket: WebSocket, text: String) {
+                if (text == "Refetch orders") {
+                    fetchDailyOrders()
+                }
+            }
+
+            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+                // Handle binary messages
+            }
+
+            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                webSocket.close(1000, null)
+                Log.i("WebSocket", "Connection closed")
+            }
+            override fun onFailure(webSocket: WebSocket, t: Throwable, response: okhttp3.Response?) {
+                Log.e("WebSocket", "Error: ${t.message}")
+            }
+
+        }
+
+        client.newWebSocket(request, listener)
+//        client.dispatcher.executorService.shutdown()
     }
 
     private fun convertDateFormat(inputDate: String): String? {

@@ -37,7 +37,9 @@ class CreateOrderFragment : Fragment() {
         val clientNameTextView = view.findViewById<TextView>(R.id.clientNameTextView)
 
         sharedViewModel.selectedClient.observe(viewLifecycleOwner) { client ->
-            clientNameTextView.text = client.firmName
+            if (client != null) {
+                clientNameTextView.text = client.firmName
+            }
         }
 
         val productsTable = view.findViewById<TableLayout>(R.id.orderTable)
