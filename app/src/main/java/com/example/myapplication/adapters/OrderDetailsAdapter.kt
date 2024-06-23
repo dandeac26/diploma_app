@@ -25,15 +25,8 @@ class OrderDetailsAdapter(private val orderDetails: List<OrdersFragment.OrderDet
     override fun onBindViewHolder(holder: OrderDetailViewHolder, position: Int) {
         val orderDetail = orderDetails[position]
 
-//        val productPrice = orderDetail.product.price
-//        val productPriceText = if (productPrice % 1 == 0.0) {
-//            "${productPrice.toInt()}"
-//        } else {
-//            String.format("%.2f", productPrice)
-//        }
         holder.orderDetailsProductNameTextView.text = orderDetail.product.name
         holder.orderDetailsQuantityTextView.text = orderDetail.quantity.toString()
-
     }
 
     override fun getItemCount() = orderDetails.size

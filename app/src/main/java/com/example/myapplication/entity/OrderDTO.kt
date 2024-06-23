@@ -1,7 +1,5 @@
 package com.example.myapplication.entity
 
-import com.example.myapplication.fragments.OrdersFragment.OrderDetail
-
 data class OrderDTO(
     val clientId: String,
     val deliveryNeeded: Boolean,

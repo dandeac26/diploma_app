@@ -1,17 +1,17 @@
-package com.example.myapplication.api;
+package com.example.myapplication.api
 
-import com.example.myapplication.entity.ClientDTO;
-import com.example.myapplication.fragments.ClientsFragment;
+import com.example.myapplication.entity.ClientDTO
+import com.example.myapplication.fragments.ClientsFragment
 
-import retrofit2.Call;
-import retrofit2.http.Body;
-import retrofit2.http.DELETE;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.PUT;
-import retrofit2.http.Path;
+import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 
-public interface ClientAPI {
+interface ClientAPI {
     @GET("client")
     fun getClients(): Call<List<ClientsFragment.Client>>
 

@@ -4,22 +4,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.content.Context
 import android.util.Log
-import com.example.myapplication.config.ConfigLoader
-
-
-//object RetrofitInstance {
-//    fun getInstance(context: Context): Retrofit {
-//        val configManager = ConfigManager(context)
-//        val baseUrl = if (configManager.useHomeUrl) configManager.baseUrlHome else configManager.baseUrlMobile
-//        Log.d("RetrofitInstance", "baseUrl: $baseUrl")
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl(baseUrl)
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//
-//        return retrofit
-//    }
-//}
 
 object RetrofitInstance {
     fun getInstance(context: Context, port: Int): Retrofit {

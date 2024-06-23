@@ -4,20 +4,16 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.fragment.app.Fragment
-
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,7 +24,6 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
@@ -40,7 +35,6 @@ class OrderDetailsFragment : Fragment() {
     private lateinit var orderDetailsAdapter: OrderDetailsAdapter
 
     private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var shimmerViewContainer: ShimmerFrameLayout
 
     private val REQUEST_READ_CONTACTS = 1
 
@@ -60,6 +54,7 @@ class OrderDetailsFragment : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
 
         sharedViewModel.selectedOrder.observe(viewLifecycleOwner) { order ->
+
             /// HEADER
             view.findViewById<TextView>(R.id.clientName).text = order.clientName
             view.findViewById<TextView>(R.id.orderClientPhoneNumberTextView).text = order.clientPhoneNumber

@@ -98,9 +98,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             fetchDailyOrders()
         }
 
-
-
-
         orderAdapter = OrderAdapter(orders, orderAPI, this, sharedViewModel)
 
         orderRecyclerView = view.findViewById(R.id.ordersRecyclerView)
@@ -116,7 +113,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
         swipeRefreshLayout.setOnRefreshListener {
-            // Refresh orders
             fetchDailyOrders()
         }
 
@@ -142,7 +138,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
         addDayOrderButton.setOnClickListener {
 
             val orderDialogFragment = OrderDialogFragment().apply {
-                // send selectedDate to OrderDialogFragment
                 arguments = Bundle().apply {
                     putString("selectedDateString", dayDate)
                 }
@@ -150,19 +145,10 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             (activity as MainActivity).switchFragment(orderDialogFragment)
         }
 
-//        val addOrderButton = view.findViewById<ImageButton>(R.id.addOrderButton)
-//        addOrderButton.setOnClickListener {
-////            openContacts()
-//            val clientsFragment = ClientsFragment()
-//            clientsFragment.setClientSelectionListener(this)
-//            (activity as MainActivity).switchFragment(clientsFragment)
-//        }
-
-
         /// SEARCH BAR LOGIC
 
         val searchBar = view.findViewById<EditText>(R.id.searchBar)
-        searchBar.setOnTouchListener { v, event ->
+        searchBar.setOnTouchListener { _, event ->
             val DRAWABLE_RIGHT = 2
 
             if (event.action == MotionEvent.ACTION_UP) {
@@ -193,7 +179,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
         val backButton = view.findViewById<View>(R.id.backButton)
         backButton.setOnClickListener {
-            // swtich to OrdersFragment
             (activity as MainActivity).switchFragment(OrdersFragment())
         }
 
@@ -207,7 +192,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
         val listener = object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
-                // Connection opened
                 Log.i("WebSocket", "Connection opened")
             }
 
@@ -230,9 +214,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             }
 
         }
-
         client.newWebSocket(request, listener)
-//        client.dispatcher.executorService.shutdown()
     }
 
     private fun convertDateFormat(inputDate: String): String? {
@@ -244,9 +226,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
     private fun filterOrders(query: String) {
         val filteredOrders = allOrders.filter { order ->
-            order.clientName?.contains(query, ignoreCase = true) == true ||
-                    order.clientLocation?.contains(query, ignoreCase = true) == true ||
-                    order.price.toString().contains(query, ignoreCase = true)
+            order.clientName.contains(query, ignoreCase = true) || order.clientLocation.contains(query, ignoreCase = true) || order.price.toString().contains(query, ignoreCase = true)
         }
 
         displayedOrders.clear()
@@ -255,17 +235,12 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
     }
 
     override fun onClientSelected(client: ClientsFragment.Client) {
-
         Log.d("Client", client.toString())
 
         sharedViewModel.selectClient(client)
 
         val createOrderFragment = CreateOrderFragment()
         (activity as MainActivity).switchFragment(createOrderFragment)
-
-//        val createOrderV2Fragment = CreateOrderV2Fragment()
-//        (activity as MainActivity).switchFragment(createOrderV2Fragment)
-
     }
 
     fun removeOrderFromSearchLists(orderId: String) {
@@ -275,16 +250,13 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
     private fun fetchDailyOrders() {
         activity?.runOnUiThread {
-            // check network connection
+
             if (!isNetworkAvailable()) {
                 swipeRefreshLayout.isRefreshing = false
                 shimmerViewContainer.visibility = View.GONE
                 emptyView.visibility = View.VISIBLE
                 return@runOnUiThread
             }
-            // fetch orders by date
-
-
 
             val call = orderAPI.getOrdersByDate(dayDate)
             call.enqueue(object : Callback<List<OrdersFragment.Order>> {
@@ -347,8 +319,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
         }
     }
-    data class OrderListItem(val client: String, val totalPrice: String, val completed: Boolean)
-
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -372,7 +342,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
-                    // Update the completed property of the Order after the API call is successful
                     order.completed = checked
                     fetchDailyOrders()
                 } else {
@@ -386,10 +355,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             }
         })
     }
-
-
-
-
 
     fun switchToOrderDetailsFragment(selectedOrder : OrdersFragment.Order, selectedDate : String) {
         sharedViewModel.selectedOrder.value = selectedOrder

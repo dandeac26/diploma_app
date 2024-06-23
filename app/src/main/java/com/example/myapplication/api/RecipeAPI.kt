@@ -13,8 +13,10 @@ import retrofit2.http.Path
 interface RecipeAPI {
     @GET("recipe")
     fun getRecipes(): Call<Map<String, List<ProductDetailsFragment.Recipe>>>
+
     @GET("recipe/{productId}")
     fun getRecipeOfProduct(@Path("productId") productId: String): Call<List<ProductDetailsFragment.Recipe>>
+
     @DELETE("recipe/{productId}/{ingredientId}")
     fun deleteRecipe(@Path("productId") productId: String, @Path("ingredientId") ingredientId:String): Call<Void>
 

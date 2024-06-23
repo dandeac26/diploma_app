@@ -31,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     private var currentFragment: Fragment? = null
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
+
     private val fragmentToMenuItem = mapOf(
         HomeFragment::class.java to R.id.nav_home,
         ProductsFragment::class.java to R.id.nav_products,
@@ -41,20 +42,17 @@ class MainActivity : AppCompatActivity() {
 
     private val fragmentHistory = LinkedList<Fragment>()
 
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        // Save the state of your fragments
         currentFragment?.let { supportFragmentManager.putFragment(outState, "currentFragment", it) }
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val factory = SharedViewModelFactory()
-        sharedViewModel = ViewModelProvider(this, factory).get(SharedViewModel::class.java)
+        sharedViewModel = ViewModelProvider(this, factory)[SharedViewModel::class.java]
 
         networkChangeReceiver = NetworkChangeReceiver {
             RetrofitInstance.getInstance(applicationContext, 8080)
@@ -82,9 +80,6 @@ class MainActivity : AppCompatActivity() {
                         override fun onClientSelected(client: ClientsFragment.Client) {
                             sharedViewModel.selectClient(client)
                             isClientSelectionListenerActive = false
-//                            // Create a new instance of CreateOrderFragment
-//                            val createOrderFragment = CreateOrderFragment()
-//                            (activity as MainActivity).switchFragment(createOrderFragment)
                         }
                     })
                 }
@@ -102,82 +97,52 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-//        if (savedInstanceState == null) {
-//            switchFragment(HomeFragment())
-//        }
         if (savedInstanceState != null) {
-            // The activity is being recreated after a configuration change
-            // Restore the state of your fragments
             currentFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
         } else {
-            // The activity is being created for the first time
-            // Add your fragments as usual
             switchFragment(HomeFragment())
         }
     }
 
-    fun addFragmentToHistory(fragment: Fragment) {
-        fragmentHistory.add(fragment)
-    }
-    fun updateTopNavTitle(title: String) {
+    private fun updateTopNavTitle(title: String) {
         supportActionBar?.title = title
     }
-//    private var removedLast = false
+
     fun switchFragment(fragment: Fragment) {
         if (isChangingConfigurations) {
             return
         }
 
         if (fragmentHistory.isEmpty() || fragment::class.java != fragmentHistory.last::class.java) {
-            // If the fragment is not the current fragment, add it to the history
             fragmentHistory.add(fragment)
         }
 
         val fragmentTag = fragment::class.java.simpleName
 
         val transaction = supportFragmentManager.beginTransaction()
-//            .setCustomAnimations(R.anim.fade_in, 0, 0, 0)
 
-        // Hide the current fragment
-//        currentFragment?.let { transaction.hide(it)
-//        it.userVisibleHint = false
-//        }
         if(currentFragment != null) {
             transaction.hide(currentFragment!!)
-//            currentFragment!!.userVisibleHint = false
         }
 
-        // Try to find the fragment in the FragmentManager
         var newFragment = supportFragmentManager.findFragmentByTag(fragmentTag)
 
         if (newFragment != null && newFragment is ProductDetailsFragment) {
-            // If the fragment is a ProductDetailsFragment, remove it
             transaction.remove(newFragment)
             newFragment = null
         }
 
         if (newFragment == null) {
-            // If not found, add it
 
             transaction.add(R.id.fragment_container, fragment, fragmentTag)
 
             newFragment = fragment
         } else {
-            // If found, show it
             transaction.show(newFragment)
-//            newFragment.userVisibleHint = true
         }
-
-//        if(fragment.isAdded){
-//            transaction.show(fragment)
-//        } else {
-//            transaction.add(R.id.fragment_container, fragment, fragmentTag)
-//            newFragment = fragment
-//        }
 
         transaction.commit()
 
-        // Update the current fragment
         currentFragment = newFragment
 
         when (newFragment) {
@@ -245,19 +210,15 @@ class MainActivity : AppCompatActivity() {
         sharedViewModel.handleBackPress()
         if (fragmentHistory.size > 1) {
 
-            // Remove the current fragment from the history
-
             fragmentHistory.removeLast()
 
             if(fragmentHistory.last is ProductDetailsFragment) {
                 fragmentHistory.removeLast()
             }
-            // Get the previous fragment
+
             val previousFragment = fragmentHistory.last
 
             switchFragment(previousFragment)
-
-
 
             val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
             val menuItemId = fragmentToMenuItem[previousFragment::class.java]
@@ -266,7 +227,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         } else {
-            // If there's only one fragment in the history, let the system handle the back press
             super.onBackPressed()
         }
     }

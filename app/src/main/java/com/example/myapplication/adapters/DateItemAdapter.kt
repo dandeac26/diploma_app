@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.fragments.OrdersFragment
-import com.example.myapplication.fragments.StocksFragment
 import com.example.myapplication.views.SharedViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -45,7 +44,7 @@ class DateItemAdapter(private val dates: List<OrdersFragment.DateItem>, private 
             val dateItem = dates[position]
             val holder = holder as DateItemViewHolder
 
-            // Check if the date is today
+
             val today = SimpleDateFormat("dd.MM.yy", Locale.getDefault()).format(Calendar.getInstance().time)
             if (dateItem.date == today) {
                 holder.dayTextView.text = "${dateItem.day} - TODAY"

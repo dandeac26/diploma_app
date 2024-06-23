@@ -2,9 +2,6 @@ package com.example.myapplication.fragments
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,7 +13,6 @@ import android.view.animation.Animation
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.PopupMenu
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,11 +38,7 @@ import java.util.Locale
 
 class OrdersFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
-    private val orders = mutableListOf<Order>()
     private lateinit var orderAPI: OrderAPI
-    private var webSocket: WebSocket? = null
-    private lateinit var button : Button
-    private lateinit var textOrders: TextView
 
     private lateinit var recyclerView: RecyclerView
     private val dates = mutableListOf<DateItem>()
@@ -69,7 +61,7 @@ class OrdersFragment : Fragment() {
         connectWebSocket()
 
         val factory = SharedViewModelFactory()
-        sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
+        sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
         dateItemAdapter = DateItemAdapter(dates, this, sharedViewModel)
 
@@ -87,12 +79,12 @@ class OrdersFragment : Fragment() {
             swipeRefreshLayout.isRefreshing = false
         }
 
-
         sharedViewModel.refreshProductsTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {
                 fetchOrders()
             }
         }
+
         sharedViewModel.onBackPressed.observe(viewLifecycleOwner) {
 
         }
@@ -112,19 +104,14 @@ class OrdersFragment : Fragment() {
             popupMenu.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.showCompleted -> {
-                        // Navigate to StocksFragment
-//                        (activity as MainActivity).switchFragment(StocksFragment())
                         true
                     }
                     R.id.history -> {
-                        // Navigate to PredictionsFragment
                         true
                     }
                     R.id.centralizator -> {
-                        // Navigate to CentralizatorFragment
                         true
                     }
-
                     else -> false
                 }
             }
@@ -144,17 +131,13 @@ class OrdersFragment : Fragment() {
                 val selectedDate = "$selectedDay.$formattedMonth.$lastTwoDigits"
                 Log.d("OrdersFragment", "Selected date: $selectedDate")
 
-                // Create a Calendar instance with the selected date
                 val selectedCalendar = Calendar.getInstance()
                 selectedCalendar.set(selectedYear, selectedMonth, selectedDay)
 
-                // Get the day of the week
                 val selectedDayOfWeek = selectedCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
 
-                // Update the selectedDate in the shared ViewModel
                 sharedViewModel.selectedDate.value = "$selectedDayOfWeek $selectedDate"
 
-                // Switch to DailyOrderFragment
                 switchToDailyOrderFragment(selectedDate)
             }, year, month, day)
 
@@ -170,11 +153,11 @@ class OrdersFragment : Fragment() {
         (activity as MainActivity).switchFragment(dailyOrderFragment)
     }
 
-
     data class DateItem(
         val day: String,
         val date: String
     )
+
     private fun generateDateItems(): List<DateItem> {
         val dates = mutableListOf<DateItem>()
         val calendar = Calendar.getInstance()
@@ -184,7 +167,6 @@ class OrdersFragment : Fragment() {
             val date = SimpleDateFormat("dd.MM.yy", Locale.getDefault()).format(calendar.time)
             dayOfWeek?.let { DateItem(it, date) }?.let { dates.add(it) }
 
-            // If the day of the week is Sunday, add a "NextWeek" item
             if (dayOfWeek == "Sunday") {
                 dates.add(DateItem("NextWeek", ""))
             }
@@ -194,6 +176,7 @@ class OrdersFragment : Fragment() {
 
         return dates
     }
+
     private fun connectWebSocket() {
         val client = OkHttpClient()
         val request = Request.Builder()
@@ -202,7 +185,6 @@ class OrdersFragment : Fragment() {
 
         val listener = object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
-                // Connection opened
                 Log.i("WebSocket", "Connection opened")
             }
 
@@ -225,9 +207,7 @@ class OrdersFragment : Fragment() {
             }
 
         }
-
         client.newWebSocket(request, listener)
-//        client.dispatcher.executorService.shutdown()
     }
 
     data class Order (
@@ -280,21 +260,7 @@ class OrdersFragment : Fragment() {
 
     private fun fetchOrders() {
         activity?.runOnUiThread {
-//            Log.d("OrdersFragment", "Fetching orders")
-//            textOrders.text = "fetched orders"
-//            textOrders.postDelayed({
-//                textOrders.text = "Orders"
-//            }, 1000)
+
         }
-    }
-
-
-
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork ?: return false
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-        return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || networkCapabilities.hasTransport(
-            NetworkCapabilities.TRANSPORT_CELLULAR)
     }
 }

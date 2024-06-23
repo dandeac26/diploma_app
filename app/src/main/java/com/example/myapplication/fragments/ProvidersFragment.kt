@@ -36,6 +36,7 @@ class ProvidersFragment : Fragment() {
     private lateinit var addProviderButton: ImageButton
     private lateinit var updateProviderButton: ImageButton
     private lateinit var backButton : ImageButton
+
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -129,11 +130,9 @@ class ProvidersFragment : Fragment() {
                         true
                     }
                     R.id.clearAll -> {
-                        // Implement clearAll functionality
                         true
                     }
                     R.id.clearSelected -> {
-                        // Implement clearSelected functionality
                         true
                     }
                     R.id.ingredients -> {
@@ -147,7 +146,6 @@ class ProvidersFragment : Fragment() {
                         true
                     }
                     R.id.predictions -> {
-                        // Navigate to PredictionsFragment
                         true
                     }
                     else -> false
@@ -287,26 +285,6 @@ class ProvidersFragment : Fragment() {
         })
     }
 
-    private fun addProvider(newProvider: ProviderDTO, callback: (String?) -> Unit) {
-        val call = providersAPI.addProvider(newProvider)
-        call.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    callback(null)
-                    fetchProviders()
-                } else {
-                    if (response.code() == 400) {
-                        callback(response.errorBody()?.string())
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                // Handle the error
-            }
-        })
-    }
-
     fun deleteProvider(provider: StocksFragment.Provider) {
         AlertDialog.Builder(requireContext()).apply {
             setTitle("Delete Provider?")
@@ -320,7 +298,6 @@ class ProvidersFragment : Fragment() {
                             fetchProviders()
                         }
                     }
-
                     override fun onFailure(call: Call<Void>, t: Throwable) {
                         // Handle the error
                     }
@@ -346,7 +323,6 @@ class ProvidersFragment : Fragment() {
                             fetchProviders()
                         }
                     }
-
                     override fun onFailure(call: Call<Void>, t: Throwable) {
                         // Handle the error
                     }

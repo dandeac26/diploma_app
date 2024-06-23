@@ -21,10 +21,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.example.myapplication.MainActivity
 import com.example.myapplication.R
-import com.example.myapplication.adapters.ClientAdapter
-import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.api.BakeryAPI
 import com.example.myapplication.api.IngredientsAPI
 import com.example.myapplication.api.RecipeAPI
@@ -47,6 +44,7 @@ class ProductDetailsFragment : Fragment() {
     private lateinit var recipeAPI: RecipeAPI
     private lateinit var ingredientsAPI: IngredientsAPI
     private lateinit var product: Product
+
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,6 +64,7 @@ class ProductDetailsFragment : Fragment() {
 
         return view
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -76,7 +75,6 @@ class ProductDetailsFragment : Fragment() {
         backButton.setOnClickListener {
             requireActivity().onBackPressed()
         }
-
 
         val editButton = view.findViewById<View>(R.id.editButton)
         editButton.setOnClickListener {
@@ -102,7 +100,6 @@ class ProductDetailsFragment : Fragment() {
         val ingredientMeasurementUnit: String
     )
 
-
     private fun setProductDetails() {
         Glide.with(productImage.context)
             .load(product.imageUrl)
@@ -110,7 +107,6 @@ class ProductDetailsFragment : Fragment() {
 
         productName.text = product.name
         productPrice.text = product.price.toString()
-
 
         val call = recipeAPI.getRecipeOfProduct(product.productId)
         call.enqueue(object : Callback<List<Recipe>> {
@@ -132,8 +128,6 @@ class ProductDetailsFragment : Fragment() {
                             row.setOnClickListener {
                                 updateRecipeDialog(recipe)
                             }
-
-
                             recipeTable.addView(row)
                         }
                     } else {
@@ -173,7 +167,6 @@ class ProductDetailsFragment : Fragment() {
                                 updateRecipeDialog(recipe)
                             }
 
-                            // Add the row to the table
                             recipeTable.addView(row)
                         }
                     } else {
@@ -296,7 +289,6 @@ class ProductDetailsFragment : Fragment() {
         }
 
         dialogView.findViewById<Button>(R.id.saveButton).setOnClickListener {
-
             val quantity = dialogView.findViewById<EditText>(R.id.dialogQuantityInput).text.toString()
 
             if (quantity.isEmpty()) {
@@ -326,13 +318,13 @@ class ProductDetailsFragment : Fragment() {
                     Toast.makeText(context, "Ingredient not found", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
+
                 val newRecipe = RecipeDTO(product.productId, ingredientId, quantityDouble)
                 val call = recipeAPI.addRecipe(newRecipe)
                 call.enqueue(object : Callback<Void> {
                     override fun onResponse(call: Call<Void>, response: Response<Void>) {
                         if (response.isSuccessful) {
                             fetchRecipe()
-                            // set recipeTitle to "Recipe:"
                             val recipeTitle = view?.findViewById<TextView>(R.id.recipeTitle)
                             recipeTitle?.text = getString(R.string.recipe)
                             alertDialog.dismiss()

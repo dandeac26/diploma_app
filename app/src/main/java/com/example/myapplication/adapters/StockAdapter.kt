@@ -2,6 +2,7 @@ package com.example.myapplication.adapters
 
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.MenuInflater
@@ -15,8 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.fragments.StocksFragment
 import com.example.myapplication.api.StockAPI
-import com.example.myapplication.entity.StockDTO
-import com.example.myapplication.fragments.ClientsFragment
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,7 +46,7 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>, privat
         holder.quantityTextView.text = stock.quantity.toString()
         holder.priceTextView.text = stock.price
         holder.maxQuantityTextView.text = stock.maxQuantity.toString()
-        holder.packagingProgressLabel.text = stock.packaging;
+        holder.packagingProgressLabel.text = stock.packaging
 
         holder.stockProgressBar.max = stock.maxQuantity
         holder.stockProgressBar.progress = stock.quantity
@@ -72,7 +71,6 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>, privat
             colorAnimation.duration = 1500
             colorAnimation.start()
         } else {
-            // set to the color of list_item_background
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
         }
     }
@@ -124,10 +122,11 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>, privat
             .show()
     }
 
-    fun updateStock(position: Int) {
+    private fun updateStock(position: Int) {
         val stock = stocks[position]
         fragment.openAddStockDialog(stock, position)
     }
+    @SuppressLint("NotifyDataSetChanged")
     fun updateStocksAfterSearch(newStocks: List<StocksFragment.Stock>) {
         stocks.clear()
         stocks.addAll(newStocks)

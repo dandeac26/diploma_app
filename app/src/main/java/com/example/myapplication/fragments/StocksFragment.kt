@@ -27,7 +27,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -81,17 +80,17 @@ class StocksFragment : Fragment() {
         providerAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ProviderAPI::class.java)
 
         val factory = SharedViewModelFactory()
-        sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
+        sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
-        stockAdapter = StockAdapter(stocks, stockAPI, this) // was all stocks
+        stockAdapter = StockAdapter(stocks, stockAPI, this)
 
         recyclerView = view.findViewById(R.id.stocksRecyclerView)
         emptyView = view.findViewById(R.id.emptyView)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner, Observer {
+        sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner) {
             recyclerView.adapter = stockAdapter
-        })
+        }
 
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
@@ -111,11 +110,9 @@ class StocksFragment : Fragment() {
             alphaAnimation.repeatCount = 1
             alphaAnimation.repeatMode = Animation.REVERSE
 
-
             it.startAnimation(alphaAnimation)
             openAddStockDialog()
         }
-
 
         val menuButton = view.findViewById<ImageButton>(R.id.menuButton)
         menuButton.setOnClickListener {
@@ -123,7 +120,6 @@ class StocksFragment : Fragment() {
             alphaAnimation.duration = 200
             alphaAnimation.repeatCount = 1
             alphaAnimation.repeatMode = Animation.REVERSE
-
 
             it.startAnimation(alphaAnimation)
 
@@ -136,11 +132,9 @@ class StocksFragment : Fragment() {
                         true
                     }
                     R.id.clearAll -> {
-                        // Implement clearAll functionality
                         true
                     }
                     R.id.clearSelected -> {
-                        // Implement clearSelected functionality
                         true
                     }
                     R.id.ingredients -> {
@@ -154,11 +148,9 @@ class StocksFragment : Fragment() {
                         true
                     }
                     R.id.refill -> {
-                        // Implement refill functionality
                         true
                     }
                     R.id.predictions -> {
-                        // Navigate to PredictionsFragment
                         true
                     }
                     else -> false
@@ -182,7 +174,7 @@ class StocksFragment : Fragment() {
         }
 
         val searchBar = view.findViewById<EditText>(R.id.searchBar)
-        searchBar.setOnTouchListener { v, event ->
+        searchBar.setOnTouchListener { _, event ->
             val DRAWABLE_RIGHT = 2
 
             if (event.action == MotionEvent.ACTION_UP) {
@@ -197,6 +189,7 @@ class StocksFragment : Fragment() {
             }
             false
         }
+
         searchBar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
                 // No action needed here
@@ -336,7 +329,7 @@ class StocksFragment : Fragment() {
             }
         })
     }
-    var updatingStockPosition = -1
+    private var updatingStockPosition = -1
     @SuppressLint("InflateParams", "MissingInflatedId", "CutPasteId")
     fun openAddStockDialog(stock: Stock? = null, position: Int = -1) {
         if (!isNetworkAvailable()) {
@@ -353,13 +346,9 @@ class StocksFragment : Fragment() {
 
         val alertDialog = builder.show()
 
-        // populate spinner with ingredients and providers
         val ingredientSpinner = dialogView.findViewById<Spinner>(R.id.ingredientNameInput)
         val providerSpinner = dialogView.findViewById<Spinner>(R.id.providerNameInput)
 
-
-
-        // Fetch the ingredients and set them to the ingredientSpinner
         val ingredientCall = ingredientsAPI.getIngredients()
         ingredientCall.enqueue(object : Callback<List<Ingredient>> {
             override fun onResponse(call: Call<List<Ingredient>>, response: Response<List<Ingredient>>) {
@@ -385,7 +374,6 @@ class StocksFragment : Fragment() {
             }
         })
 
-        // Fetch the providers and set them to the providerSpinner
         val providerCall = providerAPI.getProviders()
         providerCall.enqueue(object : Callback<List<Provider>> {
             override fun onResponse(call: Call<List<Provider>>, response: Response<List<Provider>>) {
@@ -451,7 +439,6 @@ class StocksFragment : Fragment() {
             val quantityInt = quantityString.toInt()
             val priceDouble = priceString.toDouble()
             val maxQuantityInt = maxQuantityString.toInt()
-
 
             val ingredientId = allStocks.find { it.ingredientName == ingredientNameString }?.ingredientId
             if (ingredientId == null) {
@@ -534,7 +521,6 @@ class StocksFragment : Fragment() {
                 if (response.isSuccessful) {
                     callback(null)
                     fetchStocks()
-                    // notify the user the update was successful
                     Toast.makeText(context, "Stock updated successfully", Toast.LENGTH_SHORT).show()
                 } else {
                     if (response.code() == 400) {

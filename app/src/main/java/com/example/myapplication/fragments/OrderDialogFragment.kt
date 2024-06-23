@@ -13,7 +13,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -77,7 +76,7 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
     }
 
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     private fun mainHandleOrderCreate(view: View){
         val createOrderButton = view.findViewById<Button>(R.id.createOrderButton)
         createOrderButton.setOnClickListener {
@@ -95,15 +94,14 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
             var selectedClientId: String? = null
             var selectedClientName: String? = null
-            sharedViewModel.selectedClient.observe(viewLifecycleOwner, Observer { client ->
+            sharedViewModel.selectedClient.observe(viewLifecycleOwner) { client ->
                 selectedClientId = client.clientId
                 selectedClientName = client.firmName
-            })
+            }
 
             val selectedClientTextView = view.findViewById<TextView>(R.id.selectedClientTextView)
 
             if(selectedClientTextView.text.isNotEmpty() && selectedClientTextView.text.toString() != selectedClientName) {
-                // create new client with the name and phone number 0000000000
                 val newClient = ClientDTO(
                     firmName = selectedClientTextView.text.toString(),
                     contactPerson = selectedClientTextView.text.toString(),
@@ -114,7 +112,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                     address = "Unknown",
                 )
 
-                // Send the new client to the clientAPI
                 addClient(newClient) { clientId ->
                     if (clientId != null) {
                         // Handle the error
@@ -129,7 +126,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                             completed = false,
                         )
 
-                        // Send the order to the orderAPI
                         addOrder(order) { error, orderId ->
                             createOrderButton.isEnabled = true
                             createOrderButton.text = "Create"
@@ -138,27 +134,15 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                                 Log.e("OrderDialogFragment", "Error adding order: $error")
                             } else {
 
-                                // Add products to the order
-
-                                val productCount = selectedProducts.count { it.quantity > 0 }
-                                var successfulCalls = 0
-
                                 for (product in selectedProducts) {
-//                                    Log.d("OrderDialogFragment", "Adding order detail for product: ${product.name}")
                                     if(product.quantity > 0){
                                         Log.d("OrderDialogFragment", "Adding order detail for product: ${product.name}  for order $orderId")
-                                        addOrderDetail(orderId!!, product.id, product.quantity) { errorr ->
-                                            if (errorr != null) {
+                                        addOrderDetail(orderId!!, product.id, product.quantity) { orderDetailError ->
+                                            if (orderDetailError != null) {
                                                 // Handle the error
-                                                Log.e("OrderDialogFragment", "Error adding order detail: $errorr")
+                                                Log.e("OrderDialogFragment", "Error adding order detail: $orderDetailError")
                                             } else {
-//                                                notifyServerAboutNewOrderDetail(OrdersFragment.OrderDetailProduct(orderId, product.id, product.quantity))
                                                 Log.d("OrderDialogFragment", "Order detail added successfully")
-//                                                successfulCalls++
-//                                                if (successfulCalls == productCount) {
-//                                                    // Notify the server about the new order
-//                                                    notifyServerAboutNewOrder(order)
-//                                                }
                                             }
                                         }
                                     }
@@ -176,13 +160,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                                 Toast.makeText(context, "Order added successfully", Toast.LENGTH_SHORT).show()
                                 val dailyOrderFragment = DailyOrderFragment()
                                 (activity as MainActivity).switchFragment(dailyOrderFragment)
-
-
-
-                                // Notify the server about the new order
-
-
-
                             }
                         }
 
@@ -198,22 +175,21 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                 if(selectedClientId != null && selectedClientTextView.text.isNotEmpty()){
                     val order = OrderDTO(
                         clientId = selectedClientId!!,
-                        deliveryNeeded = false, // Replace with actual value
-                        completionDate = dayDate, // Replace with actual date
-                        completionTime = "10:00:00", // Replace with actual time
-                        price = 0.0, // Replace with actual price
+                        deliveryNeeded = false,
+                        completionDate = dayDate,
+                        completionTime = "10:00:00",
+                        price = 0.0,
                         completed = false,
                     )
 
-                    // Send the order to the orderAPI
-                    addOrder(order) { error, orderId ->
+                    addOrder(order) { error, _ ->
                         createOrderButton.isEnabled = true
                         createOrderButton.text = "Create"
                         if (error != null) {
                             // Handle the error
                             Log.e("OrderDialogFragment", "Error adding order: $error")
                         } else {
-                            // Notify the server about the new order
+
                             notifyServerAboutNewOrder(order)
 
                             hideKeyboard(it)
@@ -278,7 +254,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         call.enqueue(object : Callback<ClientsFragment.Client> {
             override fun onResponse(call: Call<ClientsFragment.Client>, response: Response<ClientsFragment.Client>) {
                 if (response.isSuccessful) {
-                    // Extract the clientId from the response body
                     Log.d("OrderDialogFragment", "Client added ${response.body()?.clientId}")
                     val clientId = response.body()?.clientId
                     callback(clientId)
@@ -318,19 +293,8 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
     }
 
     private fun notifyServerAboutNewOrder(order: OrderDTO) {
-        // Convert the order to a JSON string
         val orderJson = Gson().toJson(order)
-
-        // Send the orderJson string to the server over the WebSocket connection
         webSocket?.send(orderJson)
-    }
-
-    private fun notifyServerAboutNewOrderDetail(orderDetail: OrdersFragment.OrderDetailProduct) {
-        // Convert the order to a JSON string
-        val orderDetailJson = Gson().toJson(orderDetail)
-
-        // Send the orderJson string to the server over the WebSocket connection
-        webSocket?.send(orderDetailJson)
     }
 
     private fun connectWebSocket() {
@@ -341,7 +305,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
         val listener = object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
-                // Connection opened
                 Log.i("WebSocket", "Connection opened")
                 this@OrderDialogFragment.webSocket = webSocket
             }
@@ -380,16 +343,16 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
 
 
-    @SuppressLint("NotifyDataSetChanged")
+    @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     private fun mainInitializeViewModelAndAdapter(view: View){
         ///////////// INIT SHARED VIEW MODEL //////////////////
-        sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory()).get(SharedViewModel::class.java)
+        sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory())[SharedViewModel::class.java]
 
 
 
         //////////// INIT ADAPTER AND RECYCLE VIEW //////////////////
         selectedProductsAdapter = OrderDialogProductAdapter(selectedProducts)
-        productLineItemRecycleView = view.findViewById<RecyclerView>(R.id.productLineItemRecycleView)
+        productLineItemRecycleView = view.findViewById(R.id.productLineItemRecycleView)
 
         productLineItemRecycleView.layoutManager = LinearLayoutManager(context)
 
@@ -440,11 +403,11 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
         //// CHANGE CLIENT TEXTVIEW ////
         val selectedClientTextView = view.findViewById<TextView>(R.id.selectedClientTextView)
-        sharedViewModel.selectedClient.observe(viewLifecycleOwner, Observer { client ->
-            if(client.clientId != "1"){
+        sharedViewModel.selectedClient.observe(viewLifecycleOwner) { client ->
+            if (client.clientId != "1") {
                 selectedClientTextView.text = client.firmName
             }
-        })
+        }
         //// END CHANGE CLIENT TEXTVIEW ////
 
 
@@ -462,7 +425,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
             }
             (activity as MainActivity).switchFragment(productsFragment)
 
-            // Set the flag to indicate that the ProductsFragment is in selection mode
             sharedViewModel.isProductSelectionListenerActive.value = true
         }
         ////////////////////// END ADD BUTTON //////////////////////

@@ -29,7 +29,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -64,7 +63,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
     private lateinit var clientAPI: ClientAPI
 
     interface ClientSelectionListener {
-        fun onClientSelected(client: ClientsFragment.Client)
+        fun onClientSelected(client: Client)
     }
 
     private var clientSelectionListener: ClientSelectionListener? = null
@@ -86,7 +85,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         clientAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ClientAPI::class.java)
 
         val factory = SharedViewModelFactory()
-        sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
+        sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
         sharedViewModel.refreshClientsTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {
@@ -100,9 +99,9 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         emptyView = view.findViewById(R.id.emptyView)
         clientsRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        sharedViewModel.refreshClientsTrigger.observe(viewLifecycleOwner, Observer {
+        sharedViewModel.refreshClientsTrigger.observe(viewLifecycleOwner) {
             clientsRecyclerView.adapter = clientAdapter
-        })
+        }
 
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
@@ -142,16 +141,16 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         }
 
         val searchBar = view.findViewById<EditText>(R.id.searchBar)
-        searchBar.setOnTouchListener { v, event ->
+        searchBar.setOnTouchListener { _, event ->
             val DRAWABLE_RIGHT = 2
 
             if (event.action == MotionEvent.ACTION_UP) {
-                val drawableStart = searchBar.right - searchBar.compoundDrawables[DRAWABLE_RIGHT].bounds.width() - 50 // Subtract 50 or any other value that works for you
+                val drawableStart = searchBar.right - searchBar.compoundDrawables[DRAWABLE_RIGHT].bounds.width() - 50
                 if (event.rawX >= drawableStart) {
                     searchBar.text.clear()
-                    searchBar.clearFocus() // Clear focus
+                    searchBar.clearFocus()
                     val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-                    inputMethodManager?.hideSoftInputFromWindow(searchBar.windowToken, 0) // Hide keyboard
+                    inputMethodManager?.hideSoftInputFromWindow(searchBar.windowToken, 0)
                     return@setOnTouchListener true
                 }
             }
@@ -172,9 +171,9 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         })
 
 
-        sharedViewModel.isClientSelectionListenerActive.observe(viewLifecycleOwner, Observer { isActive ->
+        sharedViewModel.isClientSelectionListenerActive.observe(viewLifecycleOwner) { isActive ->
             isClientSelectionListenerActive = isActive
-        })
+        }
 
     }
 
@@ -214,42 +213,18 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         clientAdapter.updateClientsAfterSearch(displayedClients)
     }
 
-    fun openWaze(latitude: Double, longitude: Double) {
-        val uri = Uri.parse("https://waze.com/ul?ll=$latitude,$longitude&navigate=yes")
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        intent.setPackage("com.waze")
-        try {
-            startActivity(intent)
-        } catch (e: android.content.ActivityNotFoundException) {
-            val browserIntent = Intent(Intent.ACTION_VIEW, uri)
-            context?.startActivity(browserIntent) // Use context to start the activity
-        }
-    }
-    fun openGoogleMaps(url: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        intent.setPackage("com.google.android.apps.maps")
-        try {
-            startActivity(intent)
-        } catch (e: android.content.ActivityNotFoundException) {
-            // Fallback to opening the URL in a web browser if Google Maps is not installed
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            context?.startActivity(browserIntent)
-        }
-    }
 
     fun extractLocationAndUrl(sharedText: String): Pair<String?, String?> {
-        // Regex for old format
+
         val oldFormatRegex = "https://waze.com/ul\\S+".toRegex()
-        // Regex for new format
+
         val newFormatRegex = "https://ul\\.waze\\.com/ul\\S+".toRegex()
 
-        // Try to find matches for both formats
         val oldMatchResult = oldFormatRegex.find(sharedText)
         val newMatchResult = newFormatRegex.find(sharedText)
 
         return when {
             oldMatchResult != null -> {
-                // Old format processing
                 val url = oldMatchResult.value
                 val prefix = "Use Waze to drive to "
                 val suffix = ":"
@@ -259,14 +234,12 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
                 Pair(locationName, url)
             }
             newMatchResult != null -> {
-                // New format processing
                 val url = newMatchResult.value
-                // For the new format, the location name might need to be fetched or processed differently
-                // Here, we set it to null as a placeholder
+
                 val locationName = "Check Waze for location!"
                 Pair(locationName, url)
             }
-            else -> Pair(null, null) // No match found
+            else -> Pair(null, null)
         }
     }
 
@@ -297,8 +270,6 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         val longitude: Double,
         val address: String
     )
-
-
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -344,7 +315,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
                         allClients.clear()
                         allClients.addAll(clientsResponse)
                         allClients.reverse()
-                        // move view at the top
+
                         clientsRecyclerView.scrollToPosition(0)
 
                         displayedClients.clear()
@@ -440,14 +411,8 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
             val contactPerson = dialogView.findViewById<EditText>(R.id.contactPersonInput).text.toString()
             val location = dialogView.findViewById<EditText>(R.id.locationInput).text.toString()
 
-//            val coordinates = dialogView.findViewById<EditText>(R.id.coordinatesInput).text.toString()
-//            val coordinatesSplit = coordinates.split(",")
             val latitude: Double? = null
             val longitude: Double? = null
-//            if (coordinatesSplit.size >= 2) {
-//                latitude = coordinatesSplit[0].takeIf { it.isNotEmpty() }?.toDouble()
-//                longitude = coordinatesSplit[1].takeIf { it.isNotEmpty() }?.toDouble()
-//            }
 
             val address = dialogView.findViewById<EditText>(R.id.addressInput).text.toString()
 
@@ -532,8 +497,6 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
             ?.setPrimaryClip(clip)
     }
 
-    // Open contacts fragment
-
     private fun openContacts() {
         val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
         startActivityForResult(intent, REQUEST_CODE_PICK_CONTACT)
@@ -555,7 +518,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
                         val id = cursor.getString(idIndex)
                         val name = cursor.getString(nameIndex)
 
-                        // Query the phone number
+
                         val phoneCursor = requireActivity().contentResolver.query(
                             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                             null,
@@ -570,16 +533,13 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
 
                             Log.d("ContactInfo", "Name: $name, Number: $number")
 
-                            /// make sure number has 10 digits and no spaces
                             val numberDigits = number.filter { it.isDigit() }
                             if (numberDigits.length == 10) {
                                 openAddClientDialog(null, name, numberDigits)
                             } else {
-                                // delete all spaces and take only last 10 digits of number
                                 val newNumber = number.filter { it.isDigit() }.takeLast(10)
                                 openAddClientDialog(null, name, newNumber)
                             }
-//                            openAddClientDialog(null, name, number)
                         }
 
                         phoneCursor?.close()

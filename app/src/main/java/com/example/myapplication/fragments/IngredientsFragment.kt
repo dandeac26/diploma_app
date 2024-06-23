@@ -10,12 +10,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
-import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.PopupMenu
-import android.widget.Spinner
 import android.widget.TableLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -131,11 +129,9 @@ class IngredientsFragment : Fragment() {
                         true
                     }
                     R.id.clearAll -> {
-                        // Implement clearAll functionality
                         true
                     }
                     R.id.clearSelected -> {
-                        // Implement clearSelected functionality
                         true
                     }
                     R.id.ingredients -> {
@@ -149,11 +145,9 @@ class IngredientsFragment : Fragment() {
                         true
                     }
                     R.id.refill -> {
-                        // Implement refill functionality
                         true
                     }
                     R.id.predictions -> {
-                        // Navigate to PredictionsFragment
                         true
                     }
                     else -> false
@@ -166,7 +160,9 @@ class IngredientsFragment : Fragment() {
     private fun fetchIngredients() {
         val call = ingredientsAPI.getIngredients()
         call.enqueue(object : Callback<List<StocksFragment.Ingredient>> {
-            @SuppressLint("MissingInflatedId", "UseCompatLoadingForDrawables")
+            @SuppressLint("MissingInflatedId", "UseCompatLoadingForDrawables", "InflateParams",
+                "SetTextI18n"
+            )
             override fun onResponse(call: Call<List<StocksFragment.Ingredient>>, response: Response<List<StocksFragment.Ingredient>>) {
                 if (response.isSuccessful) {
                     val ingredients = response.body()
@@ -278,26 +274,6 @@ class IngredientsFragment : Fragment() {
     }
     private fun updateIngredient(ingredientId: String, updatedIngredient: IngredientDTO, callback: (String?) -> Unit) {
         val call = ingredientsAPI.updateIngredient(ingredientId, updatedIngredient)
-        call.enqueue(object : Callback<Void> {
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if (response.isSuccessful) {
-                    callback(null)
-                    fetchIngredients()
-                } else {
-                    if (response.code() == 400) {
-                        callback(response.errorBody()?.string())
-                    }
-                }
-            }
-
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                // Handle the error
-            }
-        })
-    }
-
-    private fun addIngredient(newIngredient: IngredientDTO, callback: (String?) -> Unit) {
-        val call = ingredientsAPI.addIngredient(newIngredient)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {

@@ -15,7 +15,6 @@ import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.api.BakeryAPI
 import com.example.myapplication.dialog.ImagePreviewDialog
 import com.example.myapplication.R
-import com.example.myapplication.fragments.ClientsFragment
 import de.hdodenhof.circleimageview.CircleImageView
 import retrofit2.Call
 import retrofit2.Callback
@@ -61,7 +60,6 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
         }
 
         holder.itemView.setOnClickListener {
-//            fragment.openAddProductDialog(product)
             onProductClickListener.onProductClick(product)
         }
     }

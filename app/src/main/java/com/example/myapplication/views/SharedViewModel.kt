@@ -9,10 +9,6 @@ import com.example.myapplication.fragments.ProductsFragment
 
 class SharedViewModel : ViewModel() {
 
-
-
-
-
     val refreshOrderDetailsTrigger: MutableLiveData<Boolean> = MutableLiveData()
     val refreshClientsTrigger = MutableLiveData<Boolean>()
     val refreshProductsTrigger = MutableLiveData<Boolean>()
@@ -23,9 +19,6 @@ class SharedViewModel : ViewModel() {
 
     val selectedDate: MutableLiveData<String> = MutableLiveData()
     val selectedOrder = MutableLiveData<OrdersFragment.Order>()
-
-
-
 
 
     private val _selectedProduct = MutableLiveData<ProductsFragment.Product>()
