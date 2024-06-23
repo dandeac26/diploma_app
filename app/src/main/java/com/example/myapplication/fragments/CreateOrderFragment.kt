@@ -65,7 +65,6 @@ class CreateOrderFragment : Fragment() {
 
         val saveButton = view.findViewById<TextView>(R.id.submitOrderButton)
         saveButton.setOnClickListener {
-//            sharedViewModel.saveOrder(getOrderProductAndQuantities())
         }
     }
 

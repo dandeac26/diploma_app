@@ -9,7 +9,7 @@ object RetrofitInstance {
     fun getInstance(context: Context, port: Int): Retrofit {
         val configManager = ConfigManager(context)
         val baseUrl = if (configManager.useHomeUrl) configManager.baseUrlHome else configManager.baseUrlMobile
-        val fullUrl = "$baseUrl:$port/" // Append the port number to the base URL with a slash before the port
+        val fullUrl = "$baseUrl:$port/"
         Log.d("RetrofitInstance", "baseUrl: $fullUrl")
         val retrofit = Retrofit.Builder()
             .baseUrl(fullUrl)

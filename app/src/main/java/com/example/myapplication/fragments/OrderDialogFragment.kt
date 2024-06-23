@@ -119,10 +119,10 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
                         val order = OrderDTO(
                             clientId = clientId,
-                            deliveryNeeded = false, // Replace with actual value
-                            completionDate = dayDate, // Replace with actual date
-                            completionTime = "10:00:00", // Replace with actual time
-                            price = 0.0, // Replace with actual price
+                            deliveryNeeded = false,
+                            completionDate = dayDate,
+                            completionTime = "10:00:00",
+                            price = 0.0,
                             completed = false,
                         )
 

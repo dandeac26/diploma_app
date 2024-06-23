@@ -72,7 +72,7 @@ class ClientAdapter(private val clients: MutableList<Client>, private val client
             holder.phoneNumberContainer.background = ContextCompat.getDrawable(fragment.requireContext(), R.drawable.rounded_phone_clicked)
 
             holder.phoneNumberContainer.postDelayed({
-                holder.phoneNumberContainer.background = ContextCompat.getDrawable(fragment.requireContext(), R.drawable.rounded_phone) // Replace `android.R.color.transparent` with your original background color if needed
+                holder.phoneNumberContainer.background = ContextCompat.getDrawable(fragment.requireContext(), R.drawable.rounded_phone)
             }, 100)
 
             fragment.copyToClipboard(holder.phoneNumberTextView.text.toString())

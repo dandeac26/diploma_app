@@ -49,7 +49,6 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
             override fun afterTextChanged(s: Editable) {
                 val quantity = s.toString().toIntOrNull()
                 if (quantity != null) {
-                    // Update the quantity for the product
                     currentProduct.quantity = quantity
                 }
             }

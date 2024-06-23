@@ -253,7 +253,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
                 startActivity(intent)
             } catch (e: android.content.ActivityNotFoundException) {
                 val browserIntent = Intent(Intent.ACTION_VIEW, uri)
-                context?.startActivity(browserIntent) // Use context to start the activity
+                context?.startActivity(browserIntent)
             }
         } else {
             Toast.makeText(context, "Invalid Waze link", Toast.LENGTH_SHORT).show()
