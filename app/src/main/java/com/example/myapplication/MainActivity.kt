@@ -41,6 +41,14 @@ class MainActivity : AppCompatActivity() {
 
     private val fragmentHistory = LinkedList<Fragment>()
 
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Save the state of your fragments
+        currentFragment?.let { supportFragmentManager.putFragment(outState, "currentFragment", it) }
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -83,6 +91,10 @@ class MainActivity : AppCompatActivity() {
                 else -> null
             }
 
+            if (isChangingConfigurations) {
+                return@setOnItemSelectedListener true
+            }
+
             if (fragment != null) {
                 switchFragment(fragment)
             }
@@ -90,10 +102,18 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        if (savedInstanceState == null) {
+//        if (savedInstanceState == null) {
+//            switchFragment(HomeFragment())
+//        }
+        if (savedInstanceState != null) {
+            // The activity is being recreated after a configuration change
+            // Restore the state of your fragments
+            currentFragment = supportFragmentManager.getFragment(savedInstanceState, "currentFragment")
+        } else {
+            // The activity is being created for the first time
+            // Add your fragments as usual
             switchFragment(HomeFragment())
         }
-
     }
 
     fun addFragmentToHistory(fragment: Fragment) {
@@ -104,6 +124,10 @@ class MainActivity : AppCompatActivity() {
     }
 //    private var removedLast = false
     fun switchFragment(fragment: Fragment) {
+        if (isChangingConfigurations) {
+            return
+        }
+
         if (fragmentHistory.isEmpty() || fragment::class.java != fragmentHistory.last::class.java) {
             // If the fragment is not the current fragment, add it to the history
             fragmentHistory.add(fragment)
@@ -112,11 +136,15 @@ class MainActivity : AppCompatActivity() {
         val fragmentTag = fragment::class.java.simpleName
 
         val transaction = supportFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.fade_in, 0, 0, 0)
+//            .setCustomAnimations(R.anim.fade_in, 0, 0, 0)
 
         // Hide the current fragment
-        currentFragment?.let { transaction.hide(it)
-        it.userVisibleHint = false
+//        currentFragment?.let { transaction.hide(it)
+//        it.userVisibleHint = false
+//        }
+        if(currentFragment != null) {
+            transaction.hide(currentFragment!!)
+//            currentFragment!!.userVisibleHint = false
         }
 
         // Try to find the fragment in the FragmentManager
@@ -137,8 +165,15 @@ class MainActivity : AppCompatActivity() {
         } else {
             // If found, show it
             transaction.show(newFragment)
-            newFragment.userVisibleHint = true
+//            newFragment.userVisibleHint = true
         }
+
+//        if(fragment.isAdded){
+//            transaction.show(fragment)
+//        } else {
+//            transaction.add(R.id.fragment_container, fragment, fragmentTag)
+//            newFragment = fragment
+//        }
 
         transaction.commit()
 
