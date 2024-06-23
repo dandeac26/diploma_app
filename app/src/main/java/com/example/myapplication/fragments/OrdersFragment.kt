@@ -167,7 +167,7 @@ class OrdersFragment : Fragment() {
             val date = SimpleDateFormat("dd.MM.yy", Locale.getDefault()).format(calendar.time)
             dayOfWeek?.let { DateItem(it, date) }?.let { dates.add(it) }
 
-            if (dayOfWeek == "Sunday") {
+            if (dayOfWeek == "Sunday" && i<13) {
                 dates.add(DateItem("NextWeek", ""))
             }
 
