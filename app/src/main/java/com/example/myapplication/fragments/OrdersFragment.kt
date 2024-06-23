@@ -17,33 +17,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.DateItemAdapter
-import com.example.myapplication.api.OrderAPI
-import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.WebSocket
-import okhttp3.WebSocketListener
-import okio.ByteString
 import java.io.Serializable
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 class OrdersFragment : Fragment() {
-    private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var orderAPI: OrderAPI
 
+    private lateinit var sharedViewModel: SharedViewModel
     private lateinit var recyclerView: RecyclerView
     private val dates = mutableListOf<DateItem>()
     private lateinit var emptyView : ViewStub
-    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private lateinit var dateItemAdapter: DateItemAdapter
 
     override fun onCreateView(
@@ -57,9 +47,6 @@ class OrdersFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        orderAPI = RetrofitInstance.getInstance(requireContext(), 8000).create(OrderAPI::class.java)
-        connectWebSocket()
-
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
@@ -70,24 +57,7 @@ class OrdersFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = dateItemAdapter
 
-
         dates.addAll(generateDateItems())
-
-        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
-        swipeRefreshLayout.setOnRefreshListener {
-            fetchOrders()
-            swipeRefreshLayout.isRefreshing = false
-        }
-
-        sharedViewModel.refreshProductsTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
-            if (shouldRefresh) {
-                fetchOrders()
-            }
-        }
-
-        sharedViewModel.onBackPressed.observe(viewLifecycleOwner) {
-
-        }
 
         val menuButton = view.findViewById<ImageButton>(R.id.menuButton)
         menuButton.setOnClickListener {
@@ -95,7 +65,6 @@ class OrdersFragment : Fragment() {
             alphaAnimation.duration = 200
             alphaAnimation.repeatCount = 1
             alphaAnimation.repeatMode = Animation.REVERSE
-
 
             it.startAnimation(alphaAnimation)
 
@@ -153,11 +122,6 @@ class OrdersFragment : Fragment() {
         (activity as MainActivity).switchFragment(dailyOrderFragment)
     }
 
-    data class DateItem(
-        val day: String,
-        val date: String
-    )
-
     private fun generateDateItems(): List<DateItem> {
         val dates = mutableListOf<DateItem>()
         val calendar = Calendar.getInstance()
@@ -173,42 +137,13 @@ class OrdersFragment : Fragment() {
 
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
-
         return dates
     }
 
-    private fun connectWebSocket() {
-        val client = OkHttpClient()
-        val request = Request.Builder()
-            .url("ws://192.168.68.56:8000/ws")
-            .build()
-
-        val listener = object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
-                Log.i("WebSocket", "Connection opened")
-            }
-
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                if (text == "Refetch orders") {
-                    fetchOrders()
-                }
-            }
-
-            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-                // Handle binary messages
-            }
-
-            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-                webSocket.close(1000, null)
-                Log.i("WebSocket", "Connection closed")
-            }
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: okhttp3.Response?) {
-                Log.e("WebSocket", "Error: ${t.message}")
-            }
-
-        }
-        client.newWebSocket(request, listener)
-    }
+    data class DateItem(
+        val day: String,
+        val date: String
+    )
 
     data class Order (
         val orderId: String,
@@ -257,10 +192,4 @@ class OrdersFragment : Fragment() {
         val price: Double,
         val imageUrl: String
     )
-
-    private fun fetchOrders() {
-        activity?.runOnUiThread {
-
-        }
-    }
 }
