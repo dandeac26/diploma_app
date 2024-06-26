@@ -2,6 +2,7 @@ package com.example.myapplication.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -102,14 +103,20 @@ class OrderDetailsFragment : Fragment() {
 
             val discardButton: Button = view.findViewById(R.id.discardButton)
             discardButton.setOnClickListener {
-                deleteOrder(order.orderId) { error ->
-                    if (error == null) {
-//                        notifyOrderDeleted()
-                        requireActivity().onBackPressed()
-                    } else {
-                        Toast.makeText(context, "Error deleting order: $error", Toast.LENGTH_SHORT).show()
+                AlertDialog.Builder(context)
+                    .setTitle("Delete Order")
+                    .setMessage("Are you sure you want to delete this order?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        deleteOrder(order.orderId) { error ->
+                            if (error == null) {
+                                requireActivity().onBackPressed()
+                            } else {
+                                Toast.makeText(context, "Error deleting order: $error", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
-                }
+                    .setNegativeButton("No", null)
+                    .show()
             }
 
             val shareButton: Button = view.findViewById(R.id.shareButton)

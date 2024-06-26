@@ -201,7 +201,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
                 }
             }
 
-
             override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                 // Handle binary messages
             }
