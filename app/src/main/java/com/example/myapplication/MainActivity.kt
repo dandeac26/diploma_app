@@ -1,14 +1,18 @@
 package com.example.myapplication
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.example.myapplication.fragments.HomeFragment
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.config.NetworkChangeReceiver
@@ -23,6 +27,7 @@ import com.example.myapplication.fragments.SettingsFragment
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 import java.util.LinkedList
 
 
@@ -31,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private var currentFragment: Fragment? = null
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var networkChangeReceiver: NetworkChangeReceiver
-
+    private val REQUEST_READ_CONTACTS = 1
     private val fragmentToMenuItem = mapOf(
         HomeFragment::class.java to R.id.nav_home,
         ProductsFragment::class.java to R.id.nav_products,
@@ -60,6 +65,15 @@ class MainActivity : AppCompatActivity() {
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        /// CHECK PERMISSIONS
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+
+            requestReadContactsPermission()
+        } else {
+            // READ_CONTACTS permission is already available
+        }
 
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item ->
@@ -228,6 +242,34 @@ class MainActivity : AppCompatActivity() {
 
         } else {
             super.onBackPressed()
+        }
+    }
+
+    private fun requestReadContactsPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
+            Snackbar.make(findViewById(R.id.main), "Permission Contacts Rationale", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Ok") {
+                    ActivityCompat.requestPermissions(
+                        this@MainActivity,
+                        arrayOf(Manifest.permission.READ_CONTACTS),
+                        REQUEST_READ_CONTACTS
+                    )
+                }
+                .show()
+        } else {
+            ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.READ_CONTACTS), REQUEST_READ_CONTACTS)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        if (requestCode == REQUEST_READ_CONTACTS) {
+            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Snackbar.make(findViewById(R.id.main), "Permission Available Contacts", Snackbar.LENGTH_SHORT).show()
+            } else {
+                Snackbar.make(findViewById(R.id.main), "Permissions Not Granted", Snackbar.LENGTH_SHORT).show()
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
     }
 }
