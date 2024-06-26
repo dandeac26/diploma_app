@@ -82,7 +82,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
 
         val factory = SharedViewModelFactory()
-        sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
+        sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
 
         dayTitle = view.findViewById(R.id.dayTitle)
@@ -200,6 +200,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
                     fetchDailyOrders()
                 }
             }
+
 
             override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                 // Handle binary messages

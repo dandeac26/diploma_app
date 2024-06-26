@@ -273,6 +273,8 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         })
     }
 
+
+
     private fun hideKeyboard(view: View) {
         val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         imm?.hideSoftInputFromWindow(view.windowToken, 0)
@@ -332,6 +334,10 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         val orderJson = Gson().toJson(order)
         webSocket?.send(orderJson)
     }
+
+//    private fun notifyServerAboutOrderDelete(orderId: String) {
+//        webSocket?.send(orderId)
+//    }
 
     private fun connectWebSocket() {
         val client = OkHttpClient()

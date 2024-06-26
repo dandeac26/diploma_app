@@ -10,6 +10,7 @@ import android.net.Uri
 import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,9 +26,19 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModelProvider
+import com.example.myapplication.MainActivity
+import com.example.myapplication.api.OrderAPI
+import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.facebook.shimmer.ShimmerFrameLayout
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class OrderDetailsFragment : Fragment() {
 
@@ -38,6 +49,8 @@ class OrderDetailsFragment : Fragment() {
 
     private val REQUEST_READ_CONTACTS = 1
 
+    private lateinit var orderAPI: OrderAPI
+    private var webSocket: WebSocket? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,6 +68,8 @@ class OrderDetailsFragment : Fragment() {
 
         sharedViewModel.selectedOrder.observe(viewLifecycleOwner) { order ->
 
+            orderAPI = RetrofitInstance.getInstance(requireContext(), 8000).create(OrderAPI::class.java)
+            connectWebSocket()
             /// HEADER
             view.findViewById<TextView>(R.id.clientName).text = order.clientName
             view.findViewById<TextView>(R.id.orderClientPhoneNumberTextView).text = order.clientPhoneNumber
@@ -87,7 +102,14 @@ class OrderDetailsFragment : Fragment() {
 
             val discardButton: Button = view.findViewById(R.id.discardButton)
             discardButton.setOnClickListener {
-                // Handle discard action
+                deleteOrder(order.orderId) { error ->
+                    if (error == null) {
+//                        notifyOrderDeleted()
+                        requireActivity().onBackPressed()
+                    } else {
+                        Toast.makeText(context, "Error deleting order: $error", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
 
             val shareButton: Button = view.findViewById(R.id.shareButton)
@@ -97,7 +119,12 @@ class OrderDetailsFragment : Fragment() {
 
             val completeButton: Button = view.findViewById(R.id.completeButton)
             completeButton.setOnClickListener {
-                // Handle complete action
+                sharedViewModel.selectedOrder.value?.let { order ->
+                    (activity as MainActivity).supportFragmentManager.fragments.lastOrNull { it is DailyOrderFragment }?.let { fragment ->
+                        (fragment as DailyOrderFragment).updateOrderCompleted(order, true)
+                    }
+                    requireActivity().onBackPressed()
+                }
             }
         }
 
@@ -110,6 +137,40 @@ class OrderDetailsFragment : Fragment() {
             requireActivity().onBackPressed()
         }
 
+    }
+
+    private fun notifyOrderDeleted() {
+        webSocket?.send("Order deleted")
+    }
+
+
+    private fun connectWebSocket() {
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url("ws://192.168.68.56:8000/ws")
+            .build()
+
+        val listener = object : WebSocketListener() {
+            override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
+                Log.i("WebSocket", "Connection opened")
+                this@OrderDetailsFragment.webSocket = webSocket
+            }
+
+            override fun onMessage(webSocket: WebSocket, text: String) {
+                // Handle incoming messages
+            }
+
+            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                webSocket.close(1000, null)
+                Log.i("WebSocket", "Connection closed")
+            }
+
+            override fun onFailure(webSocket: WebSocket, t: Throwable, response: okhttp3.Response?) {
+                Log.e("WebSocket", "Error: ${t.message}")
+            }
+        }
+
+        client.newWebSocket(request, listener)
     }
 
 
@@ -142,5 +203,25 @@ class OrderDetailsFragment : Fragment() {
             clipboard?.setPrimaryClip(clip)
             Toast.makeText(context, "Contact doesn't exist. Phone number copied to clipboard.", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun deleteOrder(orderId: String, callback: (String?) -> Unit) {
+        val call = orderAPI.deleteOrder(orderId)
+        call.enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    callback(null)
+                    Log.d("OrderDialogFragment", "Order deleted successfully")
+                } else {
+                    // Handle the error
+                    Log.d("OrderDialogFragment", "Error deleting order: ${response.errorBody()?.string()}")
+                    callback(response.errorBody()?.string())
+                }
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // Handle the error
+                callback(t.message)
+            }
+        })
     }
 }
