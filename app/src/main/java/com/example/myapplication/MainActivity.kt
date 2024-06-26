@@ -66,14 +66,15 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        /// CHECK PERMISSIONS
+        /// CHECK PERMISSIONS -------------------------
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-
             requestReadContactsPermission()
         } else {
-            // READ_CONTACTS permission is already available
+            // READ_CONTACTS permission is available
         }
+
+        //---------------------------------------------
 
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item ->
@@ -187,7 +188,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
@@ -247,7 +247,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun requestReadContactsPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
-            Snackbar.make(findViewById(R.id.main), "Permission Contacts Rationale", Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(findViewById(R.id.main), "Permission Contacts", Snackbar.LENGTH_INDEFINITE)
                 .setAction("Ok") {
                     ActivityCompat.requestPermissions(
                         this@MainActivity,
@@ -264,9 +264,9 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_READ_CONTACTS) {
             if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Snackbar.make(findViewById(R.id.main), "Permission Available Contacts", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(findViewById(R.id.main), "Permission is Available for Contacts", Snackbar.LENGTH_SHORT).show()
             } else {
-                Snackbar.make(findViewById(R.id.main), "Permissions Not Granted", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(findViewById(R.id.main), "Permissions are Not Granted", Snackbar.LENGTH_SHORT).show()
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)

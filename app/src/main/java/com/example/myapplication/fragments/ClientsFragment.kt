@@ -370,9 +370,9 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
 
         val alertDialog = builder.show()
 
-
         if (contactName != null) {
             dialogView.findViewById<EditText>(R.id.firmNameInput).setText(contactName)
+            dialogView.findViewById<EditText>(R.id.contactPersonInput).setText(contactName)
         }
         if (phoneNumber != null) {
             dialogView.findViewById<EditText>(R.id.phoneNumberInput).setText(phoneNumber)

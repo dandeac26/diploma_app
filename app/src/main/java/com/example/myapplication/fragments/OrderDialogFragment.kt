@@ -182,13 +182,27 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                         completed = false,
                     )
 
-                    addOrder(order) { error, _ ->
+                    addOrder(order) { error, orderId ->
                         createOrderButton.isEnabled = true
                         createOrderButton.text = "Create"
                         if (error != null) {
                             // Handle the error
                             Log.e("OrderDialogFragment", "Error adding order: $error")
                         } else {
+
+                            for (product in selectedProducts) {
+                                if(product.quantity > 0){
+                                    Log.d("OrderDialogFragment", "Adding order detail for product: ${product.name}  for order $orderId")
+                                    addOrderDetail(orderId!!, product.id, product.quantity) { orderDetailError ->
+                                        if (orderDetailError != null) {
+                                            // Handle the error
+                                            Log.e("OrderDialogFragment", "Error adding order detail: $orderDetailError")
+                                        } else {
+                                            Log.d("OrderDialogFragment", "Order detail added successfully")
+                                        }
+                                    }
+                                }
+                            }
 
                             notifyServerAboutNewOrder(order)
 
@@ -204,6 +218,28 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                             (activity as MainActivity).switchFragment(dailyOrderFragment)
                         }
                     }
+//                    addOrder(order) { error, _ ->
+//                        createOrderButton.isEnabled = true
+//                        createOrderButton.text = "Create"
+//                        if (error != null) {
+//                            // Handle the error
+//                            Log.e("OrderDialogFragment", "Error adding order: $error")
+//                        } else {
+//
+//                            notifyServerAboutNewOrder(order)
+//
+//                            hideKeyboard(it)
+//
+//                            selectedProducts.clear()
+//                            selectedProductsAdapter.notifyDataSetChanged()
+//
+//                            selectedClientTextView.text = ""
+//
+//                            Toast.makeText(context, "Order added successfully", Toast.LENGTH_SHORT).show()
+//                            val dailyOrderFragment = DailyOrderFragment()
+//                            (activity as MainActivity).switchFragment(dailyOrderFragment)
+//                        }
+//                    }
                 }
                 else
                 {
