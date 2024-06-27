@@ -199,6 +199,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
@@ -225,7 +226,13 @@ class HomeFragment : Fragment() {
     private var isNoonShift = true
     private lateinit var loadingSpinner: ProgressBar
 
-    private val printAdapter = object : PrintDocumentAdapter() {
+    class MyPrintDocumentAdapter(
+        private val shiftDate: TextView,
+        private val shiftIndicator: TextView,
+        private val shiftTitle: TextView,
+        private val shiftProductsAdapter: ShiftProductsAdapter,
+        private val context: Context
+    ) :  PrintDocumentAdapter() {
         override fun onLayout(
             oldAttributes: PrintAttributes?,
             newAttributes: PrintAttributes,
@@ -277,6 +284,19 @@ class HomeFragment : Fragment() {
                     val x = 50f
                     val lineSpacing = 30f * textSize / 13f // Adjust line spacing based on text size
 
+                    // Draw the header
+                    val headerPaint = Paint()
+                    headerPaint.textSize = 20f
+                    canvas.drawText(shiftTitle.text.toString(), x, y, headerPaint)
+                    y += lineSpacing
+                    canvas.drawText(shiftIndicator.text.toString(), x, y, headerPaint)
+                    y += lineSpacing
+                    canvas.drawText(shiftDate.text.toString(), x, y, headerPaint)
+                    y += lineSpacing
+
+                    // Reset the paint to the calculated text size
+                    paint.textSize = textSize
+
                     shiftProductsAdapter.products.forEach { (product, quantity) ->
                         canvas.drawText("${product.name}: $quantity", x, y, paint)
                         y += lineSpacing
@@ -290,10 +310,10 @@ class HomeFragment : Fragment() {
                     callback.onWriteFailed(e.message)
                     return
                 } finally {
+                    Toast.makeText(context, "Printing completed", Toast.LENGTH_SHORT).show()
                     close()
                 }
             }
-
             callback.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
         }
     }
@@ -335,14 +355,6 @@ class HomeFragment : Fragment() {
 
         updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate)
 
-        /// HANDLE PRINTING ///
-        val printManager = requireActivity().getSystemService(Context.PRINT_SERVICE) as PrintManager
-        val printShiftOrders = view.findViewById<TextView>(R.id.printShiftOrders)
-        printShiftOrders.setOnClickListener {
-            printManager.print("Document", printAdapter, PrintAttributes.Builder().build())
-        } /// END PRINTING ///
-
-
         header.setOnClickListener {
             if (sharedViewModel.isLoadingOrders.value == true) {
                 return@setOnClickListener
@@ -355,6 +367,13 @@ class HomeFragment : Fragment() {
 
         updateShiftRecycleView(shiftDate)
 
+        /// HANDLE PRINTING ///
+        val printManager = requireActivity().getSystemService(Context.PRINT_SERVICE) as PrintManager
+        val printShiftOrders = view.findViewById<TextView>(R.id.printShiftOrders)
+        printShiftOrders.setOnClickListener {
+            val printAdapter = MyPrintDocumentAdapter(shiftDate, shiftIndicator, shiftTitle, shiftProductsAdapter, requireContext())
+            printManager.print("Document", printAdapter, PrintAttributes.Builder().build())
+        } /// END PRINTING ///
     }
 
     private fun convertDateFormat(inputDate: String): String? {
@@ -383,8 +402,6 @@ class HomeFragment : Fragment() {
             shiftDate.text = dateFormat.format(nextDay.time)
             shiftIndicator.text = "Orders For Tomorrow"
         }
-
-
 
         isNoonShift = !isNoonShift
 
