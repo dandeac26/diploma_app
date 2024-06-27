@@ -25,4 +25,5 @@
     <color name="light_grey_progress_provider">#9A9A9A</color>
     <color name="table_row_highlight">#424242</color>
     <color name="delivery_client_location_color">#2196F3</color>
+    <color name="home_header">#17151A</color>
 </resources>

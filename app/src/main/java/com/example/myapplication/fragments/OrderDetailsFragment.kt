@@ -65,7 +65,7 @@ class OrderDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val factory = SharedViewModelFactory()
-        sharedViewModel = ViewModelProvider(requireActivity(), factory).get(SharedViewModel::class.java)
+        sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
         sharedViewModel.selectedOrder.observe(viewLifecycleOwner) { order ->
 

@@ -275,6 +275,8 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
                             displayedOrders.addAll(allOrders)
                             orderAdapter.updateOrdersAfterSearch(displayedOrders)
 
+                            sharedViewModel.setOrders(allOrders)
+
                             val searchBar = view?.findViewById<EditText>(R.id.searchBar)
                             searchBar?.text?.clear()
                         }
