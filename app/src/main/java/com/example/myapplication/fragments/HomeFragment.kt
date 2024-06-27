@@ -225,7 +225,7 @@ class HomeFragment : Fragment() {
     private var isNoonShift = true
     private lateinit var loadingSpinner: ProgressBar
 
-    val printAdapter = object : PrintDocumentAdapter() {
+    private val printAdapter = object : PrintDocumentAdapter() {
         override fun onLayout(
             oldAttributes: PrintAttributes?,
             newAttributes: PrintAttributes,
@@ -260,9 +260,28 @@ class HomeFragment : Fragment() {
             }
 
             PdfDocument().apply {
-                val pageInfo = PdfDocument.PageInfo.Builder(300, 300, 1).create()
+                val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
                 startPage(pageInfo).apply {
-                    canvas.drawText("Hello, World!", 50f, 50f, Paint())
+                    val paint = Paint()
+
+                    // Calculate the text size based on the number of items
+                    val maxItemsPerPage = 50 // This is an estimate, adjust as needed
+                    val textSize = if (shiftProductsAdapter.products.size > maxItemsPerPage) {
+                        13f * maxItemsPerPage / shiftProductsAdapter.products.size
+                    } else {
+                        13f
+                    }
+                    paint.textSize = textSize
+
+                    var y = 50f
+                    val x = 50f
+                    val lineSpacing = 30f * textSize / 13f // Adjust line spacing based on text size
+
+                    shiftProductsAdapter.products.forEach { (product, quantity) ->
+                        canvas.drawText("${product.name}: $quantity", x, y, paint)
+                        y += lineSpacing
+                    }
+
                     finishPage(this)
                 }
                 try {

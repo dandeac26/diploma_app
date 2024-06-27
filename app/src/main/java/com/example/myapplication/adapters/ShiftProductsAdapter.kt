@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.fragments.OrdersFragment
 
-class ShiftProductsAdapter(private val products: List<Pair<OrdersFragment.Product, Int>>) : RecyclerView.Adapter<ShiftProductsAdapter.ProductViewHolder>() {
+class ShiftProductsAdapter(val products: List<Pair<OrdersFragment.Product, Int>>) : RecyclerView.Adapter<ShiftProductsAdapter.ProductViewHolder>() {
 
     inner class ProductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val productNameTextView: TextView = view.findViewById(R.id.orderDetailsProductNameTextView)
