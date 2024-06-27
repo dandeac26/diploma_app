@@ -73,7 +73,7 @@ class SharedViewModel : ViewModel() {
 
     val isLoadingOrders = MutableLiveData<Boolean>(false)
 
-    fun fetchOrdersByDate(orderAPI: OrderAPI, date: String, clientType: String) {
+    fun fetchOrdersByDate(orderAPI: OrderAPI, date: String) {
         isLoadingOrders.value = true
         val call = orderAPI.getOrdersByDate(date)
         call.enqueue(object : Callback<List<OrdersFragment.Order>> {
@@ -84,12 +84,14 @@ class SharedViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val ordersResponse = response.body()
                     if (ordersResponse != null) {
-                        val filteredOrders = ordersResponse.filter { it.clientType == clientType }
-                        setOrders(filteredOrders)
+                        setOrders(ordersResponse)
                     }
                 } else {
                     // Handle the error
-                    Log.e("SharedViewModel", "Error fetching orders: ${response.errorBody()?.string()}")
+                    Log.e(
+                        "SharedViewModel",
+                        "Error fetching orders: ${response.errorBody()?.string()}"
+                    )
                 }
                 isLoadingOrders.value = false
             }
@@ -100,28 +102,4 @@ class SharedViewModel : ViewModel() {
             }
         })
     }
-//    fun fetchOrdersByDate(orderAPI: OrderAPI, date: String) {
-//        val call = orderAPI.getOrdersByDate(date)
-//        call.enqueue(object : Callback<List<OrdersFragment.Order>> {
-//            override fun onResponse(
-//                call: Call<List<OrdersFragment.Order>>,
-//                response: Response<List<OrdersFragment.Order>>
-//            ) {
-//                if (response.isSuccessful) {
-//                    val ordersResponse = response.body()
-//                    if (ordersResponse != null) {
-//                        setOrders(ordersResponse)
-//                    }
-//                }else
-//                {
-//                     // Handle the error
-//                    Log.e("SharedViewModel", "Error fetching orders: ${response.errorBody()?.string()}")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<List<OrdersFragment.Order>>, t: Throwable) {
-//                // Handle the error
-//            }
-//        })
-//    }
 }

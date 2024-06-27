@@ -191,7 +191,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -228,6 +227,9 @@ class HomeFragment : Fragment() {
 
         orderAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(OrderAPI::class.java)
 
+        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+        isNoonShift = currentHour in 14..22
 
         loadingSpinner = view.findViewById(R.id.loadingSpinner) // Add this line
 
@@ -239,7 +241,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-
         val shiftTitle: TextView = view.findViewById(R.id.shiftTitle)
         val shiftImage: ImageView = view.findViewById(R.id.shiftImage)
         val header: ConstraintLayout = view.findViewById(R.id.header)
@@ -249,7 +250,6 @@ class HomeFragment : Fragment() {
 
         header.setOnClickListener {
             if (sharedViewModel.isLoadingOrders.value == true) {
-                // Fetch request is in progress, ignore the click
                 return@setOnClickListener
             }
             updateShift(shiftTitle, shiftImage, shiftDate)
@@ -258,16 +258,8 @@ class HomeFragment : Fragment() {
         shiftRecycleView = view.findViewById(R.id.shiftRecycleView)
         shiftRecycleView.layoutManager = LinearLayoutManager(context)
 
-        sharedViewModel.orders.observe(viewLifecycleOwner) { orders ->
-            val vShiftDate = convertDateFormat(shiftDate.text.toString())
-            val products = orders.filter { it.completionDate == vShiftDate }
-                .flatMap { it.orderDetails }
-                .groupBy { it.product }
-                .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
+        updateShiftRecycleView(shiftDate)
 
-            shiftProductsAdapter = ShiftProductsAdapter(products)
-            shiftRecycleView.adapter = shiftProductsAdapter
-        }
     }
 
     private fun convertDateFormat(inputDate: String): String? {
@@ -284,25 +276,8 @@ class HomeFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun updateShift(shiftTitle: TextView, shiftImage: ImageView, shiftDate: TextView) {
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val date = convertDateFormat(shiftDate.text.toString())
-
-        if (isNoonShift) {
-            shiftTitle.text = "Noon Shift"
-            shiftImage.setImageResource(R.drawable.midday_100)
-            date?.let {
-                sharedViewModel.fetchOrdersByDate(orderAPI, it, "KINDERGARTEN")
-                sharedViewModel.fetchOrdersByDate(orderAPI, it, "SPECIAL")
-            }
-        } else {
-            shiftTitle.text = "Night Shift"
-            shiftImage.setImageResource(R.drawable.midnight_100)
-            date?.let {
-                sharedViewModel.fetchOrdersByDate(orderAPI, it, "REGULAR")
-            }
-        }
-
-        val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.US)
         val currentDate = Calendar.getInstance().time
+        val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.US)
 
         if(currentHour in 6..13) {
             shiftDate.text = dateFormat.format(currentDate)
@@ -311,6 +286,43 @@ class HomeFragment : Fragment() {
             nextDay.add(Calendar.DAY_OF_YEAR, 1)
             shiftDate.text = dateFormat.format(nextDay.time)
         }
-        isNoonShift = !isNoonShift // Toggle the shift
+
+
+
+        isNoonShift = !isNoonShift
+
+        updateShiftRecycleView(shiftDate)
+
+        if (isNoonShift) {
+            shiftTitle.text = "Noon Shift"
+            shiftImage.setImageResource(R.drawable.midday_100)
+        } else {
+            shiftTitle.text = "Night Shift"
+            shiftImage.setImageResource(R.drawable.midnight_100)
+        }
+    }
+
+    private fun updateShiftRecycleView(shiftDate: TextView){
+        convertDateFormat(shiftDate.text.toString())?.let {
+            sharedViewModel.fetchOrdersByDate(orderAPI,
+                it
+            )
+        }
+
+        sharedViewModel.orders.observe(viewLifecycleOwner) { orders ->
+            val vShiftDate = convertDateFormat(shiftDate.text.toString())
+            val filteredOrders = if (isNoonShift) {
+                orders.filter { it.clientType == "SPECIAL" || it.clientType == "KINDERGARTEN" }
+            } else {
+                orders.filter { it.clientType == "REGULAR" }
+            }
+            val products = filteredOrders.filter { it.completionDate == vShiftDate }
+                .flatMap { it.orderDetails }
+                .groupBy { it.product }
+                .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
+
+            shiftProductsAdapter = ShiftProductsAdapter(products)
+            shiftRecycleView.adapter = shiftProductsAdapter
+        }
     }
 }
