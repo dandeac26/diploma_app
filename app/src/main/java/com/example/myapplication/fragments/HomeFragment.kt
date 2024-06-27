@@ -168,13 +168,13 @@ class HomeFragment : Fragment() {
         val shiftDate: TextView = view.findViewById(R.id.shiftDate)
         val shiftIndicator: TextView = view.findViewById(R.id.shiftIndicator)
 
-        updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate)
+        updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate, true)
 
         header.setOnClickListener {
             if (sharedViewModel.isLoadingOrders.value == true) {
                 return@setOnClickListener
             }
-            updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate)
+            updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate, false)
         }
 
         shiftRecycleView = view.findViewById(R.id.shiftRecycleView)
@@ -203,7 +203,7 @@ class HomeFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateShift(shiftTitle: TextView, shiftIndicator: TextView, shiftImage: ImageView, shiftDate: TextView) {
+    private fun updateShift(shiftTitle: TextView, shiftIndicator: TextView, shiftImage: ImageView, shiftDate: TextView, isInitial : Boolean) {
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val currentDate = Calendar.getInstance().time
         val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.US)
@@ -218,7 +218,10 @@ class HomeFragment : Fragment() {
             shiftIndicator.text = "Orders For Tomorrow"
         }
 
-        isNoonShift = !isNoonShift
+        if(!isInitial) {
+            isNoonShift = !isNoonShift
+        }
+
 
         updateShiftRecycleView(shiftDate)
 
