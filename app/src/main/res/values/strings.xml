@@ -55,4 +55,10 @@
     <string name="add_provider">Add Provider</string>
     <string name="providers">Providers</string>
     <string name="create_order">Create Order</string>
+
+    <string-array name="client_types_array">
+        <item>SPECIAL</item>
+        <item>REGULAR</item>
+        <item>KINDERGARTEN</item>
+    </string-array>
 </resources>

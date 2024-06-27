@@ -22,8 +22,10 @@ import android.view.ViewStub
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -268,8 +270,18 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         val location: String,
         val latitude: Double,
         val longitude: Double,
-        val address: String
+        val address: String,
+        val type: String
     )
+
+    fun convertClientTypeToInt(type: String): Int {
+        return when (type) {
+            "SPECIAL" -> 0
+            "REGULAR" -> 1
+            "KINDERGARTEN" -> 2
+            else -> throw IllegalArgumentException("Invalid client type")
+        }
+    }
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -356,6 +368,8 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
             }
         })
     }
+
+
     @SuppressLint("InflateParams", "MissingInflatedId", "SetTextI18n")
     fun openAddClientDialog(client: Client? = null, contactName: String? = null, phoneNumber: String? = null) {
         if (!isNetworkAvailable()) {
@@ -378,8 +392,22 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
             dialogView.findViewById<EditText>(R.id.phoneNumberInput).setText(phoneNumber)
         }
 
-        if (client != null) {
+        val clientTypeSpinner = dialogView.findViewById<Spinner>(R.id.clientTypeSpinner)
 
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.client_types_array,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            // Apply the adapter to the spinner
+            clientTypeSpinner.adapter = adapter
+        }
+
+        if (client != null) {
+            clientTypeSpinner.setSelection(convertClientTypeToInt(client.type))
             dialogView.findViewById<EditText>(R.id.firmNameInput).setText(client.firmName)
             dialogView.findViewById<EditText>(R.id.phoneNumberInput).setText(client.phoneNumber)
             dialogView.findViewById<EditText>(R.id.contactPersonInput).setText(client.contactPerson)
@@ -395,7 +423,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         }
         dialogView.findViewById<Button>(R.id.saveButton).setOnClickListener {
             val firmName = dialogView.findViewById<EditText>(R.id.firmNameInput).text.toString()
-
+            val selectedType = clientTypeSpinner.selectedItemPosition
             if(firmName.isEmpty()) {
                 Toast.makeText(context, "Firm name cannot be empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -416,7 +444,9 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
 
             val address = dialogView.findViewById<EditText>(R.id.addressInput).text.toString()
 
-            val newClient = ClientDTO(firmName, contactPerson, newPhoneNumber, location, latitude ?: 0.0, longitude ?: 0.0, address)
+            val newClient = ClientDTO(firmName, contactPerson, newPhoneNumber, location, latitude ?: 0.0, longitude ?: 0.0, address,
+                selectedType.toString()
+            )
 
             if (client == null) {
                 addClient(newClient) { errorMessage ->

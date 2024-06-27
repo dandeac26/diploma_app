@@ -7,5 +7,6 @@ data class ClientDTO (
     val location: String,
     val latitude: Double,
     val longitude: Double,
-    val address: String
+    val address: String,
+    val type: String
 )

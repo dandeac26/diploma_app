@@ -110,6 +110,7 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                     latitude = 0.0,
                     longitude = 0.0,
                     address = "Unknown",
+                    type = "SPECIAL"
                 )
 
                 addClient(newClient) { clientId ->
@@ -409,6 +410,7 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
             latitude = 0.0,
             longitude = 0.0,
             address = "Address 1",
+            type = "SPECIAL"
         )
         sharedViewModel.selectClient(newClient)
 
