@@ -182,7 +182,17 @@
 package com.example.myapplication.fragments
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
 import android.os.Bundle
+import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
+import android.print.PageRange
+import android.print.PrintAttributes
+import android.print.PrintDocumentAdapter
+import android.print.PrintDocumentInfo
+import android.print.PrintManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -190,6 +200,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -200,6 +211,8 @@ import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
+import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -211,6 +224,60 @@ class HomeFragment : Fragment() {
     private lateinit var orderAPI: OrderAPI
     private var isNoonShift = true
     private lateinit var loadingSpinner: ProgressBar
+
+    val printAdapter = object : PrintDocumentAdapter() {
+        override fun onLayout(
+            oldAttributes: PrintAttributes?,
+            newAttributes: PrintAttributes,
+            cancellationSignal: CancellationSignal?,
+            callback: LayoutResultCallback,
+            extras: Bundle?
+        ) {
+            if (cancellationSignal?.isCanceled == true) {
+                callback.onLayoutCancelled()
+                return
+            }
+            callback.onLayoutFinished(
+                PrintDocumentInfo.Builder("print_output.pdf")
+                    .setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                    .setPageCount(1)
+                    .build(),
+                newAttributes != oldAttributes
+            )
+        }
+
+        override fun onWrite(
+            pages: Array<out PageRange>,
+            destination: ParcelFileDescriptor,
+            cancellationSignal: CancellationSignal?,
+            callback: WriteResultCallback
+        ) {
+            cancellationSignal?.let {
+                if (it.isCanceled) {
+                    callback.onWriteCancelled()
+                    return
+                }
+            }
+
+            PdfDocument().apply {
+                val pageInfo = PdfDocument.PageInfo.Builder(300, 300, 1).create()
+                startPage(pageInfo).apply {
+                    canvas.drawText("Hello, World!", 50f, 50f, Paint())
+                    finishPage(this)
+                }
+                try {
+                    writeTo(FileOutputStream(destination.fileDescriptor))
+                } catch (e: IOException) {
+                    callback.onWriteFailed(e.message)
+                    return
+                } finally {
+                    close()
+                }
+            }
+
+            callback.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -249,7 +316,13 @@ class HomeFragment : Fragment() {
 
         updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate)
 
+
+        val printManager = requireActivity().getSystemService(Context.PRINT_SERVICE) as PrintManager
+//            printManager.print("Document", printAdapter, PrintAttributes.Builder().build())
+
         header.setOnClickListener {
+
+
             if (sharedViewModel.isLoadingOrders.value == true) {
                 return@setOnClickListener
             }
