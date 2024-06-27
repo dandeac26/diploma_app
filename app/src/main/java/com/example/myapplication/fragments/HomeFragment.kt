@@ -316,13 +316,15 @@ class HomeFragment : Fragment() {
 
         updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate)
 
-
+        /// HANDLE PRINTING ///
         val printManager = requireActivity().getSystemService(Context.PRINT_SERVICE) as PrintManager
-//            printManager.print("Document", printAdapter, PrintAttributes.Builder().build())
+        val printShiftOrders = view.findViewById<TextView>(R.id.printShiftOrders)
+        printShiftOrders.setOnClickListener {
+            printManager.print("Document", printAdapter, PrintAttributes.Builder().build())
+        } /// END PRINTING ///
+
 
         header.setOnClickListener {
-
-
             if (sharedViewModel.isLoadingOrders.value == true) {
                 return@setOnClickListener
             }
