@@ -22,31 +22,40 @@
             android:layout_marginStart="8dp"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/shiftImage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/shiftImage" />
+
+        <TextView
+            android:id="@+id/shiftIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Orders For Today"
+            android:textSize="13sp"
+            android:textStyle="italic"
+            app:layout_constraintStart_toStartOf="@+id/shiftTitle"
+            app:layout_constraintTop_toBottomOf="@+id/shiftTitle" />
 
         <TextView
             android:id="@+id/shiftDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:textSize="17sp"
             android:textStyle="italic"
-            app:layout_constraintBottom_toBottomOf="@+id/shiftImage"
+            app:layout_constraintBottom_toBottomOf="@+id/shiftIndicator"
             app:layout_constraintEnd_toStartOf="@+id/shiftImage"
-            app:layout_constraintStart_toEndOf="@id/shiftTitle"
-            app:layout_constraintTop_toTopOf="@+id/shiftImage" />
+            app:layout_constraintStart_toEndOf="@+id/shiftTitle"
+            app:layout_constraintTop_toTopOf="@+id/shiftTitle" />
 
         <ImageView
             android:id="@+id/shiftImage"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:scaleX="0.7"
-            android:scaleY="0.7"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="4dp"
+            android:scaleX="0.9"
+            android:scaleY="0.9"
+            app:layout_constraintBottom_toBottomOf="@id/shiftDate"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="@id/shiftDate" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
