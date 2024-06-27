@@ -156,6 +156,7 @@ class OrdersFragment : Fragment() {
         val clientName: String,
         val clientLocation: String,
         val clientPhoneNumber: String,
+        val clientType: String,
         val orderDetails: List<OrderDetail>
     ) : Serializable
 
@@ -170,6 +171,7 @@ class OrdersFragment : Fragment() {
         val clientName: String,
         val clientLocation: String,
         val clientPhoneNumber: String,
+        val clientType: String,
         val orderDetails: Any?
     ) : Serializable
 
