@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import com.example.myapplication.fragments.HomeFragment
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -29,6 +30,10 @@ import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
 import java.util.LinkedList
 
 
@@ -47,6 +52,8 @@ class MainActivity : AppCompatActivity() {
     )
 
     private val fragmentHistory = LinkedList<Fragment>()
+
+    private lateinit var webSocket: WebSocket
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -118,6 +125,37 @@ class MainActivity : AppCompatActivity() {
         } else {
             switchFragment(HomeFragment())
         }
+
+        connectWebSocket()
+    }
+
+    private fun connectWebSocket() {
+        val client = OkHttpClient()
+        val request = Request.Builder()
+            .url("ws://192.168.68.56:8000/ws")
+            .build()
+
+        val listener = object : WebSocketListener() {
+            override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
+                Log.i("WebSocket", "Connection opened")
+                this@MainActivity.webSocket = webSocket
+            }
+
+            override fun onMessage(webSocket: WebSocket, text: String) {
+                // Handle incoming messages
+            }
+
+            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                webSocket.close(1000, null)
+                Log.i("WebSocket", "Connection closed")
+            }
+
+            override fun onFailure(webSocket: WebSocket, t: Throwable, response: okhttp3.Response?) {
+                Log.e("WebSocket", "Error: ${t.message}")
+            }
+        }
+
+        client.newWebSocket(request, listener)
     }
 
     private fun updateTopNavTitle(title: String) {
