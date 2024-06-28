@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.R
 import com.example.myapplication.adapters.SensorAdapter
 import com.example.myapplication.api.SensorAPI
@@ -18,9 +20,8 @@ class SensorFragment : Fragment() {
     private lateinit var sensorAPI: SensorAPI
 
     private val sensors = listOf(
-        Sensor("9920ccbf-d43e-4713-bc6d-5460375f6e81", "Sensor 1"),
-        Sensor("1920ccbf-d43e-4713-bc6d-5460375f6e82", "Sensor 2"),
-        // Add more sensors as needed
+        Sensor("9920ccbf-d43e-4713-bc6d-5460375f6e81", "Warehouse1 Sensor"),
+        Sensor("1920ccbf-d43e-4713-bc6d-5460375f6e82", "Kitchen1 Sensor"),
     )
 
     override fun onCreateView(
@@ -33,31 +34,20 @@ class SensorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val loadingProgressBar: ProgressBar = view.findViewById(R.id.loadingProgressBar)
+        val swipeRefreshLayout: SwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
+
         sensorAPI = RetrofitInstance.getInstance(requireContext(), 8001).create(SensorAPI::class.java)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = SensorAdapter(sensors, sensorAPI)
+        recyclerView.adapter = SensorAdapter(sensors, sensorAPI, loadingProgressBar)
 
-//        fetchSensorData()
+        swipeRefreshLayout.setOnRefreshListener {
+            // Refresh the sensor readings here
+            recyclerView.adapter = SensorAdapter(sensors, sensorAPI, loadingProgressBar)
+            swipeRefreshLayout.isRefreshing = false
+        }
     }
-
-//    fun fetchSensorData(){
-//        sensorAPI.getSensorData().enqueue(object : Callback<List<SensorData>> {
-//            override fun onResponse(call: Call<List<SensorData>>, response: Response<List<SensorData>>) {
-//                if (response.isSuccessful) {
-//                    val sensorData = response.body()
-//                    Log.d("SensorFragment", "Response: $sensorData")
-//                } else {
-//                    Log.e("SensorFragment", "Request failed with response code: ${response.code()}")
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<List<SensorData>>, t: Throwable) {
-//                Log.e("SensorFragment", "Request failed with error: ${t.message}")
-//            }
-//        })
-//    }
-
 
     data class SensorData(
         val sensorId: String,
