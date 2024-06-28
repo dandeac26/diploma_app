@@ -64,9 +64,7 @@ dependencies {
 
     implementation(libs.kotlinx.coroutines.core)
 
-    implementation(libs.graphview){
-        exclude(group = "com.android.support")
-    }
+    implementation("com.jjoe64:graphview:4.2.2")
 
 
     implementation(libs.androidx.core.ktx)
