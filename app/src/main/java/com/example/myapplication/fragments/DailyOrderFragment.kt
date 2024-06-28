@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -198,6 +199,12 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             override fun onMessage(webSocket: WebSocket, text: String) {
                 if (text == "Refetch orders") {
                     fetchDailyOrders()
+                }
+                else {
+                    Log.i("WebSocket", "Received message: $text")
+                    activity?.runOnUiThread {
+                        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
 
