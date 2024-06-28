@@ -20,6 +20,8 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.MainActivity
+import com.example.myapplication.MainActivity.Companion.CHANNEL_ID
 import com.example.myapplication.R
 import com.example.myapplication.adapters.OrderAdapter
 import com.example.myapplication.api.OrderAPI
@@ -196,14 +199,26 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
                 Log.i("WebSocket", "Connection opened")
             }
 
+            @SuppressLint("MissingPermission")
             override fun onMessage(webSocket: WebSocket, text: String) {
                 if (text == "Refetch orders") {
                     fetchDailyOrders()
                 }
                 else {
-                    Log.i("WebSocket", "Received message: $text")
+
                     activity?.runOnUiThread {
+                        Log.i("WebSocket", "Received message: $text")
+                        val notificationId = 2
                         Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+                        val builder = NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+                            .setSmallIcon(R.drawable.midday_100)
+                            .setContentTitle("My notification")
+                            .setContentText(text)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+                        with(NotificationManagerCompat.from(requireContext())) {
+                            notify(notificationId, builder.build())
+                        }
                     }
                 }
             }
@@ -255,7 +270,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
         displayedOrders.removeAll { it.orderId == orderId }
     }
 
-    private fun fetchDailyOrders() {
+    fun fetchDailyOrders() {
         activity?.runOnUiThread {
 
             if (!isNetworkAvailable()) {

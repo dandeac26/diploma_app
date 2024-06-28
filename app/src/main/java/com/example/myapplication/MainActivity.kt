@@ -2,24 +2,33 @@ package com.example.myapplication
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
+import android.os.Build
 import com.example.myapplication.fragments.HomeFragment
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.config.NetworkChangeReceiver
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.fragments.ClientsFragment.ClientSelectionListener
 import com.example.myapplication.fragments.ClientsFragment
+import com.example.myapplication.fragments.DailyOrderFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductDetailsFragment
 import com.example.myapplication.fragments.ProductsFragment
@@ -50,6 +59,10 @@ class MainActivity : AppCompatActivity() {
         StocksFragment::class.java to R.id.nav_stocks,
         ClientsFragment::class.java to R.id.nav_clients
     )
+
+    companion object {
+        const val CHANNEL_ID = "pastry_central_channel"
+    }
 
     private val fragmentHistory = LinkedList<Fragment>()
 
@@ -127,6 +140,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         connectWebSocket()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.channel_name)
+            val descriptionText = getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     private fun connectWebSocket() {
@@ -141,8 +166,26 @@ class MainActivity : AppCompatActivity() {
                 this@MainActivity.webSocket = webSocket
             }
 
+            @SuppressLint("MissingPermission")
             override fun onMessage(webSocket: WebSocket, text: String) {
-                // Handle incoming messages
+                if (text == "Refetch orders") {
+                    DailyOrderFragment().fetchDailyOrders()
+                } else {
+                    runOnUiThread {
+                        Log.i("WebSocket", "Received message: $text")
+                        val notificationId = 2
+                        Toast.makeText(this@MainActivity, text, Toast.LENGTH_SHORT).show()
+                        val builder = NotificationCompat.Builder(this@MainActivity, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.midday_100)
+                            .setContentTitle("My notification")
+                            .setContentText(text)
+                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+                        with(NotificationManagerCompat.from(this@MainActivity)) {
+                            notify(notificationId, builder.build())
+                        }
+                    }
+                }
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
@@ -153,6 +196,18 @@ class MainActivity : AppCompatActivity() {
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: okhttp3.Response?) {
                 Log.e("WebSocket", "Error: ${t.message}")
             }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.channel_name)
+            val descriptionText = getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
 
         client.newWebSocket(request, listener)

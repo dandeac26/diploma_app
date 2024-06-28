@@ -55,6 +55,8 @@
     <string name="add_provider">Add Provider</string>
     <string name="providers">Providers</string>
     <string name="create_order">Create Order</string>
+    <string name="channel_name">pastry central notifs</string>
+    <string name="channel_description">notifications from sensors or others</string>
 
     <string-array name="client_types_array">
         <item>SPECIAL</item>
