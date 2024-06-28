@@ -1,5 +1,6 @@
 package com.example.myapplication.adapters
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.text.Editable
@@ -29,10 +30,11 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
         return ProductViewHolder(view)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val currentProduct = productList[position]
         holder.productName.text = currentProduct.name
-
+        holder.quantityEditText.setText("")
         Glide.with(holder.productImage.context)
             .load(currentProduct.imageUrl)
             .into(holder.productImage)

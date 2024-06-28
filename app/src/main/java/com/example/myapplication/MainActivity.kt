@@ -22,6 +22,7 @@ import com.example.myapplication.fragments.ClientsFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductDetailsFragment
 import com.example.myapplication.fragments.ProductsFragment
+import com.example.myapplication.fragments.SensorFragment
 import com.example.myapplication.fragments.StocksFragment
 import com.example.myapplication.fragments.SettingsFragment
 import com.example.myapplication.views.SharedViewModel
@@ -197,6 +198,10 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_settings -> {
                 switchFragment(SettingsFragment())
+                true
+            }
+            R.id.action_monitoring -> {
+                switchFragment(SensorFragment())
                 true
             }
             else -> super.onOptionsItemSelected(item)
