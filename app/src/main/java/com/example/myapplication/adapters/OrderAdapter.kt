@@ -17,6 +17,7 @@ import com.example.myapplication.views.SharedViewModel
 class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, private val orderAPI: OrderAPI,
                     private val fragment: DailyOrderFragment, private val sharedViewModel: SharedViewModel) : RecyclerView.Adapter<OrderAdapter.OrderViewHolder>() {
 
+    var showCompleted = true
     inner class OrderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val orderClientNameTextView : TextView = view.findViewById(R.id.orderClientNameTextView)
         val orderTotalTextView : TextView = view.findViewById(R.id.orderTotalTextView)
@@ -66,7 +67,12 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
     @SuppressLint("NotifyDataSetChanged")
     fun updateOrdersAfterSearch(displayedOrders: MutableList<OrdersFragment.Order>) {
         orders.clear()
-        orders.addAll(displayedOrders)
+        if(showCompleted) {
+            orders.addAll(displayedOrders)
+        } else {
+            orders.addAll(displayedOrders.filter { !it.completed })
+        }
+//        orders.addAll(displayedOrders)
         notifyDataSetChanged()
     }
 }

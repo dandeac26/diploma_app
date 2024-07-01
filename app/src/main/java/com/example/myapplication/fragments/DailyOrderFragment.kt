@@ -77,7 +77,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
         return inflater.inflate(R.layout.fragment_daily_order, container, false)
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -186,6 +186,17 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             (activity as MainActivity).switchFragment(OrdersFragment())
         }
 
+        val showCompletedLabel = view.findViewById<TextView>(R.id.showCompletedLabel)
+        showCompletedLabel.setOnClickListener {
+            orderAdapter.showCompleted = !orderAdapter.showCompleted
+            orderAdapter.updateOrdersAfterSearch(displayedOrders)
+            val numStr = getNumCompletedOrders()
+            showCompletedLabel.text = if (orderAdapter.showCompleted) "Hide completed" else "Show completed ($numStr)"
+        }
+    }
+
+    private fun getNumCompletedOrders(): Int {
+        return allOrders.count { it.completed }
     }
 
     private fun connectWebSocket() {
