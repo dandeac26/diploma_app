@@ -174,6 +174,8 @@ class HomeFragment : Fragment() {
 
         updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate, true)
 
+
+
         header.setOnClickListener {
             if (sharedViewModel.isLoadingOrders.value == true) {
                 return@setOnClickListener
@@ -184,7 +186,7 @@ class HomeFragment : Fragment() {
         shiftRecycleView = view.findViewById(R.id.shiftRecycleView)
         shiftRecycleView.layoutManager = LinearLayoutManager(context)
 
-        updateShiftRecycleView(shiftDate)
+        updateShiftRecycleView(shiftDate.text.toString())
 
         /// HANDLE PRINTING ///
         val printManager = requireActivity().getSystemService(Context.PRINT_SERVICE) as PrintManager
@@ -227,7 +229,7 @@ class HomeFragment : Fragment() {
         }
 
 
-        updateShiftRecycleView(shiftDate)
+        updateShiftRecycleView(shiftDate.text.toString())
 
         if (isNoonShift) {
             shiftTitle.text = "Noon Shift"
@@ -238,15 +240,23 @@ class HomeFragment : Fragment() {
         }
     }
 
-     private fun updateShiftRecycleView(shiftDate: TextView){
-        convertDateFormat(shiftDate.text.toString())?.let {
+     fun updateShiftRecycleView(shiftDate: String){
+        convertDateFormat(shiftDate)?.let {
             sharedViewModel.fetchOrdersByDate(orderAPI,
                 it
             )
         }
 
         sharedViewModel.orders.observe(viewLifecycleOwner) { orders ->
-            val vShiftDate = convertDateFormat(shiftDate.text.toString())
+            val vShiftDate = convertDateFormat(shiftDate)
+
+            val allProducts = orders.filter { it.completionDate == vShiftDate }
+                .flatMap { it.orderDetails }
+                .groupBy { it.product }
+                .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
+
+            sharedViewModel.setAllShiftProducts(allProducts)
+
             val filteredOrders = if (isNoonShift) {
                 orders.filter { it.clientType == "SPECIAL" || it.clientType == "KINDERGARTEN" }
             } else {
@@ -257,12 +267,7 @@ class HomeFragment : Fragment() {
                 .groupBy { it.product }
                 .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
 
-            val allProducts = orders.filter { it.completionDate == vShiftDate }
-                .flatMap { it.orderDetails }
-                .groupBy { it.product }
-                .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
 
-            sharedViewModel.setAllShiftProducts(allProducts)
             sharedViewModel.calculateIngredientQuantities(recipeAPI)
             shiftProductsAdapter = ShiftProductsAdapter(products)
             shiftRecycleView.adapter = shiftProductsAdapter

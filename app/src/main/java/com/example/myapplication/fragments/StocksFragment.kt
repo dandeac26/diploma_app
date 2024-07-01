@@ -49,6 +49,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.Serializable
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class StocksFragment : Fragment() {
 
@@ -178,6 +181,7 @@ class StocksFragment : Fragment() {
             predictionMode.value = !(predictionMode.value ?: false)
 //            DailyOrderFragment().fetchDailyOrders()
 //            sharedViewModel.calculateIngredientQuantities(recipeAPI)
+
             if(predictionMode.value == true){
                 showUsageLabel.text = "Show current stocks"
             } else {
