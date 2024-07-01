@@ -5,8 +5,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.myapplication.api.OrderAPI
+import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.fragments.ClientsFragment
 import com.example.myapplication.fragments.OrdersFragment
+import com.example.myapplication.fragments.ProductDetailsFragment
 import com.example.myapplication.fragments.ProductsFragment
 import retrofit2.Call
 import retrofit2.Callback
@@ -62,6 +64,33 @@ class SharedViewModel : ViewModel() {
     val _allShiftProducts = MutableLiveData<List<Pair<OrdersFragment.Product, Int>>>()
     fun setAllShiftProducts(products: List<Pair<OrdersFragment.Product, Int>>){
         _allShiftProducts.value = products
+    }
+
+    val ingredientQuantities = MutableLiveData<Map<String, Int>>()
+
+    fun calculateIngredientQuantities(recipeAPI: RecipeAPI) {
+        val quantities = mutableMapOf<String, Int>()
+        _allShiftProducts.value?.forEach { (product, productQuantity) ->
+            recipeAPI.getRecipeOfProduct(product.productId).enqueue(object : Callback<List<ProductDetailsFragment.Recipe>> {
+                override fun onResponse(call: Call<List<ProductDetailsFragment.Recipe>>, response: Response<List<ProductDetailsFragment.Recipe>>) {
+                    if (response.isSuccessful) {
+                        val recipes = response.body()
+                        if (recipes != null) {
+                            for (recipe in recipes) {
+                                val ingredientId = recipe.ingredientId
+                                val ingredientQuantity = recipe.quantity
+                                quantities[ingredientId] = quantities.getOrDefault(ingredientId, 0) + (ingredientQuantity * productQuantity).toInt()
+                            }
+                        }
+                        ingredientQuantities.value = quantities
+                    }
+                }
+
+                override fun onFailure(call: Call<List<ProductDetailsFragment.Recipe>>, t: Throwable) {
+                    // Handle the error
+                }
+            })
+        }
     }
 
     val onBackPressed = MutableLiveData<Boolean>()

@@ -16,11 +16,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
-import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.fragments.StocksFragment
 import com.example.myapplication.api.StockAPI
-import com.example.myapplication.fragments.OrdersFragment
-import com.example.myapplication.fragments.ProductDetailsFragment.Recipe
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,8 +25,8 @@ import retrofit2.Response
 class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
                    private val stockAPI: StockAPI, private val fragment: StocksFragment,
                    private val predictionMode: MutableLiveData<Boolean>,
-                   private val allShiftProducts :List<Pair<OrdersFragment.Product, Int>>,
-                   private val recipeAPI: RecipeAPI) : RecyclerView.Adapter<StockAdapter.StockViewHolder>() {
+                   private val ingredientQuantities: Map<String, Int>
+) : RecyclerView.Adapter<StockAdapter.StockViewHolder>() {
     private var highlightedPosition = -1
 
     inner class StockViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -60,18 +57,24 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
 
         predictionMode.observe(fragment.viewLifecycleOwner) { isPredictionMode ->
             if (isPredictionMode) {
-
-                calculatePrediction(stock) { prediction ->
-                    // If in prediction mode, change the progress bar color and value
-                    Log.d("StockAdapter", "PREDICTION: $prediction")
+                // If in prediction mode, change the progress bar color and value
+                val predictedQuantity = ingredientQuantities[stock.ingredientId]
+                if (predictedQuantity != null) {
+                    val prediction = predictedQuantity/stock.quantityPerPackage
                     holder.stockProgressBar.progressDrawable = fragment.resources.getDrawable(R.drawable.custom_prediction_progressbar, null)
                     holder.stockProgressBar.max = stock.quantity
-                    holder.stockProgressBar.progress = prediction // CHANGE THIS
-                    holder.quantityTextView.text = prediction.toString() // CHANGE THIS
+                    holder.stockProgressBar.progress = prediction
+                    holder.quantityTextView.text = prediction.toString()
+                    holder.maxQuantityTextView.text = stock.quantity.toString()
+                    holder.maxQuantityLabel.text = "current quantity:"
+                }else{
+                    holder.stockProgressBar.progressDrawable = fragment.resources.getDrawable(R.drawable.custom_prediction_progressbar, null)
+                    holder.stockProgressBar.max = stock.quantity
+                    holder.stockProgressBar.progress = 0
+                    holder.quantityTextView.text = "0"
                     holder.maxQuantityTextView.text = stock.quantity.toString()
                     holder.maxQuantityLabel.text = "current quantity:"
                 }
-
             } else {
                 // If not in prediction mode, revert to the original color and value
                 holder.stockProgressBar.progressDrawable = fragment.resources.getDrawable(R.drawable.custom_progressbar, null)
@@ -82,6 +85,27 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
                 holder.maxQuantityLabel.text = "max:"
             }
         }
+//        predictionMode.observe(fragment.viewLifecycleOwner) { isPredictionMode ->
+//            if (isPredictionMode) {
+//                    // If in prediction mode, change the progress bar color and value
+//                Log.d("StockAdapter", "PREDICTION: $prediction")
+//                holder.stockProgressBar.progressDrawable = fragment.resources.getDrawable(R.drawable.custom_prediction_progressbar, null)
+//                holder.stockProgressBar.max = stock.quantity
+//                holder.stockProgressBar.progress = prediction
+//                holder.quantityTextView.text = prediction.toString()
+//                holder.maxQuantityTextView.text = stock.quantity.toString()
+//                holder.maxQuantityLabel.text = "current quantity:"
+//
+//            } else {
+//                // If not in prediction mode, revert to the original color and value
+//                holder.stockProgressBar.progressDrawable = fragment.resources.getDrawable(R.drawable.custom_progressbar, null)
+//                holder.stockProgressBar.max = stock.maxQuantity
+//                holder.stockProgressBar.progress = stock.quantity
+//                holder.quantityTextView.text = stock.quantity.toString()
+//                holder.maxQuantityTextView.text = stock.maxQuantity.toString()
+//                holder.maxQuantityLabel.text = "max:"
+//            }
+//        }
 
         holder.itemView.setOnLongClickListener { v ->
             showPopupMenu(v, holder.adapterPosition)
@@ -105,62 +129,6 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
         } else {
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
         }
-    }
-
-    interface RecipeCallback {
-        fun onResult(recipes: List<Pair<String, Double>>)
-    }
-
-
-    private fun calculatePrediction(stock: StocksFragment.Stock, onResult: (Int) -> Unit) {
-        val stockMaxQuantity = stock.maxQuantity
-        val stockIngredientId = stock.ingredientId
-
-        for (shiftProduct in allShiftProducts) {
-            val product = shiftProduct.first
-            val quantity = shiftProduct.second
-
-            getRecipeOfProduct(product, object : RecipeCallback {
-                override fun onResult(recipes: List<Pair<String, Double>>) {
-                    var result = 0.0
-                    for (ingredient in recipes) {
-                        if (ingredient.first == stockIngredientId) {
-                            result += ingredient.second * quantity
-                        }
-                    }
-                    result /= stock.quantityPerPackage
-                    val resultInt = result.toInt()
-                    val finalResult = when {
-                        resultInt < 0 -> 0
-                        resultInt > stockMaxQuantity -> stockMaxQuantity
-                        else -> resultInt
-                    }
-                    // Call the onResult function with the final result
-                    onResult(finalResult)
-                }
-            })
-        }
-    }
-
-    private fun getRecipeOfProduct(product: OrdersFragment.Product, callback: RecipeCallback) {
-        val result = mutableListOf<Pair<String, Double>>()
-        val call = recipeAPI.getRecipeOfProduct(product.productId)
-        call.enqueue(object : Callback<List<Recipe>> {
-            override fun onResponse(call: Call<List<Recipe>>, response: Response<List<Recipe>>) {
-                if (response.isSuccessful) {
-                    val recipes = response.body()
-                    if (!recipes.isNullOrEmpty()) {
-                        for (recipe in recipes) {
-                            result.add(Pair(recipe.ingredientId, recipe.quantity))
-                        }
-                    }
-                    callback.onResult(result)
-                }
-            }
-            override fun onFailure(call: Call<List<Recipe>>, t: Throwable) {
-                // Handle the error
-            }
-        })
     }
 
 

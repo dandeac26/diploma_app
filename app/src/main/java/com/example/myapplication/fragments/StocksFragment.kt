@@ -41,6 +41,7 @@ import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.api.StockAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.entity.StockDTO
+import com.example.myapplication.fragments.ProductDetailsFragment.Recipe
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -68,7 +69,6 @@ class StocksFragment : Fragment() {
     private val displayedStocks = mutableListOf<Stock>()
 
     private val predictionMode = MutableLiveData<Boolean>().apply { value = false }
-//    private val shiftOrders = MutableLiveData<List<OrdersFragment.Order>>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -77,7 +77,7 @@ class StocksFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_stocks, container, false)
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -90,8 +90,10 @@ class StocksFragment : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
         sharedViewModel._allShiftProducts.observe(viewLifecycleOwner) { products ->
-            stockAdapter = StockAdapter(stocks, stockAPI, this, predictionMode, products, recipeAPI)
+            sharedViewModel.calculateIngredientQuantities(recipeAPI)
+            stockAdapter = StockAdapter(stocks, stockAPI, this, predictionMode, sharedViewModel.ingredientQuantities.value ?: mapOf())
         }
+
         recyclerView = view.findViewById(R.id.stocksRecyclerView)
         emptyView = view.findViewById(R.id.emptyView)
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -169,12 +171,13 @@ class StocksFragment : Fragment() {
 
         val showUsageLabel = view.findViewById<TextView>(R.id.showUsageLabel)
         showUsageLabel.setOnClickListener {
-                predictionMode.value = !(predictionMode.value ?: false)
-                if(predictionMode.value == true){
-                    showUsageLabel.text = "Show current stocks"
-                } else {
-                    showUsageLabel.text = "Show usage for today"
-                }
+            predictionMode.value = !(predictionMode.value ?: false)
+            if(predictionMode.value == true){
+                showUsageLabel.text = "Show current stocks"
+            } else {
+                showUsageLabel.text = "Show usage for today"
+            }
+            stockAdapter.notifyDataSetChanged()
         }
 
         sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
