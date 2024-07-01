@@ -27,6 +27,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,6 +37,7 @@ import com.example.myapplication.R
 import com.example.myapplication.adapters.StockAdapter
 import com.example.myapplication.api.IngredientsAPI
 import com.example.myapplication.api.ProviderAPI
+import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.api.StockAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.entity.StockDTO
@@ -60,9 +62,13 @@ class StocksFragment : Fragment() {
     private lateinit var stockAPI: StockAPI
     private lateinit var ingredientsAPI: IngredientsAPI
     private lateinit var providerAPI: ProviderAPI
+    private lateinit var recipeAPI: RecipeAPI
 
     private val allStocks = mutableListOf<Stock>()
     private val displayedStocks = mutableListOf<Stock>()
+
+    private val predictionMode = MutableLiveData<Boolean>().apply { value = false }
+//    private val shiftOrders = MutableLiveData<List<OrdersFragment.Order>>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -78,12 +84,14 @@ class StocksFragment : Fragment() {
         stockAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(StockAPI::class.java)
         ingredientsAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(IngredientsAPI::class.java)
         providerAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ProviderAPI::class.java)
+        recipeAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(RecipeAPI::class.java)
 
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
-        stockAdapter = StockAdapter(stocks, stockAPI, this)
-
+        sharedViewModel._allShiftProducts.observe(viewLifecycleOwner) { products ->
+            stockAdapter = StockAdapter(stocks, stockAPI, this, predictionMode, products, recipeAPI)
+        }
         recyclerView = view.findViewById(R.id.stocksRecyclerView)
         emptyView = view.findViewById(R.id.emptyView)
         recyclerView.layoutManager = LinearLayoutManager(context)
@@ -159,6 +167,16 @@ class StocksFragment : Fragment() {
             popupMenu.show()
         }
 
+        val showUsageLabel = view.findViewById<TextView>(R.id.showUsageLabel)
+        showUsageLabel.setOnClickListener {
+                predictionMode.value = !(predictionMode.value ?: false)
+                if(predictionMode.value == true){
+                    showUsageLabel.text = "Show current stocks"
+                } else {
+                    showUsageLabel.text = "Show usage for today"
+                }
+        }
+
         sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {
                 fetchStocks()
@@ -172,6 +190,7 @@ class StocksFragment : Fragment() {
                 inputMethodManager?.hideSoftInputFromWindow(searchBar.windowToken, 0)
             }
         }
+
 
         val searchBar = view.findViewById<EditText>(R.id.searchBar)
         searchBar.setOnTouchListener { _, event ->
@@ -213,6 +232,7 @@ class StocksFragment : Fragment() {
         var quantity: Int,
         var price: String,
         var maxQuantity: Int,
+        var quantityPerPackage: Int,
         var packaging: String
     ):Serializable
 
@@ -401,7 +421,7 @@ class StocksFragment : Fragment() {
         if (stock != null) {
             ingredientSpinner.isEnabled = false
             providerSpinner.isEnabled = false
-
+            dialogView.findViewById<EditText>(R.id.stockQuantityPerPackageInput).setText(stock.quantityPerPackage.toString())
             dialogView.findViewById<EditText>(R.id.quantityInput).setText(stock.quantity.toString())
             dialogView.findViewById<EditText>(R.id.priceInput).setText(stock.price)
             dialogView.findViewById<EditText>(R.id.maxQuantityInput).setText(stock.maxQuantity.toString())
@@ -413,6 +433,7 @@ class StocksFragment : Fragment() {
             val quantityString = dialogView.findViewById<EditText>(R.id.quantityInput).text.toString()
             val priceString = dialogView.findViewById<EditText>(R.id.priceInput).text.toString()
             val maxQuantityString = dialogView.findViewById<EditText>(R.id.maxQuantityInput).text.toString()
+            val quantityPerPackageString = dialogView.findViewById<EditText>(R.id.stockQuantityPerPackageInput).text.toString()
 
             if (quantityString.isEmpty()) {
                 Toast.makeText(context, "Quantity cannot be empty", Toast.LENGTH_SHORT).show()
@@ -426,11 +447,16 @@ class StocksFragment : Fragment() {
                 Toast.makeText(context, "Max quantity cannot be empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (quantityPerPackageString.isEmpty()) {
+                Toast.makeText(context, "Quantity per package cannot be empty", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             try {
                 val quantityInt = quantityString.toInt()
                 val price = priceString.toDouble()
                 val maxQuantity = maxQuantityString.toInt()
+                val quantityPerPackage = quantityPerPackageString.toInt()
             } catch (e: NumberFormatException) {
                 Toast.makeText(context, "Input number is too large", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -439,6 +465,7 @@ class StocksFragment : Fragment() {
             val quantityInt = quantityString.toInt()
             val priceDouble = priceString.toDouble()
             val maxQuantityInt = maxQuantityString.toInt()
+            val quantityPerPackageInt = quantityPerPackageString.toInt()
 
             val ingredientId = allStocks.find { it.ingredientName == ingredientNameString }?.ingredientId
             if (ingredientId == null) {
@@ -451,7 +478,7 @@ class StocksFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val newStock = StockDTO(ingredientId, providerId, quantityInt, priceDouble, maxQuantityInt)
+            val newStock = StockDTO(ingredientId, providerId, quantityInt, priceDouble, maxQuantityInt, quantityPerPackageInt)
 
             if (stock == null) {
                 addStock(newStock) { errorMessage ->
@@ -468,7 +495,7 @@ class StocksFragment : Fragment() {
             } else {
                 val oldStock = stocks.find { it.ingredientId == ingredientId && it.providerId == providerId }
 
-                if (oldStock != null && newStock.providerId == oldStock.providerId && oldStock.quantity == quantityInt && oldStock.price == priceDouble.toString() && oldStock.maxQuantity == maxQuantityInt) {
+                if (oldStock != null && newStock.providerId == oldStock.providerId && oldStock.quantity == quantityInt && oldStock.price == priceDouble.toString() && oldStock.maxQuantity == maxQuantityInt && oldStock.quantityPerPackage == quantityPerPackageInt) {
                     alertDialog.dismiss()
                     return@setOnClickListener
                 }

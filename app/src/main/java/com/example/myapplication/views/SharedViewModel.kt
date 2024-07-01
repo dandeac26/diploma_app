@@ -59,7 +59,10 @@ class SharedViewModel : ViewModel() {
         currentOrders.addAll(orders)
         _orders.value = currentOrders
     }
-
+    val _allShiftProducts = MutableLiveData<List<Pair<OrdersFragment.Product, Int>>>()
+    fun setAllShiftProducts(products: List<Pair<OrdersFragment.Product, Int>>){
+        _allShiftProducts.value = products
+    }
 
     val onBackPressed = MutableLiveData<Boolean>()
 

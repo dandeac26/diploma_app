@@ -5,5 +5,6 @@ data class StockDTO(
     val providerId: String,
     val quantity: Int,
     val price: Double,
-    val maxQuantity: Int
+    val maxQuantity: Int,
+    val quantityPerPackage: Int
 )

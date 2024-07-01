@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.adapters.ShiftProductsAdapter
 import com.example.myapplication.api.OrderAPI
+import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
@@ -43,6 +44,7 @@ class HomeFragment : Fragment() {
     private lateinit var orderAPI: OrderAPI
     private var isNoonShift = true
     private lateinit var loadingSpinner: ProgressBar
+
 
     class MyPrintDocumentAdapter(
         private val shiftDate: TextView,
@@ -253,8 +255,14 @@ class HomeFragment : Fragment() {
                 .groupBy { it.product }
                 .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
 
+            val allProducts = orders.filter { it.completionDate == vShiftDate }
+                .flatMap { it.orderDetails }
+                .groupBy { it.product }
+                .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
+
             shiftProductsAdapter = ShiftProductsAdapter(products)
             shiftRecycleView.adapter = shiftProductsAdapter
+            sharedViewModel.setAllShiftProducts(allProducts)
         }
     }
 }

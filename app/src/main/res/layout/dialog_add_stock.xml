@@ -103,6 +103,29 @@
         app:layout_constraintVertical_bias="0.521" />
 
     <TextView
+        android:id="@+id/stockQuantityPerPackageLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Units in Pack: "
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stockPriceLabel" />
+
+    <EditText
+        android:id="@+id/stockQuantityPerPackageInput"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:hint="Units per package"
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toBottomOf="@id/stockQuantityPerPackageLabel"
+        app:layout_constraintStart_toEndOf="@id/stockQuantityPerPackageLabel"
+        app:layout_constraintTop_toTopOf="@id/stockQuantityPerPackageLabel"
+        app:layout_constraintVertical_bias="0.521" />
+
+    <TextView
         android:id="@+id/stockMaxQuantityLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -111,7 +134,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stockPriceLabel" />
+        app:layout_constraintTop_toBottomOf="@+id/stockQuantityPerPackageLabel" />
 
     <EditText
         android:id="@+id/maxQuantityInput"
