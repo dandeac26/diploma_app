@@ -44,6 +44,7 @@ class HomeFragment : Fragment() {
     private lateinit var orderAPI: OrderAPI
     private var isNoonShift = true
     private lateinit var loadingSpinner: ProgressBar
+    private lateinit var recipeAPI: RecipeAPI
 
 
     class MyPrintDocumentAdapter(
@@ -149,6 +150,7 @@ class HomeFragment : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
         orderAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(OrderAPI::class.java)
+        recipeAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(RecipeAPI::class.java)
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
 
@@ -236,7 +238,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun updateShiftRecycleView(shiftDate: TextView){
+     private fun updateShiftRecycleView(shiftDate: TextView){
         convertDateFormat(shiftDate.text.toString())?.let {
             sharedViewModel.fetchOrdersByDate(orderAPI,
                 it
@@ -260,9 +262,10 @@ class HomeFragment : Fragment() {
                 .groupBy { it.product }
                 .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
 
+            sharedViewModel.setAllShiftProducts(allProducts)
+            sharedViewModel.calculateIngredientQuantities(recipeAPI)
             shiftProductsAdapter = ShiftProductsAdapter(products)
             shiftRecycleView.adapter = shiftProductsAdapter
-            sharedViewModel.setAllShiftProducts(allProducts)
         }
     }
 }

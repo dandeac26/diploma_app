@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.adapters.ShiftProductsAdapter
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.fragments.ClientsFragment
@@ -61,10 +62,15 @@ class SharedViewModel : ViewModel() {
         currentOrders.addAll(orders)
         _orders.value = currentOrders
     }
+
+
+
     val _allShiftProducts = MutableLiveData<List<Pair<OrdersFragment.Product, Int>>>()
     fun setAllShiftProducts(products: List<Pair<OrdersFragment.Product, Int>>){
         _allShiftProducts.value = products
     }
+
+
 
     val ingredientQuantities = MutableLiveData<Map<String, Int>>()
 
@@ -117,6 +123,12 @@ class SharedViewModel : ViewModel() {
                     val ordersResponse = response.body()
                     if (ordersResponse != null) {
                         setOrders(ordersResponse)
+//                        val allProducts = ordersResponse
+//                            .flatMap { it.orderDetails }
+//                            .groupBy { it.product }
+//                            .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
+//
+//                        setAllShiftProducts(allProducts)
                     }
                 } else {
                     // Handle the error

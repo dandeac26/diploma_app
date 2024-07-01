@@ -89,9 +89,13 @@ class StocksFragment : Fragment() {
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
-        sharedViewModel._allShiftProducts.observe(viewLifecycleOwner) { products ->
+        sharedViewModel._allShiftProducts.observe(viewLifecycleOwner) {
+//            Log.d("Ordersssss", orders.toString())
+//            DailyOrderFragment().fetchDailyOrders()
             sharedViewModel.calculateIngredientQuantities(recipeAPI)
             stockAdapter = StockAdapter(stocks, stockAPI, this, predictionMode, sharedViewModel.ingredientQuantities.value ?: mapOf())
+
+            stockAdapter.notifyDataSetChanged()
         }
 
         recyclerView = view.findViewById(R.id.stocksRecyclerView)
@@ -172,6 +176,8 @@ class StocksFragment : Fragment() {
         val showUsageLabel = view.findViewById<TextView>(R.id.showUsageLabel)
         showUsageLabel.setOnClickListener {
             predictionMode.value = !(predictionMode.value ?: false)
+//            DailyOrderFragment().fetchDailyOrders()
+//            sharedViewModel.calculateIngredientQuantities(recipeAPI)
             if(predictionMode.value == true){
                 showUsageLabel.text = "Show current stocks"
             } else {
