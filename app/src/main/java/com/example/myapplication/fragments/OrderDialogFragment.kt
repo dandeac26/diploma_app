@@ -35,6 +35,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionListener, ProductsFragment.ProductsSelectionListener {
@@ -444,7 +445,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         }
         //////////// END ADD CLIENT BUTTON //////////////////
 
-
         //// CHANGE CLIENT TEXTVIEW ////
         val selectedClientTextView = view.findViewById<TextView>(R.id.selectedClientTextView)
         sharedViewModel.selectedClient.observe(viewLifecycleOwner) { client ->
@@ -453,6 +453,52 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
             }
         }
         //// END CHANGE CLIENT TEXTVIEW ////
+
+        /////////// POPULATE ORDER DETAILS WITH PREVIOUS CLIENT ORDER //////////////////
+        sharedViewModel.selectedClient.observe(viewLifecycleOwner) { client ->
+            if(client.clientId != null || client.clientId != "1") {
+                orderAPI.getOrders().enqueue(object : Callback<List<OrdersFragment.Order>> {
+                    @SuppressLint("NotifyDataSetChanged")
+                    override fun onResponse(
+                        call: Call<List<OrdersFragment.Order>>,
+                        response: Response<List<OrdersFragment.Order>>
+                    ) {
+                        if (response.isSuccessful) {
+                            val allOrders = response.body()
+                            if (allOrders != null) {
+                                Log.d("Entereddd", "Entered")
+                                val clientOrders =
+                                    allOrders.filter { it.clientId == client.clientId }
+                                val mostRecentOrder =
+                                    clientOrders.maxByOrNull { convertDateFormat2(it.completionDate) }
+                                if (mostRecentOrder != null) {
+                                    selectedProducts.clear()
+                                    mostRecentOrder.orderDetails.forEach { orderDetail ->
+                                        val lineItemProduct = ProductsFragment.Product(
+                                            orderDetail.product.productId,
+                                            orderDetail.product.name,
+                                            orderDetail.product.price,
+                                            orderDetail.product.imageUrl
+                                        )
+                                        sharedViewModel.selectProduct(lineItemProduct)
+                                    }
+                                    selectedProductsAdapter.notifyDataSetChanged()
+                                }
+                            }
+                        } else {
+                            Log.e(
+                                "OrderDialogFragment",
+                                "Error fetching orders: ${response.errorBody()?.string()}"
+                            )
+                        }
+                    }
+
+                    override fun onFailure(call: Call<List<OrdersFragment.Order>>, t: Throwable) {
+                        Log.e("OrderDialogFragment", "Error fetching orders: ${t.message}")
+                    }
+                })
+            }
+        }
 
 
         //////////// ADD BUTTON //////////////////
@@ -472,6 +518,11 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
             sharedViewModel.isProductSelectionListenerActive.value = true
         }
         ////////////////////// END ADD BUTTON //////////////////////
+    }
+
+    fun convertDateFormat2(inputDate: String): Date {
+        val originalFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        return originalFormat.parse(inputDate)!!
     }
 
     data class LineItemProduct(

@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide
 import com.example.myapplication.R
 import com.example.myapplication.fragments.OrderDialogFragment
 import de.hdodenhof.circleimageview.CircleImageView
+import kotlin.math.min
 
 class OrderDialogProductAdapter(private val productList: MutableList<OrderDialogFragment.LineItemProduct>) :
     RecyclerView.Adapter<OrderDialogProductAdapter.ProductViewHolder>() {
@@ -23,6 +24,7 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
         val productName: TextView = itemView.findViewById(R.id.productName)
         val quantityEditText: EditText = itemView.findViewById(R.id.quantityEditText)
         val productImage: CircleImageView = itemView.findViewById(R.id.productImage)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -34,12 +36,12 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val currentProduct = productList[position]
         holder.productName.text = currentProduct.name
-        holder.quantityEditText.setText("")
         Glide.with(holder.productImage.context)
             .load(currentProduct.imageUrl)
             .into(holder.productImage)
 
-        holder.quantityEditText.addTextChangedListener(object : TextWatcher {
+        // Create a new TextWatcher
+        val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
                 // No action needed here
             }
@@ -54,13 +56,21 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
                     currentProduct.quantity = quantity
                 }
             }
-        })
+        }
+
+        // Remove the TextWatcher before setting the text
+        holder.quantityEditText.removeTextChangedListener(textWatcher)
+        // If the quantity is zero, set the text to an empty string. Otherwise, set it to the quantity.
+        holder.quantityEditText.setText(if (currentProduct.quantity == 0) "" else currentProduct.quantity.toString())
+        // Add the TextWatcher back after setting the text
+        holder.quantityEditText.addTextChangedListener(textWatcher)
 
         holder.itemView.setOnLongClickListener {
             showDeleteConfirmationDialog(holder.itemView.context, position)
             true
         }
     }
+
 
     private fun showDeleteConfirmationDialog(context: Context, position: Int) {
         AlertDialog.Builder(context).apply {
@@ -74,5 +84,5 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
         }.show()
     }
 
-    override fun getItemCount() = productList.size
+    override fun getItemCount() = min(7, productList.size)
 }
