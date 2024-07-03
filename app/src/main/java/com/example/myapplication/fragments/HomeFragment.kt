@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -49,7 +50,7 @@ class HomeFragment : Fragment() {
     private lateinit var shiftRecycleView: RecyclerView
     private lateinit var homeStocksRecyclerViewAdapter: NegativeStocksAdapter
     private var checkStockPredictions = true
-
+    private var notSwitchingShifts = true
 
     private lateinit var orderAPI: OrderAPI
     private lateinit var recipeAPI: RecipeAPI
@@ -219,8 +220,8 @@ class HomeFragment : Fragment() {
                 shiftIndicator.text = "Orders for Selected Date"
                 updateShift(shiftTitle, shiftImage, shiftDate, false)
             }, year, month, day)
-
             datePickerDialog.show()
+            view.findViewById<ScrollView>(R.id.scrollView).scrollTo(0, 0)
         }
 
         updateShift(shiftTitle, shiftImage, shiftDate, true)
@@ -229,7 +230,9 @@ class HomeFragment : Fragment() {
             if (sharedViewModel.isLoadingOrders.value == true) {
                 return@setOnClickListener
             }
+
             updateShift(shiftTitle, shiftImage, shiftDate, false)
+            view.findViewById<ScrollView>(R.id.scrollView).scrollTo(0, 0)
         }
 
         shiftRecycleView = view.findViewById(R.id.shiftRecycleView)
@@ -286,7 +289,8 @@ class HomeFragment : Fragment() {
                 it
             )
         }
-
+        val homeStockTitle = view?.findViewById<TextView>(R.id.homeStockTitle)
+        homeStockTitle?.text = "Stock Predictions ($shiftDate)"
         sharedViewModel.orders.observe(viewLifecycleOwner) { orders ->
             val vShiftDate = convertDateFormat(shiftDate)
 
@@ -347,11 +351,11 @@ class HomeFragment : Fragment() {
     data class NegativeStock(
         val ingredientId: String,
         val ingredientName: String,
-        val remainingQuantity: Int
+        val remainingQuantity: Int,
+        val packaging: String
     )
 
     private fun calculateAndCollectNegativeRemainingStocks() {
-
         sharedViewModel._allStocks.observe(viewLifecycleOwner) {
             sharedViewModel.allIngredientQuantitiesTillDate.observe(viewLifecycleOwner) {
                 val negativeStocks = mutableListOf<NegativeStock>()
@@ -362,19 +366,14 @@ class HomeFragment : Fragment() {
                         val totalNeededQuantity = allQuantities[stock.ingredientId]
 
                         totalNeededQuantity?.let {
-                            // Calculate the remaining quantity
                             val remainingQuantity = stock.quantity - (it / stock.quantityPerPackage)
 
-                            // Check if the remaining quantity is negative
                             if (remainingQuantity < 0) {
-                                // Add to the list of negative stocks
-                                negativeStocks.add(NegativeStock(stock.ingredientId, stock.ingredientName, remainingQuantity))
-
+                                negativeStocks.add(NegativeStock(stock.ingredientId, stock.ingredientName, remainingQuantity, stock.packaging))
                             }
                         }
                     }
                 }
-//                Log.d("NegativeStocks7", negativeStocks.toString())
                 homeStocksRecyclerViewAdapter.updateData(negativeStocks)
             }
         }
