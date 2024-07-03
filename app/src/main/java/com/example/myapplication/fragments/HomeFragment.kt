@@ -251,13 +251,20 @@ class HomeFragment : Fragment() {
 
         val loadStocksButton = view.findViewById<Button>(R.id.loadStocksButton)
         loadStocksButton.setOnClickListener {
-            // switch to stocks fragment and set predictionMode to true
+            checkStockPredictions = true
+            updateShiftRecycleView(shiftDate.text.toString())
+        }
+
+        val checkPredictionButton = view.findViewById<Button>(R.id.checkPredictionButton)
+        checkPredictionButton.setOnClickListener {
+            // if homeStocksRecyclerViewAdapter.data.isNotEmpty() {
+            if(homeStocksRecyclerView.adapter?.itemCount == 0){
+                Toast.makeText(context, "Press Load first!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val stocksFragment = StocksFragment()
             stocksFragment.predictionMode.value = true
             (activity as MainActivity).switchFragment(stocksFragment)
-
-            checkStockPredictions = true
-            updateShiftRecycleView(shiftDate.text.toString())
         }
     }
 

@@ -194,14 +194,29 @@
                         app:cardBackgroundColor="@color/client_list_item_background"
                         android:clipToPadding="false" />
 
-                    <Button
-                        android:id="@+id/loadStocksButton"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Load"
                         android:layout_gravity="center"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="20dp"/>
+                        android:orientation="horizontal">
+                        <Button
+                            android:id="@+id/loadStocksButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Load"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="20dp"/>
+
+                        <Button
+                            android:id="@+id/checkPredictionButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Check Stocks"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginBottom="20dp"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
