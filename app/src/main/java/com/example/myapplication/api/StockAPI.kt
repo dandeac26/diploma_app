@@ -14,6 +14,9 @@ interface StockAPI {
     @GET("stock")
     fun getStocks(): Call<Map<String, List<StocksFragment.Stock>>>
 
+    @GET("stock/unique-stocks")
+    fun getUniqueStocks(): Call<List<StocksFragment.Stock>>
+
     @DELETE("stock/{ingredientId}/{providerId}")
     fun deleteStock(@Path("ingredientId") ingredientId: String, @Path("providerId") providerId:String): Call<Void>
 

@@ -183,17 +183,16 @@ class SharedViewModel : ViewModel() {
     }
 
     fun populateAllStocks(stockAPI: StockAPI) {
-        val call = stockAPI.getStocks()
-        call.enqueue(object : Callback<Map<String, List<Stock>>> {
-            override fun onResponse(call: Call<Map<String, List<Stock>>>, response: Response<Map<String, List<Stock>>>) {
+        val call = stockAPI.getUniqueStocks()
+        call.enqueue(object : Callback <List<Stock>> {
+            override fun onResponse(call: Call<List<Stock>>, response: Response<List<Stock>>) {
                 if (response.isSuccessful) {
                     val stocksResponse = response.body()
                     if (stocksResponse != null) {
                         val interStock = mutableListOf<Stock>()
-                        stocksResponse.values.flatten()
-                            .groupBy { it.ingredientId }
-                            .map { (_, stocks) -> stocks.first() }
-                            .forEach { interStock.add(it) }
+                        for (stock in stocksResponse) {
+                            interStock.add(stock)
+                        }
                         setAllStocks(interStock)
                     }
                 } else {
@@ -205,7 +204,7 @@ class SharedViewModel : ViewModel() {
                 }
             }
 
-            override fun onFailure(call: Call<Map<String, List<Stock>>>, t: Throwable) {
+            override fun onFailure(call: Call<List<Stock>>, t: Throwable) {
                 // Handle the error
             }
         })
