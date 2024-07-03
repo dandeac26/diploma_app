@@ -68,7 +68,7 @@ class StocksFragment : Fragment() {
     private val allStocks = mutableListOf<Stock>()
     private val displayedStocks = mutableListOf<Stock>()
 
-    private val predictionMode = MutableLiveData<Boolean>().apply { value = false }
+    var predictionMode = MutableLiveData<Boolean>().apply { value = false }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -105,19 +105,12 @@ class StocksFragment : Fragment() {
                 sharedViewModel._allStocks.value?.let { allStocks ->
                     stockAdapter.updateData(allStocks.toMutableList())
                 }
+                shimmerViewContainer.visibility = View.GONE
             } else {
                 fetchStocks()
                 recyclerView.adapter = stockAdapter
             }
         }
-
-//        sharedViewModel._allStocks.observe(viewLifecycleOwner) { allStocks ->
-//            if (predictionMode.value == true) {
-//                stockAdapter.updateData(allStocks.toMutableList())
-//            }
-//            else
-//                stockAdapter.updateData(stocks)
-//        }
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setOnRefreshListener {
@@ -136,6 +129,7 @@ class StocksFragment : Fragment() {
                     )
                     recyclerView.adapter = stockAdapter
                     sharedViewModel._allStocks.value?.let { it1 -> stockAdapter.updateData(it1.toMutableList()) }
+                    swipeRefreshLayout.isRefreshing = false
                 }
             } else {
                 showUsageLabel.text = "Show usage for today"
@@ -147,8 +141,6 @@ class StocksFragment : Fragment() {
 
         shimmerViewContainer = view.findViewById(R.id.shimmer_view_container)
         shimmerViewContainer.startShimmer()
-
-
 
         if (predictionMode.value == true) {
             showUsageLabel.text = "Show current stocks"
@@ -168,13 +160,9 @@ class StocksFragment : Fragment() {
             }
         } else {
             showUsageLabel.text = "Show usage for today"
-
             fetchStocks()
             recyclerView.adapter = stockAdapter
-
         }
-
-
 
         val addStockButton = view.findViewById<Button>(R.id.addStockButton)
         addStockButton.setOnClickListener {
@@ -260,10 +248,7 @@ class StocksFragment : Fragment() {
                 recyclerView.adapter = stockAdapter
 
             }
-//            stockAdapter.notifyDataSetChanged()
         }
-
-
 
         sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {

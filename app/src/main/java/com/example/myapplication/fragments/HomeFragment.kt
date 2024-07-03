@@ -28,6 +28,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.NegativeStocksAdapter
 import com.example.myapplication.adapters.ShiftProductsAdapter
@@ -250,6 +251,11 @@ class HomeFragment : Fragment() {
 
         val loadStocksButton = view.findViewById<Button>(R.id.loadStocksButton)
         loadStocksButton.setOnClickListener {
+            // switch to stocks fragment and set predictionMode to true
+            val stocksFragment = StocksFragment()
+            stocksFragment.predictionMode.value = true
+            (activity as MainActivity).switchFragment(stocksFragment)
+
             checkStockPredictions = true
             updateShiftRecycleView(shiftDate.text.toString())
         }
