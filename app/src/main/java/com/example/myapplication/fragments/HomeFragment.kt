@@ -189,7 +189,6 @@ class HomeFragment : Fragment() {
             shiftIndicator.text = "Orders for Tomorrow"
         }
 
-
         shiftDate.setOnClickListener {
             val calendar = Calendar.getInstance()
             val year = calendar.get(Calendar.YEAR)
@@ -281,11 +280,11 @@ class HomeFragment : Fragment() {
             } else {
                 orders.filter { it.clientType == "REGULAR" }
             }
+
             val products = filteredOrders.filter { it.completionDate == vShiftDate }
                 .flatMap { it.orderDetails }
                 .groupBy { it.product }
                 .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
-
 
             sharedViewModel.calculateIngredientQuantities(recipeAPI)
             shiftProductsAdapter = ShiftProductsAdapter(products)
@@ -323,13 +322,16 @@ class HomeFragment : Fragment() {
         } else {
             1
         }
+
         repeat(juniorPackagersNeeded) {
             recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.JUNIOR))
         }
+
         val experiencedPackagersNeeded = totalDayProducts / 200
         repeat(experiencedPackagersNeeded) {
             recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.EXPERIENCED))
         }
+
         return recommendations
     }
 
@@ -365,6 +367,7 @@ class HomeFragment : Fragment() {
         }
         return recommendations
     }
+
     private fun calculateStaff(totalShiftProducts: Int, totalDayProducts: Int): List<StaffRecommendation> {
         var recommendations = mutableListOf<StaffRecommendation>()
 
