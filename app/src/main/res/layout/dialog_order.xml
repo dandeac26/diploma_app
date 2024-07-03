@@ -41,11 +41,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/selectClientButton" />
 
+
+
     <ImageButton
         android:id="@+id/addProductsButton"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginEnd="15dp"
         android:scaleX="0.8"
         android:scaleY="0.8"
         android:background="@color/product_header"
@@ -53,9 +54,19 @@
         android:src="@drawable/add_48"
         android:tooltipText="Add product to order"
         app:layout_constraintBottom_toBottomOf="@id/productsTitleTextView"
-        app:layout_constraintEnd_toStartOf="@id/createOrderButton"
+        app:layout_constraintEnd_toStartOf="@id/hourSpinner"
         app:layout_constraintStart_toEndOf="@id/productsTitleTextView"
         app:layout_constraintTop_toTopOf="@id/productsTitleTextView" />
+
+
+    <Spinner
+        android:id="@+id/hourSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/addProductsButton"
+        app:layout_constraintEnd_toStartOf="@+id/createOrderButton"
+        app:layout_constraintStart_toEndOf="@+id/addProductsButton"
+        app:layout_constraintTop_toTopOf="@id/addProductsButton" />
 
 
     <Button
@@ -65,8 +76,7 @@
         android:text="Create"
         app:layout_constraintBottom_toBottomOf="@id/productsTitleTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/addProductsButton"
-        app:layout_constraintTop_toTopOf="@id/productsTitleTextView"/>
+        app:layout_constraintTop_toTopOf="@id/productsTitleTextView" />
 
     <ScrollView
         android:layout_width="match_parent"

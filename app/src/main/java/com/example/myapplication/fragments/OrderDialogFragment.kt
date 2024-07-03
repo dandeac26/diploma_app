@@ -8,8 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
@@ -93,6 +95,10 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                 }
             }
 
+            // get the selected hour from spinner
+            val hourSpinner = view.findViewById<Spinner>(R.id.hourSpinner)
+            val selectedHour = convertHourToCompletionTime(hourSpinner.selectedItem.toString())
+
             var selectedClientId: String? = null
             var selectedClientName: String? = null
             sharedViewModel.selectedClient.observe(viewLifecycleOwner) { client ->
@@ -123,7 +129,7 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                             clientId = clientId,
                             deliveryNeeded = false,
                             completionDate = dayDate,
-                            completionTime = "10:00:00",
+                            completionTime = selectedHour,
                             price = 0.0,
                             completed = false,
                         )
@@ -179,7 +185,7 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                         clientId = selectedClientId!!,
                         deliveryNeeded = false,
                         completionDate = dayDate,
-                        completionTime = "10:00:00",
+                        completionTime = selectedHour,
                         price = 0.0,
                         completed = false,
                     )
@@ -220,28 +226,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                             (activity as MainActivity).switchFragment(dailyOrderFragment)
                         }
                     }
-//                    addOrder(order) { error, _ ->
-//                        createOrderButton.isEnabled = true
-//                        createOrderButton.text = "Create"
-//                        if (error != null) {
-//                            // Handle the error
-//                            Log.e("OrderDialogFragment", "Error adding order: $error")
-//                        } else {
-//
-//                            notifyServerAboutNewOrder(order)
-//
-//                            hideKeyboard(it)
-//
-//                            selectedProducts.clear()
-//                            selectedProductsAdapter.notifyDataSetChanged()
-//
-//                            selectedClientTextView.text = ""
-//
-//                            Toast.makeText(context, "Order added successfully", Toast.LENGTH_SHORT).show()
-//                            val dailyOrderFragment = DailyOrderFragment()
-//                            (activity as MainActivity).switchFragment(dailyOrderFragment)
-//                        }
-//                    }
                 }
                 else
                 {
@@ -253,6 +237,20 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                 return@setOnClickListener
             }
         }
+    }
+
+    @SuppressLint("DefaultLocale")
+    fun convertHourToCompletionTime(selectedHour: String): String {
+        val isPm = "PM" in selectedHour
+        var hour = selectedHour.filter { it.isDigit() }.toInt()
+
+        if (isPm && hour != 12) {
+            hour += 12
+        } else if (!isPm && hour == 12) {
+            hour = 12
+        }
+
+        return String.format("%02d:00:00", hour)
     }
 
     private fun addOrderDetail(orderId: String, productId: String, quantity: Int, callback: (String?) -> Unit) {
@@ -392,7 +390,15 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         ///////////// INIT SHARED VIEW MODEL //////////////////
         sharedViewModel = ViewModelProvider(requireActivity(), SharedViewModelFactory())[SharedViewModel::class.java]
 
+        val hoursRange = (10..18).map { hour ->
+            if (hour > 12) "${hour - 12} PM" else "$hour AM"
+        }
 
+        val hourAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, hoursRange)
+        hourAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        val hourSpinner = view.findViewById<Spinner>(R.id.hourSpinner)
+        hourSpinner.adapter = hourAdapter
 
         //////////// INIT ADAPTER AND RECYCLE VIEW //////////////////
         selectedProductsAdapter = OrderDialogProductAdapter(selectedProducts)
@@ -504,6 +510,10 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         //////////// ADD BUTTON //////////////////
         val addProductsButton = view.findViewById<ImageButton>(R.id.addProductsButton)
         addProductsButton.setOnClickListener {
+            if(selectedClientTextView.text.isEmpty()){
+                Toast.makeText(context, "Please select a client", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             hideKeyboard(it)
             val productsFragment = ProductsFragment().apply {
                 setProductSelectionListener(object : ProductsFragment.ProductsSelectionListener {
