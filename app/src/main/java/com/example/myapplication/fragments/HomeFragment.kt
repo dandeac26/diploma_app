@@ -17,6 +17,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -27,10 +28,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
+import com.example.myapplication.adapters.NegativeStocksAdapter
 import com.example.myapplication.adapters.ShiftProductsAdapter
 import com.example.myapplication.adapters.StaffRecommendationsAdapter
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.api.RecipeAPI
+import com.example.myapplication.api.StockAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
@@ -44,10 +47,17 @@ class HomeFragment : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var shiftProductsAdapter: ShiftProductsAdapter
     private lateinit var shiftRecycleView: RecyclerView
+    private lateinit var homeStocksRecyclerViewAdapter: NegativeStocksAdapter
+    private var checkStockPredictions = true
+
+
     private lateinit var orderAPI: OrderAPI
+    private lateinit var recipeAPI: RecipeAPI
+    private lateinit var stockAPI: StockAPI
+
     private var isNoonShift = true
     private lateinit var loadingSpinner: ProgressBar
-    private lateinit var recipeAPI: RecipeAPI
+
 
     class MyPrintDocumentAdapter(
         private val shiftDate: TextView,
@@ -154,6 +164,7 @@ class HomeFragment : Fragment() {
 
         orderAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(OrderAPI::class.java)
         recipeAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(RecipeAPI::class.java)
+        stockAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(StockAPI::class.java)
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
 
@@ -168,6 +179,11 @@ class HomeFragment : Fragment() {
                 loadingSpinner.visibility = View.GONE
             }
         }
+
+        val homeStocksRecyclerView = view.findViewById<RecyclerView>(R.id.homeStocksRecyclerView)
+        homeStocksRecyclerView.layoutManager = LinearLayoutManager(context)
+        homeStocksRecyclerViewAdapter = NegativeStocksAdapter(listOf())
+        homeStocksRecyclerView.adapter = homeStocksRecyclerViewAdapter
 
         val shiftTitle: TextView = view.findViewById(R.id.shiftTitle)
         val shiftImage: ImageView = view.findViewById(R.id.shiftImage)
@@ -228,6 +244,12 @@ class HomeFragment : Fragment() {
             val printAdapter = MyPrintDocumentAdapter(shiftDate, shiftIndicator, shiftTitle, shiftProductsAdapter, requireContext())
             printManager.print("Document", printAdapter, PrintAttributes.Builder().build())
         } /// END PRINTING ///
+
+        val loadStocksButton = view.findViewById<Button>(R.id.loadStocksButton)
+        loadStocksButton.setOnClickListener {
+            checkStockPredictions = true
+            updateShiftRecycleView(shiftDate.text.toString())
+        }
     }
 
     private fun convertDateFormat(inputDate: String): String? {
@@ -293,7 +315,70 @@ class HomeFragment : Fragment() {
             val totalDayProducts = allProducts.sumOf { it.second }
             Log.d("TotalShiftProducts", "$totalShiftProducts $totalDayProducts")
             updateEmployeeRecyclerView(calculateStaff(totalShiftProducts, totalDayProducts))
+
+            /// ADD STOCK PREDICTIONS ///
+            if(checkStockPredictions) {
+                sharedViewModel.populateAllStocks(stockAPI)
+
+                if (vShiftDate != null) {
+                    val allProductsTillDate = orders.filter { it.completionDate <= vShiftDate }
+                        .flatMap { it.orderDetails }
+                        .groupBy { it.product }
+                        .map { (product, orderDetails) ->
+                            Pair(
+                                product,
+                                orderDetails.sumOf { it.quantity })
+                        }
+
+                    sharedViewModel.setAllProductsTillDate(allProductsTillDate)
+                    sharedViewModel.calculateAllIngredientQuantitiesTillDate(recipeAPI)
+
+                    calculateAndCollectNegativeRemainingStocks()
+
+                    checkStockPredictions = false
+                }
+                checkStockPredictions = false
+            }else{
+                homeStocksRecyclerViewAdapter.updateData(listOf())
+            }
         }
+    }
+
+    data class NegativeStock(
+        val ingredientId: String,
+        val ingredientName: String,
+        val remainingQuantity: Int
+    )
+
+    private fun calculateAndCollectNegativeRemainingStocks() {
+
+        sharedViewModel._allStocks.observe(viewLifecycleOwner) {
+            sharedViewModel.allIngredientQuantitiesTillDate.observe(viewLifecycleOwner) {
+                val negativeStocks = mutableListOf<NegativeStock>()
+
+                sharedViewModel._allStocks.value?.forEach { stock ->
+
+                    sharedViewModel.allIngredientQuantitiesTillDate.value?.let { allQuantities ->
+                        val totalNeededQuantity = allQuantities[stock.ingredientId]
+
+                        totalNeededQuantity?.let {
+                            // Calculate the remaining quantity
+                            val remainingQuantity = stock.quantity - (it / stock.quantityPerPackage)
+
+                            // Check if the remaining quantity is negative
+                            if (remainingQuantity < 0) {
+                                // Add to the list of negative stocks
+                                negativeStocks.add(NegativeStock(stock.ingredientId, stock.ingredientName, remainingQuantity))
+
+                            }
+                        }
+                    }
+                }
+//                Log.d("NegativeStocks7", negativeStocks.toString())
+                homeStocksRecyclerViewAdapter.updateData(negativeStocks)
+            }
+        }
+
     }
 
     private fun updateEmployeeRecyclerView(recommendations: List<StaffRecommendation>) {

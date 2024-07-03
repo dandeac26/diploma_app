@@ -7,10 +7,13 @@ import androidx.lifecycle.ViewModel
 import com.example.myapplication.adapters.ShiftProductsAdapter
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.api.RecipeAPI
+import com.example.myapplication.api.StockAPI
 import com.example.myapplication.fragments.ClientsFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductDetailsFragment
 import com.example.myapplication.fragments.ProductsFragment
+import com.example.myapplication.fragments.StocksFragment
+import com.example.myapplication.fragments.StocksFragment.Stock
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -105,10 +108,6 @@ class SharedViewModel : ViewModel() {
         onBackPressed.value = true
     }
 
-    fun saveOrder(orderProductAndQuantities: Map<String, Int>) {
-
-    }
-
     val isLoadingOrders = MutableLiveData<Boolean>(false)
 
     fun fetchOrdersByDate(orderAPI: OrderAPI, date: String) {
@@ -123,12 +122,6 @@ class SharedViewModel : ViewModel() {
                     val ordersResponse = response.body()
                     if (ordersResponse != null) {
                         setOrders(ordersResponse)
-//                        val allProducts = ordersResponse
-//                            .flatMap { it.orderDetails }
-//                            .groupBy { it.product }
-//                            .map { (product, orderDetails) -> Pair(product, orderDetails.sumOf { it.quantity }) }
-//
-//                        setAllShiftProducts(allProducts)
                     }
                 } else {
                     // Handle the error
@@ -146,4 +139,76 @@ class SharedViewModel : ViewModel() {
             }
         })
     }
+
+
+
+
+    /// GET INGREDIENTS TOTAL TILL A CERTAIN DATE
+    val _allProductsTillDate = MutableLiveData<List<Pair<OrdersFragment.Product, Int>>>()
+    fun setAllProductsTillDate(products: List<Pair<OrdersFragment.Product, Int>>){
+        _allProductsTillDate.value = products
+    }
+
+    val allIngredientQuantitiesTillDate = MutableLiveData<Map<String, Int>>()
+
+    fun calculateAllIngredientQuantitiesTillDate(recipeAPI: RecipeAPI) {
+        val quantities = mutableMapOf<String, Int>()
+        _allProductsTillDate.value?.forEach { (product, productQuantity) ->
+            recipeAPI.getRecipeOfProduct(product.productId).enqueue(object : Callback<List<ProductDetailsFragment.Recipe>> {
+                override fun onResponse(call: Call<List<ProductDetailsFragment.Recipe>>, response: Response<List<ProductDetailsFragment.Recipe>>) {
+                    if (response.isSuccessful) {
+                        val recipes = response.body()
+                        if (recipes != null) {
+                            for (recipe in recipes) {
+                                val ingredientId = recipe.ingredientId
+                                val ingredientQuantity = recipe.quantity
+                                quantities[ingredientId] = quantities.getOrDefault(ingredientId, 0) + (ingredientQuantity * productQuantity).toInt()
+                            }
+                        }
+                        allIngredientQuantitiesTillDate.value = quantities
+                    }
+                }
+
+                override fun onFailure(call: Call<List<ProductDetailsFragment.Recipe>>, t: Throwable) {
+                    // Handle the error
+                }
+            })
+        }
+    }
+
+
+    val _allStocks = MutableLiveData<List<Stock>>()
+    fun setAllStocks(stocks: List<Stock>){
+        _allStocks.value = stocks
+    }
+
+    fun populateAllStocks(stockAPI: StockAPI) {
+        val call = stockAPI.getStocks()
+        call.enqueue(object : Callback<Map<String, List<Stock>>> {
+            override fun onResponse(call: Call<Map<String, List<Stock>>>, response: Response<Map<String, List<Stock>>>) {
+                if (response.isSuccessful) {
+                    val stocksResponse = response.body()
+                    if (stocksResponse != null) {
+                        val interStock = mutableListOf<Stock>()
+                        stocksResponse.values.flatten()
+                            .groupBy { it.ingredientId }
+                            .map { (_, stocks) -> stocks.first() }
+                            .forEach { interStock.add(it) }
+                        setAllStocks(interStock)
+                    }
+                } else {
+                    // Handle the error
+                    Log.e(
+                        "SharedViewModel",
+                        "Error fetching stocks: ${response.errorBody()?.string()}"
+                    )
+                }
+            }
+
+            override fun onFailure(call: Call<Map<String, List<Stock>>>, t: Throwable) {
+                // Handle the error
+            }
+        })
+    }
 }
+

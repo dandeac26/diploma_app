@@ -41,7 +41,6 @@ import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.api.StockAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.entity.StockDTO
-import com.example.myapplication.fragments.ProductDetailsFragment.Recipe
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -49,9 +48,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.Serializable
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+
 
 class StocksFragment : Fragment() {
 
@@ -93,8 +90,6 @@ class StocksFragment : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
         sharedViewModel._allShiftProducts.observe(viewLifecycleOwner) {
-//            Log.d("Ordersssss", orders.toString())
-//            DailyOrderFragment().fetchDailyOrders()
             sharedViewModel.calculateIngredientQuantities(recipeAPI)
             stockAdapter = StockAdapter(stocks, stockAPI, this, predictionMode, sharedViewModel.ingredientQuantities.value ?: mapOf())
 
@@ -179,8 +174,6 @@ class StocksFragment : Fragment() {
         val showUsageLabel = view.findViewById<TextView>(R.id.showUsageLabel)
         showUsageLabel.setOnClickListener {
             predictionMode.value = !(predictionMode.value ?: false)
-//            DailyOrderFragment().fetchDailyOrders()
-//            sharedViewModel.calculateIngredientQuantities(recipeAPI)
 
             if(predictionMode.value == true){
                 showUsageLabel.text = "Show current stocks"
@@ -203,7 +196,6 @@ class StocksFragment : Fragment() {
                 inputMethodManager?.hideSoftInputFromWindow(searchBar.windowToken, 0)
             }
         }
-
 
         val searchBar = view.findViewById<EditText>(R.id.searchBar)
         searchBar.setOnTouchListener { _, event ->

@@ -57,7 +57,6 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
 
         predictionMode.observe(fragment.viewLifecycleOwner) { isPredictionMode ->
             if (isPredictionMode) {
-                // If in prediction mode, change the progress bar color and value
                 val predictedQuantity = ingredientQuantities[stock.ingredientId]
                 if (predictedQuantity != null) {
                     val prediction = predictedQuantity/stock.quantityPerPackage
@@ -76,7 +75,6 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
                     holder.maxQuantityLabel.text = "current quantity:"
                 }
             } else {
-                // If not in prediction mode, revert to the original color and value
                 holder.stockProgressBar.progressDrawable = fragment.resources.getDrawable(R.drawable.custom_progressbar, null)
                 holder.stockProgressBar.max = stock.maxQuantity
                 holder.stockProgressBar.progress = stock.quantity
@@ -85,27 +83,6 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
                 holder.maxQuantityLabel.text = "max:"
             }
         }
-//        predictionMode.observe(fragment.viewLifecycleOwner) { isPredictionMode ->
-//            if (isPredictionMode) {
-//                    // If in prediction mode, change the progress bar color and value
-//                Log.d("StockAdapter", "PREDICTION: $prediction")
-//                holder.stockProgressBar.progressDrawable = fragment.resources.getDrawable(R.drawable.custom_prediction_progressbar, null)
-//                holder.stockProgressBar.max = stock.quantity
-//                holder.stockProgressBar.progress = prediction
-//                holder.quantityTextView.text = prediction.toString()
-//                holder.maxQuantityTextView.text = stock.quantity.toString()
-//                holder.maxQuantityLabel.text = "current quantity:"
-//
-//            } else {
-//                // If not in prediction mode, revert to the original color and value
-//                holder.stockProgressBar.progressDrawable = fragment.resources.getDrawable(R.drawable.custom_progressbar, null)
-//                holder.stockProgressBar.max = stock.maxQuantity
-//                holder.stockProgressBar.progress = stock.quantity
-//                holder.quantityTextView.text = stock.quantity.toString()
-//                holder.maxQuantityTextView.text = stock.maxQuantity.toString()
-//                holder.maxQuantityLabel.text = "max:"
-//            }
-//        }
 
         holder.itemView.setOnLongClickListener { v ->
             showPopupMenu(v, holder.adapterPosition)
@@ -130,7 +107,6 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
         }
     }
-
 
     private fun showPopupMenu(view: View, position: Int) {
         val popup = PopupMenu(view.context, view)
