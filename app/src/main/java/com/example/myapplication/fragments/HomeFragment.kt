@@ -304,45 +304,36 @@ class HomeFragment : Fragment() {
         employeeRecyclerView?.adapter = adapter
     }
 
-    private fun calculateStaff(totalShiftProducts: Int, totalDayProducts: Int): List<StaffRecommendation> {
-        val recommendations = mutableListOf<StaffRecommendation>()
+    private fun calculateMorningStaff(recommendations: MutableList<StaffRecommendation>, totalDayProducts: Int)  : MutableList<StaffRecommendation>{
+        recommendations.add(StaffRecommendation(Role.HEADER_MORNING, EmployeeSeniority.NONE))
 
-        if(totalShiftProducts == 0) {
-            if(totalDayProducts == 0) {
-                recommendations.add(StaffRecommendation(Role.HEADER_CURRENT_SHIFT, EmployeeSeniority.NONE))
-                recommendations.add(StaffRecommendation(Role.HEADER_MORNING, EmployeeSeniority.NONE))
-                return recommendations
-            } else {
-                recommendations.add(StaffRecommendation(Role.HEADER_CURRENT_SHIFT, EmployeeSeniority.NONE))
-                recommendations.add(StaffRecommendation(Role.HEADER_MORNING, EmployeeSeniority.NONE))
-
-                if(totalDayProducts < 200) {
-                    recommendations.add(
-                        StaffRecommendation(
-                            Role.PACKAGER,
-                            EmployeeSeniority.EXPERIENCED
-                        )
-                    )
-                    return recommendations
-                }
-
-                var juniorPackagersNeeded = 0
-                juniorPackagersNeeded = if(totalDayProducts % 200 > 100) {
-                    2
-                } else {
-                    1
-                }
-                repeat(juniorPackagersNeeded) {
-                    recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.JUNIOR))
-                }
-                val experiencedPackagersNeeded = totalDayProducts / 200
-                repeat(experiencedPackagersNeeded) {
-                    recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.EXPERIENCED))
-                }
-                return recommendations
-            }
+        if(totalDayProducts < 200) {
+            recommendations.add(
+                StaffRecommendation(
+                    Role.PACKAGER,
+                    EmployeeSeniority.EXPERIENCED
+                )
+            )
+            return recommendations
         }
 
+        var juniorPackagersNeeded = 0
+        juniorPackagersNeeded = if(totalDayProducts % 200 > 100) {
+            2
+        } else {
+            1
+        }
+        repeat(juniorPackagersNeeded) {
+            recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.JUNIOR))
+        }
+        val experiencedPackagersNeeded = totalDayProducts / 200
+        repeat(experiencedPackagersNeeded) {
+            recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.EXPERIENCED))
+        }
+        return recommendations
+    }
+
+    private fun calculateCurrentShiftStaff(recommendations: MutableList<StaffRecommendation>, totalShiftProducts: Int) : MutableList<StaffRecommendation>{
         recommendations.add(StaffRecommendation(Role.HEADER_CURRENT_SHIFT, EmployeeSeniority.NONE))
 
         if(totalShiftProducts < 100) {
@@ -372,32 +363,24 @@ class HomeFragment : Fragment() {
                 recommendations.add(StaffRecommendation(Role.COOK, EmployeeSeniority.JUNIOR))
             }
         }
+        return recommendations
+    }
+    private fun calculateStaff(totalShiftProducts: Int, totalDayProducts: Int): List<StaffRecommendation> {
+        var recommendations = mutableListOf<StaffRecommendation>()
 
-        recommendations.add(StaffRecommendation(Role.HEADER_MORNING, EmployeeSeniority.NONE))
-
-        if(totalDayProducts < 200) {
-            recommendations.add(
-                StaffRecommendation(
-                    Role.PACKAGER,
-                    EmployeeSeniority.EXPERIENCED
-                )
-            )
-            return recommendations
+        if(totalShiftProducts == 0) {
+            recommendations.add(StaffRecommendation(Role.HEADER_CURRENT_SHIFT, EmployeeSeniority.NONE))
+            if(totalDayProducts == 0) {
+                recommendations.add(StaffRecommendation(Role.HEADER_MORNING, EmployeeSeniority.NONE))
+                return recommendations
+            } else {
+                return calculateMorningStaff(recommendations, totalDayProducts)
+            }
         }
 
-        var juniorPackagersNeeded = 0
-        juniorPackagersNeeded = if(totalDayProducts % 200 > 100) {
-            2
-        } else {
-            1
-        }
-        repeat(juniorPackagersNeeded) {
-            recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.JUNIOR))
-        }
-        val experiencedPackagersNeeded = totalDayProducts / 200
-        repeat(experiencedPackagersNeeded) {
-            recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.EXPERIENCED))
-        }
+        recommendations = calculateCurrentShiftStaff(recommendations, totalShiftProducts)
+
+        recommendations = calculateMorningStaff(recommendations, totalDayProducts)
 
         Log.d("StaffRecommendations", recommendations.toString())
         return recommendations
