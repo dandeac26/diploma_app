@@ -29,4 +29,5 @@
     <color name="table_row_highlight">#FFD3D3D3</color>
     <color name="delivery_client_location_color">#2196F3</color>
     <color name="home_header">#FFD3D3D3</color>
+    <color name="home_employee_header">#E7D0D0</color>
 </resources>

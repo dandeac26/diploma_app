@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.adapters.ShiftProductsAdapter
+import com.example.myapplication.adapters.StaffRecommendationsAdapter
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.config.RetrofitInstance
@@ -290,50 +291,128 @@ class HomeFragment : Fragment() {
             shiftProductsAdapter = ShiftProductsAdapter(products)
             shiftRecycleView.adapter = shiftProductsAdapter
             val totalShiftProducts = shiftProductsAdapter.products.sumOf { it.second }
-            Log.d("TotalShiftProducts", totalShiftProducts.toString())
-            calculateStaff(totalShiftProducts)
+            val totalDayProducts = allProducts.sumOf { it.second }
+            Log.d("TotalShiftProducts", "$totalShiftProducts $totalDayProducts")
+            updateEmployeeRecyclerView(calculateStaff(totalShiftProducts, totalDayProducts))
         }
     }
 
-    private fun calculateStaff(totalShiftProducts: Int): List<StaffRecommendation> {
-        if(totalShiftProducts == 0) {
-            return emptyList()
-        }
+    private fun updateEmployeeRecyclerView(recommendations: List<StaffRecommendation>) {
+        val employeeRecyclerView = view?.findViewById<RecyclerView>(R.id.employeeRecyclerView)
+        val adapter = StaffRecommendationsAdapter(recommendations)
+        employeeRecyclerView?.layoutManager = LinearLayoutManager(context)
+        employeeRecyclerView?.adapter = adapter
+    }
 
+    private fun calculateStaff(totalShiftProducts: Int, totalDayProducts: Int): List<StaffRecommendation> {
         val recommendations = mutableListOf<StaffRecommendation>()
 
-        var juniorCooksNeeded = 0
-        if(totalShiftProducts % 100 > 50) {
-            juniorCooksNeeded = 2
-        }else
-        {
-            juniorCooksNeeded = 1
+        if(totalShiftProducts == 0) {
+            if(totalDayProducts == 0) {
+                recommendations.add(StaffRecommendation(Role.HEADER_CURRENT_SHIFT, EmployeeSeniority.NONE))
+                recommendations.add(StaffRecommendation(Role.HEADER_MORNING, EmployeeSeniority.NONE))
+                return recommendations
+            } else {
+                recommendations.add(StaffRecommendation(Role.HEADER_CURRENT_SHIFT, EmployeeSeniority.NONE))
+                recommendations.add(StaffRecommendation(Role.HEADER_MORNING, EmployeeSeniority.NONE))
+
+                if(totalDayProducts < 200) {
+                    recommendations.add(
+                        StaffRecommendation(
+                            Role.PACKAGER,
+                            EmployeeSeniority.EXPERIENCED
+                        )
+                    )
+                    return recommendations
+                }
+
+                var juniorPackagersNeeded = 0
+                juniorPackagersNeeded = if(totalDayProducts % 200 > 100) {
+                    2
+                } else {
+                    1
+                }
+                repeat(juniorPackagersNeeded) {
+                    recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.JUNIOR))
+                }
+                val experiencedPackagersNeeded = totalDayProducts / 200
+                repeat(experiencedPackagersNeeded) {
+                    recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.EXPERIENCED))
+                }
+                return recommendations
+            }
         }
-        val experiencedCooksNeeded = totalShiftProducts / 100
+
+        recommendations.add(StaffRecommendation(Role.HEADER_CURRENT_SHIFT, EmployeeSeniority.NONE))
+
+        if(totalShiftProducts < 100) {
+            recommendations.add(
+                StaffRecommendation(
+                    Role.COOK,
+                    EmployeeSeniority.EXPERIENCED
+                )
+            )
+
+        }
+        else{
+            var juniorCooksNeeded = 0
+            juniorCooksNeeded = if(totalShiftProducts % 100 > 50) {
+                2
+            }else {
+                1
+            }
+            val experiencedCooksNeeded = totalShiftProducts / 100
 
 
-        repeat(experiencedCooksNeeded) {
-            recommendations.add(StaffRecommendation(EmployeeRole.COOK, EmployeeSeniority.EXPERIENCED))
+            repeat(experiencedCooksNeeded) {
+                recommendations.add(StaffRecommendation(Role.COOK, EmployeeSeniority.EXPERIENCED))
+            }
+
+            repeat(juniorCooksNeeded) {
+                recommendations.add(StaffRecommendation(Role.COOK, EmployeeSeniority.JUNIOR))
+            }
         }
 
-        repeat(juniorCooksNeeded) {
-            recommendations.add(StaffRecommendation(EmployeeRole.COOK, EmployeeSeniority.JUNIOR))
+        recommendations.add(StaffRecommendation(Role.HEADER_MORNING, EmployeeSeniority.NONE))
+
+        if(totalDayProducts < 200) {
+            recommendations.add(
+                StaffRecommendation(
+                    Role.PACKAGER,
+                    EmployeeSeniority.EXPERIENCED
+                )
+            )
+            return recommendations
+        }
+
+        var juniorPackagersNeeded = 0
+        juniorPackagersNeeded = if(totalDayProducts % 200 > 100) {
+            2
+        } else {
+            1
+        }
+        repeat(juniorPackagersNeeded) {
+            recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.JUNIOR))
+        }
+        val experiencedPackagersNeeded = totalDayProducts / 200
+        repeat(experiencedPackagersNeeded) {
+            recommendations.add(StaffRecommendation(Role.PACKAGER, EmployeeSeniority.EXPERIENCED))
         }
 
         Log.d("StaffRecommendations", recommendations.toString())
         return recommendations
     }
 
-    enum class EmployeeRole {
-        COOK, PACKAGER
+    enum class Role {
+        COOK, PACKAGER, HEADER_MORNING, HEADER_CURRENT_SHIFT
     }
 
     enum class EmployeeSeniority {
-        EXPERIENCED, JUNIOR
+        EXPERIENCED, JUNIOR, NONE
     }
 
     data class StaffRecommendation(
-        val role: EmployeeRole,
+        val role: Role,
         val seniority: EmployeeSeniority
     )
 }
