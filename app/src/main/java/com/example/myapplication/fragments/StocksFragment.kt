@@ -354,6 +354,8 @@ class StocksFragment : Fragment() {
             }
         })
     }
+    private val ingredientNameToIdMap = mutableMapOf<String, String>()
+    private val providerNameToIdMap = mutableMapOf<String, String>()
     private var updatingStockPosition = -1
     @SuppressLint("InflateParams", "MissingInflatedId", "CutPasteId")
     fun openAddStockDialog(stock: Stock? = null, position: Int = -1) {
@@ -380,7 +382,12 @@ class StocksFragment : Fragment() {
                 if (response.isSuccessful) {
                     val ingredients = response.body()
                     if (ingredients != null) {
-                        val ingredientNames = ingredients.map { it.name }
+                        ingredientNameToIdMap.clear()
+                        val ingredientNames = ingredients.map { it.name }.also { names ->
+                            ingredients.forEach { ingredient ->
+                                ingredientNameToIdMap[ingredient.name] = ingredient.ingredientId
+                            }
+                        }
                         val ingredientAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, ingredientNames)
                         ingredientAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         ingredientSpinner.adapter = ingredientAdapter
@@ -405,7 +412,12 @@ class StocksFragment : Fragment() {
                 if (response.isSuccessful) {
                     val providers = response.body()
                     if (providers != null) {
-                        val providerNames = providers.map { it.name }
+                        providerNameToIdMap.clear()
+                        val providerNames = providers.map { it.name }.also { names ->
+                            providers.forEach { provider ->
+                                providerNameToIdMap[provider.name] = provider.providerId
+                            }
+                        }
                         val providerAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, providerNames)
                         providerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                         providerSpinner.adapter = providerAdapter
@@ -434,6 +446,7 @@ class StocksFragment : Fragment() {
 
         dialogView.findViewById<Button>(R.id.saveButton).setOnClickListener {
             val ingredientNameString = dialogView.findViewById<Spinner>(R.id.ingredientNameInput).selectedItem.toString()
+            Log.d("ingredient3NameString", ingredientNameString)
             val providerNameString = dialogView.findViewById<Spinner>(R.id.providerNameInput).selectedItem.toString()
             val quantityString = dialogView.findViewById<EditText>(R.id.quantityInput).text.toString()
             val priceString = dialogView.findViewById<EditText>(R.id.priceInput).text.toString()
@@ -472,14 +485,11 @@ class StocksFragment : Fragment() {
             val maxQuantityInt = maxQuantityString.toInt()
             val quantityPerPackageInt = quantityPerPackageString.toInt()
 
-            val ingredientId = allStocks.find { it.ingredientName == ingredientNameString }?.ingredientId
-            if (ingredientId == null) {
-                Toast.makeText(context, "Ingredient not found", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            val providerId = allStocks.find { it.providerName == providerNameString }?.providerId
-            if (providerId == null) {
-                Toast.makeText(context, "Provider not found", Toast.LENGTH_SHORT).show()
+            val ingredientId = ingredientNameToIdMap[ingredientNameString]
+            val providerId = providerNameToIdMap[providerNameString]
+
+            if(ingredientId == null || providerId == null){
+                Toast.makeText(context, "Ingredient or provider not found", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
