@@ -283,6 +283,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+     @SuppressLint("SetTextI18n")
      private fun updateShiftRecycleView(shiftDate: String){
         convertDateFormat(shiftDate)?.let {
             sharedViewModel.fetchOrdersByDate(orderAPI,

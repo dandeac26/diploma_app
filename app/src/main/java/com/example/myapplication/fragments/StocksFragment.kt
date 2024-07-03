@@ -77,7 +77,7 @@ class StocksFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_stocks, container, false)
     }
 
-    @SuppressLint("ClickableViewAccessibility", "NotifyDataSetChanged")
+    @SuppressLint("ClickableViewAccessibility", "NotifyDataSetChanged", "SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -86,34 +86,95 @@ class StocksFragment : Fragment() {
         providerAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ProviderAPI::class.java)
         recipeAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(RecipeAPI::class.java)
 
+        val showUsageLabel = view.findViewById<TextView>(R.id.showUsageLabel)
+
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
-        sharedViewModel._allShiftProducts.observe(viewLifecycleOwner) {
-            sharedViewModel.calculateIngredientQuantities(recipeAPI)
-            stockAdapter = StockAdapter(stocks, stockAPI, this, predictionMode, sharedViewModel.ingredientQuantities.value ?: mapOf())
 
-            stockAdapter.notifyDataSetChanged()
-        }
 
+        stockAdapter = StockAdapter(mutableListOf(), stockAPI, this, predictionMode, mapOf())
         recyclerView = view.findViewById(R.id.stocksRecyclerView)
         emptyView = view.findViewById(R.id.emptyView)
         recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = stockAdapter
 
-        sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner) {
-            recyclerView.adapter = stockAdapter
+
+        predictionMode.observe(viewLifecycleOwner) { isPredictionMode ->
+            if (isPredictionMode) {
+                sharedViewModel._allStocks.value?.let { allStocks ->
+                    stockAdapter.updateData(allStocks.toMutableList())
+                }
+            } else {
+                fetchStocks()
+                recyclerView.adapter = stockAdapter
+            }
         }
 
+//        sharedViewModel._allStocks.observe(viewLifecycleOwner) { allStocks ->
+//            if (predictionMode.value == true) {
+//                stockAdapter.updateData(allStocks.toMutableList())
+//            }
+//            else
+//                stockAdapter.updateData(stocks)
+//        }
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setOnRefreshListener {
-            fetchStocks()
+            if (predictionMode.value == true) {
+                showUsageLabel.text = "Show current stocks"
+                sharedViewModel._allStocks.value?.let { allStocks ->
+                    stockAdapter.updateData(allStocks.toMutableList())
+                }
+                sharedViewModel.allIngredientQuantitiesTillDate.value?.let { ingredientQuantities ->
+                    stockAdapter = StockAdapter(
+                        allStocks.toMutableList(),
+                        stockAPI,
+                        this@StocksFragment,
+                        predictionMode,
+                        ingredientQuantities
+                    )
+                    recyclerView.adapter = stockAdapter
+                    sharedViewModel._allStocks.value?.let { it1 -> stockAdapter.updateData(it1.toMutableList()) }
+                }
+            } else {
+                showUsageLabel.text = "Show usage for today"
+                fetchStocks() // This method should fetch and display the initial stocks
+                recyclerView.adapter = stockAdapter
+            }
+
         }
 
         shimmerViewContainer = view.findViewById(R.id.shimmer_view_container)
         shimmerViewContainer.startShimmer()
 
-        fetchStocks()
+
+
+        if (predictionMode.value == true) {
+            showUsageLabel.text = "Show current stocks"
+            sharedViewModel._allStocks.value?.let { allStocks ->
+                stockAdapter.updateData(allStocks.toMutableList())
+            }
+            sharedViewModel.allIngredientQuantitiesTillDate.value?.let { ingredientQuantities ->
+                stockAdapter = StockAdapter(
+                    allStocks.toMutableList(),
+                    stockAPI,
+                    this@StocksFragment,
+                    predictionMode,
+                    ingredientQuantities
+                )
+                recyclerView.adapter = stockAdapter
+                sharedViewModel._allStocks.value?.let { it1 -> stockAdapter.updateData(it1.toMutableList()) }
+            }
+        } else {
+            showUsageLabel.text = "Show usage for today"
+
+            fetchStocks()
+            recyclerView.adapter = stockAdapter
+
+        }
+
+
 
         val addStockButton = view.findViewById<Button>(R.id.addStockButton)
         addStockButton.setOnClickListener {
@@ -171,23 +232,66 @@ class StocksFragment : Fragment() {
             popupMenu.show()
         }
 
-        val showUsageLabel = view.findViewById<TextView>(R.id.showUsageLabel)
+
         showUsageLabel.setOnClickListener {
             predictionMode.value = !(predictionMode.value ?: false)
 
             if(predictionMode.value == true){
                 showUsageLabel.text = "Show current stocks"
+
+                sharedViewModel.populateAllStocks(stockAPI)
+                sharedViewModel._allStocks.observe(viewLifecycleOwner) {
+                    stockAdapter.updateData(it.toMutableList())
+                }
+                sharedViewModel.calculateAllIngredientQuantitiesTillDate(recipeAPI)
+                sharedViewModel.allIngredientQuantitiesTillDate.observe(viewLifecycleOwner) {
+                    stockAdapter = StockAdapter(
+                        allStocks.toMutableList(),
+                        stockAPI,
+                        this,
+                        predictionMode,
+                        it
+                    )
+                    sharedViewModel._allStocks.value?.let { it1 -> stockAdapter.updateData(it1.toMutableList()) }
+                }
             } else {
                 showUsageLabel.text = "Show usage for today"
+                fetchStocks()
+                recyclerView.adapter = stockAdapter
+
             }
-            stockAdapter.notifyDataSetChanged()
+//            stockAdapter.notifyDataSetChanged()
         }
+
+
 
         sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {
-                fetchStocks()
+                if (predictionMode.value == true) {
+                    showUsageLabel.text = "Show current stocks"
+                    sharedViewModel._allStocks.value?.let { allStocks ->
+                        stockAdapter.updateData(allStocks.toMutableList())
+                    }
+                    sharedViewModel.allIngredientQuantitiesTillDate.value?.let { ingredientQuantities ->
+                        stockAdapter = StockAdapter(
+                            allStocks.toMutableList(),
+                            stockAPI,
+                            this@StocksFragment,
+                            predictionMode,
+                            ingredientQuantities
+                        )
+                        recyclerView.adapter = stockAdapter
+                        sharedViewModel._allStocks.value?.let { it1 -> stockAdapter.updateData(it1.toMutableList()) }
+                    }
+                } else {
+                    showUsageLabel.text = "Show usage for today"
+                    fetchStocks() // This method should fetch and display the initial stocks
+                    recyclerView.adapter = stockAdapter
+                }
+
             }
         }
+
         sharedViewModel.onBackPressed.observe(viewLifecycleOwner) {
             val searchBar = view.findViewById<EditText>(R.id.searchBar)
             if (searchBar.isFocused) {
@@ -213,6 +317,8 @@ class StocksFragment : Fragment() {
             }
             false
         }
+
+
 
         searchBar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {

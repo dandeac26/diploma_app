@@ -54,7 +54,7 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
         holder.providerNameTextView.text = stock.providerName
         holder.priceTextView.text = stock.price
         holder.packagingProgressLabel.text = stock.packaging
-
+        Log.d("dfdfd9", ingredientQuantities.toString())
         predictionMode.observe(fragment.viewLifecycleOwner) { isPredictionMode ->
             if (isPredictionMode) {
                 val predictedQuantity = ingredientQuantities[stock.ingredientId]
@@ -106,6 +106,13 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
         } else {
             holder.itemView.setBackgroundColor(Color.TRANSPARENT)
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateData(newStocks: MutableList<StocksFragment.Stock>) {
+        this.stocks.clear()
+        this.stocks.addAll(newStocks)
+        notifyDataSetChanged()
     }
 
     private fun showPopupMenu(view: View, position: Int) {
