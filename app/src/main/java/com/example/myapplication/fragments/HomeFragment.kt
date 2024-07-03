@@ -1,6 +1,7 @@
 package com.example.myapplication.fragments
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.content.Context
 import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
@@ -12,6 +13,7 @@ import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintDocumentInfo
 import android.print.PrintManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,7 +47,6 @@ class HomeFragment : Fragment() {
     private var isNoonShift = true
     private lateinit var loadingSpinner: ProgressBar
     private lateinit var recipeAPI: RecipeAPI
-
 
     class MyPrintDocumentAdapter(
         private val shiftDate: TextView,
@@ -143,6 +144,7 @@ class HomeFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
+    @SuppressLint("DefaultLocale", "SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -156,7 +158,7 @@ class HomeFragment : Fragment() {
 
         isNoonShift = currentHour in 14..22
 
-        loadingSpinner = view.findViewById(R.id.loadingSpinner) // Add this line
+        loadingSpinner = view.findViewById(R.id.loadingSpinner)
 
         sharedViewModel.isLoadingOrders.observe(viewLifecycleOwner) { isLoading ->
             if (isLoading) {
@@ -172,15 +174,46 @@ class HomeFragment : Fragment() {
         val shiftDate: TextView = view.findViewById(R.id.shiftDate)
         val shiftIndicator: TextView = view.findViewById(R.id.shiftIndicator)
 
-        updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate, true)
+        val calendarInst = Calendar.getInstance()
+        val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.US)
+
+        if (currentHour in 0..13) {
+            // From midnight (00:00) to 14:00, show today's orders
+            shiftDate.text = dateFormat.format(calendarInst.time)
+            shiftIndicator.text = "Orders for Today"
+        } else {
+            // From 14:00 to midnight, show tomorrow's orders
+            calendarInst.add(Calendar.DAY_OF_YEAR, 1)
+            shiftDate.text = dateFormat.format(calendarInst.time)
+            shiftIndicator.text = "Orders for Tomorrow"
+        }
 
 
+        shiftDate.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH)
+            val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
+                val selectedCalendar = Calendar.getInstance()
+                selectedCalendar.set(selectedYear, selectedMonth, selectedDay)
+                val selectedDate = dateFormat.format(selectedCalendar.time)
+                shiftDate.text = selectedDate
+                shiftIndicator.text = "Orders for Selected Date"
+                updateShift(shiftTitle, shiftImage, shiftDate, false)
+            }, year, month, day)
+
+            datePickerDialog.show()
+        }
+
+        updateShift(shiftTitle, shiftImage, shiftDate, true)
 
         header.setOnClickListener {
             if (sharedViewModel.isLoadingOrders.value == true) {
                 return@setOnClickListener
             }
-            updateShift(shiftTitle, shiftIndicator, shiftImage, shiftDate, false)
+            updateShift(shiftTitle, shiftImage, shiftDate, false)
         }
 
         shiftRecycleView = view.findViewById(R.id.shiftRecycleView)
@@ -209,25 +242,10 @@ class HomeFragment : Fragment() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun updateShift(shiftTitle: TextView, shiftIndicator: TextView, shiftImage: ImageView, shiftDate: TextView, isInitial : Boolean) {
-        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val currentDate = Calendar.getInstance().time
-        val dateFormat = SimpleDateFormat("dd/MM/yy", Locale.US)
-
-        if(currentHour in 6..13) {
-            shiftDate.text = dateFormat.format(currentDate)
-            shiftIndicator.text = "Orders For Today"
-        } else {
-            val nextDay = Calendar.getInstance()
-            nextDay.add(Calendar.DAY_OF_YEAR, 1)
-            shiftDate.text = dateFormat.format(nextDay.time)
-            shiftIndicator.text = "Orders For Tomorrow"
-        }
-
+    private fun updateShift(shiftTitle: TextView, shiftImage: ImageView, shiftDate: TextView, isInitial : Boolean) {
         if(!isInitial) {
             isNoonShift = !isNoonShift
         }
-
 
         updateShiftRecycleView(shiftDate.text.toString())
 
@@ -240,7 +258,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-     fun updateShiftRecycleView(shiftDate: String){
+     private fun updateShiftRecycleView(shiftDate: String){
         convertDateFormat(shiftDate)?.let {
             sharedViewModel.fetchOrdersByDate(orderAPI,
                 it
@@ -271,6 +289,51 @@ class HomeFragment : Fragment() {
             sharedViewModel.calculateIngredientQuantities(recipeAPI)
             shiftProductsAdapter = ShiftProductsAdapter(products)
             shiftRecycleView.adapter = shiftProductsAdapter
+            val totalShiftProducts = shiftProductsAdapter.products.sumOf { it.second }
+            Log.d("TotalShiftProducts", totalShiftProducts.toString())
+            calculateStaff(totalShiftProducts)
         }
     }
+
+    private fun calculateStaff(totalShiftProducts: Int): List<StaffRecommendation> {
+        if(totalShiftProducts == 0) {
+            return emptyList()
+        }
+
+        val recommendations = mutableListOf<StaffRecommendation>()
+
+        var juniorCooksNeeded = 0
+        if(totalShiftProducts % 100 > 50) {
+            juniorCooksNeeded = 2
+        }else
+        {
+            juniorCooksNeeded = 1
+        }
+        val experiencedCooksNeeded = totalShiftProducts / 100
+
+
+        repeat(experiencedCooksNeeded) {
+            recommendations.add(StaffRecommendation(EmployeeRole.COOK, EmployeeSeniority.EXPERIENCED))
+        }
+
+        repeat(juniorCooksNeeded) {
+            recommendations.add(StaffRecommendation(EmployeeRole.COOK, EmployeeSeniority.JUNIOR))
+        }
+
+        Log.d("StaffRecommendations", recommendations.toString())
+        return recommendations
+    }
+
+    enum class EmployeeRole {
+        COOK, PACKAGER
+    }
+
+    enum class EmployeeSeniority {
+        EXPERIENCED, JUNIOR
+    }
+
+    data class StaffRecommendation(
+        val role: EmployeeRole,
+        val seniority: EmployeeSeniority
+    )
 }
