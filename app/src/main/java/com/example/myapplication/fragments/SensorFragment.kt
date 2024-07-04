@@ -37,7 +37,7 @@ class SensorFragment : Fragment() {
         val loadingProgressBar: ProgressBar = view.findViewById(R.id.loadingProgressBar)
         val swipeRefreshLayout: SwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
-        sensorAPI = RetrofitInstance.getInstance(requireContext(), 8001).create(SensorAPI::class.java)
+        sensorAPI = RetrofitInstance.getInstance("http://", requireContext(), 8001).create(SensorAPI::class.java)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = SensorAdapter(sensors, sensorAPI, loadingProgressBar)

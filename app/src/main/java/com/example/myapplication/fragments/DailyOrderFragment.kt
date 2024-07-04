@@ -81,7 +81,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        orderAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(OrderAPI::class.java)
+        orderAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(OrderAPI::class.java)
         connectWebSocket()
 
 
@@ -201,8 +201,11 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
 
     private fun connectWebSocket() {
         val client = OkHttpClient()
+        val retrofit = RetrofitInstance.getInstance("ws://", requireContext(), 8000)
+        val httpUrl = retrofit.baseUrl()
+
         val request = Request.Builder()
-            .url("ws://192.168.68.56:8000/ws")
+            .url("ws://${httpUrl.host}:${httpUrl.port}/ws")
             .build()
 
         val listener = object : WebSocketListener() {

@@ -52,9 +52,9 @@ class ProductDetailsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_product_details, container, false)
 
-        bakeryAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(BakeryAPI::class.java)
-        recipeAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(RecipeAPI::class.java)
-        ingredientsAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(IngredientsAPI::class.java)
+        bakeryAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(BakeryAPI::class.java)
+        recipeAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(RecipeAPI::class.java)
+        ingredientsAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(IngredientsAPI::class.java)
 
         productImage = view.findViewById(R.id.productImage)
         productName = view.findViewById(R.id.productName)

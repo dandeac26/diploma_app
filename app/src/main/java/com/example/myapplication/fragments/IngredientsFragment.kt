@@ -43,7 +43,7 @@ class IngredientsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_ingredients, container, false)
 
-        ingredientsAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(IngredientsAPI::class.java)
+        ingredientsAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(IngredientsAPI::class.java)
 
         ingredientsTable = view.findViewById(R.id.ingredientsTable)
         deleteAllButton = view.findViewById(R.id.deleteAllIngredientsButton)

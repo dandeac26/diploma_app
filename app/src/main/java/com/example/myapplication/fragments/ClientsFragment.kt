@@ -84,7 +84,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        clientAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ClientAPI::class.java)
+        clientAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(ClientAPI::class.java)
 
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]

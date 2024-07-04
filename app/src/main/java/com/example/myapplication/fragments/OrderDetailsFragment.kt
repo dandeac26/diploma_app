@@ -69,7 +69,7 @@ class OrderDetailsFragment : Fragment() {
 
         sharedViewModel.selectedOrder.observe(viewLifecycleOwner) { order ->
 
-            orderAPI = RetrofitInstance.getInstance(requireContext(), 8000).create(OrderAPI::class.java)
+            orderAPI = RetrofitInstance.getInstance("http://", requireContext(), 8000).create(OrderAPI::class.java)
             connectWebSocket()
             /// HEADER
             view.findViewById<TextView>(R.id.clientName).text = order.clientName
@@ -153,8 +153,11 @@ class OrderDetailsFragment : Fragment() {
 
     private fun connectWebSocket() {
         val client = OkHttpClient()
+        val retrofit = RetrofitInstance.getInstance("ws://", requireContext(), 8000)
+        val httpUrl = retrofit.baseUrl()
+
         val request = Request.Builder()
-            .url("ws://192.168.68.56:8000/ws")
+            .url("ws://${httpUrl.host}:${httpUrl.port}/ws")
             .build()
 
         val listener = object : WebSocketListener() {

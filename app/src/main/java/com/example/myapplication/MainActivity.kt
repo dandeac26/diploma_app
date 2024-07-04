@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         sharedViewModel = ViewModelProvider(this, factory)[SharedViewModel::class.java]
 
         networkChangeReceiver = NetworkChangeReceiver {
-            RetrofitInstance.getInstance(applicationContext, 8080)
+            RetrofitInstance.getInstance("http://", applicationContext, 8080)
         }
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -156,8 +156,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun connectWebSocket() {
         val client = OkHttpClient()
+        val retrofit = RetrofitInstance.getInstance("http://", applicationContext, 8000)
+        val httpUrl = retrofit.baseUrl()
+
         val request = Request.Builder()
-            .url("ws://192.168.68.56:8000/ws")
+            .url("ws://${httpUrl.host}:${httpUrl.port}/ws")
             .build()
 
         val listener = object : WebSocketListener() {

@@ -90,10 +90,10 @@ class StocksFragment : Fragment() {
 //            Log.d("isPrediction", "true")
 //        }
 
-        stockAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(StockAPI::class.java)
-        ingredientsAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(IngredientsAPI::class.java)
-        providerAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ProviderAPI::class.java)
-        recipeAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(RecipeAPI::class.java)
+        stockAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(StockAPI::class.java)
+        ingredientsAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(IngredientsAPI::class.java)
+        providerAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(ProviderAPI::class.java)
+        recipeAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(RecipeAPI::class.java)
 
         val showUsageLabel = view.findViewById<TextView>(R.id.showUsageLabel)
 

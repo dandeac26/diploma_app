@@ -6,10 +6,10 @@ import android.content.Context
 import android.util.Log
 
 object RetrofitInstance {
-    fun getInstance(context: Context, port: Int): Retrofit {
+    fun getInstance(protocol: String, context: Context, port: Int): Retrofit {
         val configManager = ConfigManager(context)
         val baseUrl = if (configManager.useHomeUrl) configManager.baseUrlHome else configManager.baseUrlMobile
-        val fullUrl = "$baseUrl:$port/"
+        val fullUrl = "$protocol$baseUrl:$port/"
         Log.d("RetrofitInstance", "baseUrl: $fullUrl")
         val retrofit = Retrofit.Builder()
             .baseUrl(fullUrl)

@@ -171,9 +171,9 @@ class HomeFragment : Fragment() {
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
-        orderAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(OrderAPI::class.java)
-        recipeAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(RecipeAPI::class.java)
-        stockAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(StockAPI::class.java)
+        orderAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(OrderAPI::class.java)
+        recipeAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(RecipeAPI::class.java)
+        stockAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(StockAPI::class.java)
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
 

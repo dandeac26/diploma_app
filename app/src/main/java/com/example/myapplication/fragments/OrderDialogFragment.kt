@@ -62,10 +62,10 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         val view = inflater.inflate(R.layout.dialog_order, container, false)
 
 
-        orderAPI = RetrofitInstance.getInstance(requireContext(), 8000).create(OrderAPI::class.java)
+        orderAPI = RetrofitInstance.getInstance("http://", requireContext(), 8000).create(OrderAPI::class.java)
         connectWebSocket()
-        orderDetailsAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(OrderAPI::class.java)
-        clientAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ClientAPI::class.java)
+        orderDetailsAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(OrderAPI::class.java)
+        clientAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(ClientAPI::class.java)
 
         mainInitializeViewModelAndAdapter(view)
 
@@ -341,8 +341,11 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
     private fun connectWebSocket() {
         val client = OkHttpClient()
+        val retrofit = RetrofitInstance.getInstance("ws://", requireContext(), 8000)
+        val httpUrl = retrofit.baseUrl()
+
         val request = Request.Builder()
-            .url("ws://192.168.68.56:8000/ws")
+            .url("ws://${httpUrl.host}:${httpUrl.port}/ws")
             .build()
 
         val listener = object : WebSocketListener() {
