@@ -341,7 +341,7 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
     private fun connectWebSocket() {
         val client = OkHttpClient()
-        val retrofit = RetrofitInstance.getInstance("ws://", requireContext(), 8000)
+        val retrofit = RetrofitInstance.getInstance("http://", requireContext(), 8000)
         val httpUrl = retrofit.baseUrl()
 
         val request = Request.Builder()
