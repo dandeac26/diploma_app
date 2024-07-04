@@ -81,6 +81,15 @@ class StocksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
+//        val isPrediction = arguments?.getBoolean("isPrediction", false) ?: false
+//        if (isPrediction) {
+//            // Set the prediction mode accordingly
+//            predictionMode.value = true
+//            Log.d("isPrediction", "true")
+//        }
+
         stockAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(StockAPI::class.java)
         ingredientsAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(IngredientsAPI::class.java)
         providerAPI = RetrofitInstance.getInstance(requireContext(), 8080).create(ProviderAPI::class.java)
@@ -92,6 +101,9 @@ class StocksFragment : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
 
+        sharedViewModel.predictionMode.observe(viewLifecycleOwner) { isPredictionMode ->
+            predictionMode.value = isPredictionMode
+        }
 
         stockAdapter = StockAdapter(mutableListOf(), stockAPI, this, predictionMode, mapOf())
         recyclerView = view.findViewById(R.id.stocksRecyclerView)
@@ -101,7 +113,7 @@ class StocksFragment : Fragment() {
 
 
         predictionMode.observe(viewLifecycleOwner) { isPredictionMode ->
-            if (isPredictionMode) {
+            if (predictionMode.value == true|| arguments?.getBoolean("isPrediction") == true) {
                 sharedViewModel._allStocks.value?.let { allStocks ->
                     stockAdapter.updateData(allStocks.toMutableList())
                 }
@@ -114,7 +126,7 @@ class StocksFragment : Fragment() {
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setOnRefreshListener {
-            if (predictionMode.value == true) {
+            if (predictionMode.value == true|| arguments?.getBoolean("isPrediction") == true) {
                 showUsageLabel.text = "Show current stocks"
                 sharedViewModel._allStocks.value?.let { allStocks ->
                     stockAdapter.updateData(allStocks.toMutableList())
@@ -142,7 +154,7 @@ class StocksFragment : Fragment() {
         shimmerViewContainer = view.findViewById(R.id.shimmer_view_container)
         shimmerViewContainer.startShimmer()
 
-        if (predictionMode.value == true) {
+        if (predictionMode.value == true|| arguments?.getBoolean("isPrediction") == true) {
             showUsageLabel.text = "Show current stocks"
             sharedViewModel._allStocks.value?.let { allStocks ->
                 stockAdapter.updateData(allStocks.toMutableList())
@@ -223,7 +235,7 @@ class StocksFragment : Fragment() {
 
         showUsageLabel.setOnClickListener {
             predictionMode.value = !(predictionMode.value ?: false)
-
+            sharedViewModel.predictionMode.value = predictionMode.value
             if(predictionMode.value == true){
                 showUsageLabel.text = "Show current stocks"
 
@@ -252,7 +264,7 @@ class StocksFragment : Fragment() {
 
         sharedViewModel.refreshStocksTrigger.observe(viewLifecycleOwner) { shouldRefresh ->
             if (shouldRefresh) {
-                if (predictionMode.value == true) {
+                if (predictionMode.value == true || arguments?.getBoolean("isPrediction") == true){
                     showUsageLabel.text = "Show current stocks"
                     sharedViewModel._allStocks.value?.let { allStocks ->
                         stockAdapter.updateData(allStocks.toMutableList())

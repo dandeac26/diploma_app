@@ -28,6 +28,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -280,7 +281,7 @@ class HomeFragment : Fragment() {
                 return@setOnClickListener
             }
             val stocksFragment = StocksFragment()
-            stocksFragment.predictionMode.value = true
+            sharedViewModel.predictionMode.value = true
             (activity as MainActivity).switchFragment(stocksFragment)
         }
     }

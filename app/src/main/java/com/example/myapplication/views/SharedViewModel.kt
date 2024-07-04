@@ -20,6 +20,7 @@ import retrofit2.Response
 
 class SharedViewModel : ViewModel() {
 
+    val predictionMode: MutableLiveData<Boolean> = MutableLiveData(false)
     val refreshOrderDetailsTrigger: MutableLiveData<Boolean> = MutableLiveData()
     val refreshClientsTrigger = MutableLiveData<Boolean>()
     val refreshProductsTrigger = MutableLiveData<Boolean>()
