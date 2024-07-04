@@ -56,6 +56,8 @@ class HomeFragment : Fragment() {
     private lateinit var homeStocksRecyclerViewAdapter: NegativeStocksAdapter
     private var checkStockPredictions = true
     private var notSwitchingShifts = true
+    private var dataChanged = false
+    private var isDataLoaded = false
 
     private lateinit var orderAPI: OrderAPI
     private lateinit var recipeAPI: RecipeAPI
@@ -223,6 +225,8 @@ class HomeFragment : Fragment() {
                 val selectedDate = dateFormat.format(selectedCalendar.time)
                 shiftDate.text = selectedDate
                 shiftIndicator.text = "Orders for Selected Date"
+                dataChanged = true
+                isDataLoaded = false
                 updateShift(shiftTitle, shiftImage, shiftDate, false)
             }, year, month, day)
             datePickerDialog.show()
@@ -235,7 +239,8 @@ class HomeFragment : Fragment() {
             if (sharedViewModel.isLoadingOrders.value == true) {
                 return@setOnClickListener
             }
-
+            dataChanged = false
+            isDataLoaded = true
             updateShift(shiftTitle, shiftImage, shiftDate, false)
             view.findViewById<ScrollView>(R.id.scrollView).scrollTo(0, 0)
         }
@@ -254,9 +259,18 @@ class HomeFragment : Fragment() {
         } /// END PRINTING ///
 
         val loadStocksButton = view.findViewById<Button>(R.id.loadStocksButton)
+//        loadStocksButton.setOnClickListener {
+//            checkStockPredictions = true
+//            dataChanged = false
+//            updateShiftRecycleView(shiftDate.text.toString())
+//        }
+
         loadStocksButton.setOnClickListener {
-            checkStockPredictions = true
-            updateShiftRecycleView(shiftDate.text.toString())
+            if (!isDataLoaded) {
+                checkStockPredictions = true
+                updateShiftRecycleView(shiftDate.text.toString())
+                isDataLoaded = true // Data is now loaded
+            }
         }
 
         val checkPredictionButton = view.findViewById<Button>(R.id.checkPredictionButton)
@@ -302,6 +316,18 @@ class HomeFragment : Fragment() {
 
      @SuppressLint("SetTextI18n")
      private fun updateShiftRecycleView(shiftDate: String){
+//         if(dataChanged &&!checkStockPredictions){
+//             homeStocksRecyclerViewAdapter.updateData(listOf()) // Clear RecyclerView
+//             return // Exit the method to prevent loading data until "Load" is pressed
+//         }
+
+         if(dataChanged){
+             homeStocksRecyclerViewAdapter.updateData(listOf()) // Clear RecyclerView
+             isDataLoaded = false // Ensure flag is reset since data is cleared
+             dataChanged = false // Reset dataChanged flag as well
+             return
+         }
+
          sharedViewModel.fetchAllOrders(orderAPI)
 
 
@@ -338,6 +364,7 @@ class HomeFragment : Fragment() {
             Log.d("TotalShiftProducts", "$totalShiftProducts $totalDayProducts")
             updateEmployeeRecyclerView(calculateStaff(totalShiftProducts, totalDayProducts))
 
+
             /// ADD STOCK PREDICTIONS ///
             if(checkStockPredictions){
                 sharedViewModel.populateAllStocks(stockAPI)
@@ -362,6 +389,9 @@ class HomeFragment : Fragment() {
                 }
                 checkStockPredictions = false
             }
+//            else{
+//                homeStocksRecyclerViewAdapter.updateData(listOf())
+//            }
 
         }
     }
