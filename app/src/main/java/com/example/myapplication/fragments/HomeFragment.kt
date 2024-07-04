@@ -7,6 +7,8 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.CancellationSignal
+import android.os.Handler
+import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.print.PageRange
 import android.print.PrintAttributes
@@ -17,12 +19,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -257,7 +261,6 @@ class HomeFragment : Fragment() {
 
         val checkPredictionButton = view.findViewById<Button>(R.id.checkPredictionButton)
         checkPredictionButton.setOnClickListener {
-            // if homeStocksRecyclerViewAdapter.data.isNotEmpty() {
             if(homeStocksRecyclerView.adapter?.itemCount == 0){
                 Toast.makeText(context, "Press Load first!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -296,15 +299,16 @@ class HomeFragment : Fragment() {
         }
     }
 
+
      @SuppressLint("SetTextI18n")
      private fun updateShiftRecycleView(shiftDate: String){
-        convertDateFormat(shiftDate)?.let {
-            sharedViewModel.fetchOrdersByDate(orderAPI,
-                it
-            )
-        }
+         sharedViewModel.fetchAllOrders(orderAPI)
+
+
         val homeStockTitle = view?.findViewById<TextView>(R.id.homeStockTitle)
         homeStockTitle?.text = "Stock Predictions ($shiftDate)"
+
+
         sharedViewModel.orders.observe(viewLifecycleOwner) { orders ->
             val vShiftDate = convertDateFormat(shiftDate)
 
@@ -335,10 +339,12 @@ class HomeFragment : Fragment() {
             updateEmployeeRecyclerView(calculateStaff(totalShiftProducts, totalDayProducts))
 
             /// ADD STOCK PREDICTIONS ///
-            if(checkStockPredictions) {
+            if(checkStockPredictions){
                 sharedViewModel.populateAllStocks(stockAPI)
 
                 if (vShiftDate != null) {
+                    Log.d("FilteredOrders", "Shift Date: $vShiftDate")
+
                     val allProductsTillDate = orders.filter { it.completionDate <= vShiftDate }
                         .flatMap { it.orderDetails }
                         .groupBy { it.product }
@@ -349,16 +355,14 @@ class HomeFragment : Fragment() {
                         }
 
                     sharedViewModel.setAllProductsTillDate(allProductsTillDate)
+
                     sharedViewModel.calculateAllIngredientQuantitiesTillDate(recipeAPI)
 
                     calculateAndCollectNegativeRemainingStocks()
-
-                    checkStockPredictions = false
                 }
                 checkStockPredictions = false
-            }else{
-                homeStocksRecyclerViewAdapter.updateData(listOf())
             }
+
         }
     }
 
@@ -372,7 +376,7 @@ class HomeFragment : Fragment() {
     private fun calculateAndCollectNegativeRemainingStocks() {
         sharedViewModel._allStocks.observe(viewLifecycleOwner) {
             sharedViewModel.allIngredientQuantitiesTillDate.observe(viewLifecycleOwner) {
-                val negativeStocks = mutableListOf<NegativeStock>()
+                val negativeStockss = mutableListOf<NegativeStock>()
 
                 sharedViewModel._allStocks.value?.forEach { stock ->
 
@@ -383,12 +387,12 @@ class HomeFragment : Fragment() {
                             val remainingQuantity = stock.quantity - (it / stock.quantityPerPackage)
 
                             if (remainingQuantity < 0) {
-                                negativeStocks.add(NegativeStock(stock.ingredientId, stock.ingredientName, remainingQuantity, stock.packaging))
+                                negativeStockss.add(NegativeStock(stock.ingredientId, stock.ingredientName, remainingQuantity, stock.packaging))
                             }
                         }
                     }
                 }
-                homeStocksRecyclerViewAdapter.updateData(negativeStocks)
+                homeStocksRecyclerViewAdapter.updateData(negativeStockss)
             }
         }
 

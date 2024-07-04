@@ -66,6 +66,12 @@ class SharedViewModel : ViewModel() {
         _orders.value = currentOrders
     }
 
+    fun setAllOrders(orders: List<OrdersFragment.Order>) {
+//        val currentOrders = _orders.value?.toMutableList() ?: mutableListOf()
+//        currentOrders.addAll(orders)
+        _orders.value = orders
+    }
+
 
 
     val _allShiftProducts = MutableLiveData<List<Pair<OrdersFragment.Product, Int>>>()
@@ -122,6 +128,40 @@ class SharedViewModel : ViewModel() {
                     val ordersResponse = response.body()
                     if (ordersResponse != null) {
                         setOrders(ordersResponse)
+                    }
+                } else {
+                    // Handle the error
+                    Log.e(
+                        "SharedViewModel",
+                        "Error fetching orders: ${response.errorBody()?.string()}"
+                    )
+                }
+                isLoadingOrders.value = false
+            }
+
+            override fun onFailure(call: Call<List<OrdersFragment.Order>>, t: Throwable) {
+                // Handle the error
+                isLoadingOrders.value = false
+            }
+        })
+    }
+
+
+
+
+
+    fun fetchAllOrders(orderAPI: OrderAPI) {
+        isLoadingOrders.value = true
+        val call = orderAPI.getOrders()
+        call.enqueue(object : Callback<List<OrdersFragment.Order>> {
+            override fun onResponse(
+                call: Call<List<OrdersFragment.Order>>,
+                response: Response<List<OrdersFragment.Order>>
+            ) {
+                if (response.isSuccessful) {
+                    val ordersResponse = response.body()
+                    if (ordersResponse != null) {
+                        setAllOrders(ordersResponse)
                     }
                 } else {
                     // Handle the error
