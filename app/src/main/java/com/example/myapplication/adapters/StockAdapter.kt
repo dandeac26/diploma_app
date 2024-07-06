@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.View
@@ -47,14 +46,15 @@ class StockAdapter(private val stocks: MutableList<StocksFragment.Stock>,
 
     override fun getItemCount() = stocks.size
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint("UseCompatLoadingForDrawables", "SetTextI18n")
     override fun onBindViewHolder(holder: StockViewHolder, position: Int) {
         val stock = stocks[position]
         holder.ingredientNameTextView.text = stock.ingredientName
         holder.providerNameTextView.text = stock.providerName
-        holder.priceTextView.text = stock.price
+
+        holder.priceTextView.text = "%.2f".format(stock.price.toDouble())
+
         holder.packagingProgressLabel.text = stock.packaging
-        Log.d("dfdfd9", ingredientQuantities.toString())
         predictionMode.observe(fragment.viewLifecycleOwner) { isPredictionMode ->
             if (isPredictionMode) {
                 val predictedQuantity = ingredientQuantities[stock.ingredientId]

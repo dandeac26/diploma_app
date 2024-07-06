@@ -54,8 +54,9 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
             showPopupMenu(v, holder.adapterPosition)
             true
         }
+
         holder.productImage.setOnClickListener {
-            val dialog = ImagePreviewDialog.newInstance(product.imageUrl ?: "")
+            val dialog = ImagePreviewDialog.newInstance(product.imageUrl)
             dialog.show(fragment.parentFragmentManager, "ImagePreviewDialog")
         }
 
@@ -111,7 +112,7 @@ class ProductAdapter(private val products: MutableList<Product>, private val bak
             .show()
     }
 
-    fun updateProduct(position: Int) {
+    private fun updateProduct(position: Int) {
         val product = products[position]
         fragment.openAddProductDialog(product)
     }

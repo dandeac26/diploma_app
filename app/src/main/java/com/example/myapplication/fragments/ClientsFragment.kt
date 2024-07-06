@@ -70,7 +70,6 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
 
     private var clientSelectionListener: ClientSelectionListener? = null
 
-
     var isClientSelectionListenerActive: Boolean = false
 
     override fun onCreateView(
@@ -172,11 +171,9 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
             }
         })
 
-
         sharedViewModel.isClientSelectionListenerActive.observe(viewLifecycleOwner) { isActive ->
             isClientSelectionListenerActive = isActive
         }
-
     }
 
     override fun onClientClick(client: Client) {
@@ -203,6 +200,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         allClients.removeAll { it.clientId == clientId }
         displayedClients.removeAll { it.clientId == clientId }
     }
+
     private fun filterClients(query: String) {
         val filteredClients = allClients.filter { client ->
             client.firmName.contains(query, ignoreCase = true) ||
@@ -217,9 +215,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
 
 
     fun extractLocationAndUrl(sharedText: String): Pair<String?, String?> {
-
         val oldFormatRegex = "https://waze.com/ul\\S+".toRegex()
-
         val newFormatRegex = "https://ul\\.waze\\.com/ul\\S+".toRegex()
 
         val oldMatchResult = oldFormatRegex.find(sharedText)
@@ -274,7 +270,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         val type: String
     )
 
-    fun convertClientTypeToInt(type: String): Int {
+    private fun convertClientTypeToInt(type: String): Int {
         return when (type) {
             "SPECIAL" -> 0
             "REGULAR" -> 1
@@ -357,7 +353,6 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
                     callback(null)
                     fetchClients()
                 } else {
-                    // Handle the error
                     if (response.code() == 400) {
                         callback(response.errorBody()?.string())
                     }
@@ -394,15 +389,12 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
 
         val clientTypeSpinner = dialogView.findViewById<Spinner>(R.id.clientTypeSpinner)
 
-        // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter.createFromResource(
             requireContext(),
             R.array.client_types_array,
             android.R.layout.simple_spinner_item
         ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
             clientTypeSpinner.adapter = adapter
         }
 
@@ -417,13 +409,16 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
         else{
             dialogView.findViewById<Button>(R.id.addFromContactsButton).visibility = View.VISIBLE
         }
+
         dialogView.findViewById<Button>(R.id.addFromContactsButton).setOnClickListener {
             openContacts()
             alertDialog.dismiss()
         }
+
         dialogView.findViewById<Button>(R.id.saveButton).setOnClickListener {
             val firmName = dialogView.findViewById<EditText>(R.id.firmNameInput).text.toString()
             val selectedType = clientTypeSpinner.selectedItemPosition
+
             if(firmName.isEmpty()) {
                 Toast.makeText(context, "Firm name cannot be empty", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -472,6 +467,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
                 }
             }
         }
+
         dialogView.findViewById<Button>(R.id.cancelButton).setOnClickListener {
             alertDialog.dismiss()
         }
@@ -496,6 +492,7 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
                 })
                 dialog.dismiss()
             }
+
             setNegativeButton("No") { dialog, _ ->
                 dialog.dismiss()
             }
@@ -548,7 +545,6 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
                         val id = cursor.getString(idIndex)
                         val name = cursor.getString(nameIndex)
 
-
                         val phoneCursor = requireActivity().contentResolver.query(
                             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                             null,
@@ -582,5 +578,4 @@ class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {
     companion object {
         const val REQUEST_CODE_PICK_CONTACT = 1
     }
-
 }

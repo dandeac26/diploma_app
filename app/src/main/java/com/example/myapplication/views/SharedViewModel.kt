@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.myapplication.adapters.ShiftProductsAdapter
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.api.StockAPI
@@ -12,7 +11,6 @@ import com.example.myapplication.fragments.ClientsFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductDetailsFragment
 import com.example.myapplication.fragments.ProductsFragment
-import com.example.myapplication.fragments.StocksFragment
 import com.example.myapplication.fragments.StocksFragment.Stock
 import retrofit2.Call
 import retrofit2.Callback
@@ -21,17 +19,14 @@ import retrofit2.Response
 class SharedViewModel : ViewModel() {
 
     val predictionMode: MutableLiveData<Boolean> = MutableLiveData(false)
-    val refreshOrderDetailsTrigger: MutableLiveData<Boolean> = MutableLiveData()
     val refreshClientsTrigger = MutableLiveData<Boolean>()
     val refreshProductsTrigger = MutableLiveData<Boolean>()
     val refreshOrdersTrigger = MutableLiveData<Boolean>()
     val refreshStocksTrigger = MutableLiveData<Boolean>()
     val refreshDailyOrdersTrigger = MutableLiveData<Boolean>()
     val refreshHomeTrigger = MutableLiveData<Boolean>()
-
     val selectedDate: MutableLiveData<String> = MutableLiveData()
     val selectedOrder = MutableLiveData<OrdersFragment.Order>()
-
 
     private val _selectedProduct = MutableLiveData<ProductsFragment.Product>()
     val selectedProduct: LiveData<ProductsFragment.Product> get() = _selectedProduct
@@ -50,8 +45,6 @@ class SharedViewModel : ViewModel() {
     val isClientSelectionListenerActive = MutableLiveData<Boolean>()
     val isProductSelectionListenerActive = MutableLiveData<Boolean>()
 
-
-
     private val _orders = MutableLiveData<List<OrdersFragment.Order>>()
     val orders: LiveData<List<OrdersFragment.Order>> get() = _orders
 
@@ -68,19 +61,13 @@ class SharedViewModel : ViewModel() {
     }
 
     fun setAllOrders(orders: List<OrdersFragment.Order>) {
-//        val currentOrders = _orders.value?.toMutableList() ?: mutableListOf()
-//        currentOrders.addAll(orders)
         _orders.value = orders
     }
-
-
 
     val _allShiftProducts = MutableLiveData<List<Pair<OrdersFragment.Product, Int>>>()
     fun setAllShiftProducts(products: List<Pair<OrdersFragment.Product, Int>>){
         _allShiftProducts.value = products
     }
-
-
 
     val ingredientQuantities = MutableLiveData<Map<String, Int>>()
 
@@ -131,7 +118,6 @@ class SharedViewModel : ViewModel() {
                         setOrders(ordersResponse)
                     }
                 } else {
-                    // Handle the error
                     Log.e(
                         "SharedViewModel",
                         "Error fetching orders: ${response.errorBody()?.string()}"
@@ -141,15 +127,10 @@ class SharedViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<List<OrdersFragment.Order>>, t: Throwable) {
-                // Handle the error
                 isLoadingOrders.value = false
             }
         })
     }
-
-
-
-
 
     fun fetchAllOrders(orderAPI: OrderAPI) {
         isLoadingOrders.value = true
@@ -165,7 +146,6 @@ class SharedViewModel : ViewModel() {
                         setAllOrders(ordersResponse)
                     }
                 } else {
-                    // Handle the error
                     Log.e(
                         "SharedViewModel",
                         "Error fetching orders: ${response.errorBody()?.string()}"
@@ -175,16 +155,11 @@ class SharedViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<List<OrdersFragment.Order>>, t: Throwable) {
-                // Handle the error
                 isLoadingOrders.value = false
             }
         })
     }
 
-
-
-
-    /// GET INGREDIENTS TOTAL TILL A CERTAIN DATE
     val _allProductsTillDate = MutableLiveData<List<Pair<OrdersFragment.Product, Int>>>()
     fun setAllProductsTillDate(products: List<Pair<OrdersFragment.Product, Int>>){
         _allProductsTillDate.value = products
@@ -219,7 +194,6 @@ class SharedViewModel : ViewModel() {
             allIngredientQuantitiesTillDate.value = quantities
         }
     }
-
 
     val _allStocks = MutableLiveData<List<Stock>>()
     fun setAllStocks(stocks: List<Stock>){

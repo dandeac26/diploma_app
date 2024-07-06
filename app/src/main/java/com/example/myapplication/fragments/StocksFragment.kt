@@ -68,7 +68,7 @@ class StocksFragment : Fragment() {
     private val allStocks = mutableListOf<Stock>()
     private val displayedStocks = mutableListOf<Stock>()
 
-    var predictionMode = MutableLiveData<Boolean>().apply { value = false }
+    private var predictionMode = MutableLiveData<Boolean>().apply { value = false }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,15 +81,6 @@ class StocksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
-//        val isPrediction = arguments?.getBoolean("isPrediction", false) ?: false
-//        if (isPrediction) {
-//            // Set the prediction mode accordingly
-//            predictionMode.value = true
-//            Log.d("isPrediction", "true")
-//        }
-
         stockAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(StockAPI::class.java)
         ingredientsAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(IngredientsAPI::class.java)
         providerAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(ProviderAPI::class.java)
@@ -99,7 +90,6 @@ class StocksFragment : Fragment() {
 
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
-
 
         sharedViewModel.predictionMode.observe(viewLifecycleOwner) { isPredictionMode ->
             predictionMode.value = isPredictionMode
@@ -111,8 +101,7 @@ class StocksFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = stockAdapter
 
-
-        predictionMode.observe(viewLifecycleOwner) { isPredictionMode ->
+        predictionMode.observe(viewLifecycleOwner) {
             if (predictionMode.value == true|| arguments?.getBoolean("isPrediction") == true) {
                 sharedViewModel._allStocks.value?.let { allStocks ->
                     stockAdapter.updateData(allStocks.toMutableList())
@@ -145,7 +134,7 @@ class StocksFragment : Fragment() {
                 }
             } else {
                 showUsageLabel.text = "Show usage for today"
-                fetchStocks() // This method should fetch and display the initial stocks
+                fetchStocks()
                 recyclerView.adapter = stockAdapter
             }
 
@@ -232,7 +221,6 @@ class StocksFragment : Fragment() {
             popupMenu.show()
         }
 
-
         showUsageLabel.setOnClickListener {
             predictionMode.value = !(predictionMode.value ?: false)
             sharedViewModel.predictionMode.value = predictionMode.value
@@ -258,7 +246,6 @@ class StocksFragment : Fragment() {
                 showUsageLabel.text = "Show usage for today"
                 fetchStocks()
                 recyclerView.adapter = stockAdapter
-
             }
         }
 
@@ -282,7 +269,7 @@ class StocksFragment : Fragment() {
                     }
                 } else {
                     showUsageLabel.text = "Show usage for today"
-                    fetchStocks() // This method should fetch and display the initial stocks
+                    fetchStocks()
                     recyclerView.adapter = stockAdapter
                 }
 
@@ -315,15 +302,13 @@ class StocksFragment : Fragment() {
             false
         }
 
-
-
         searchBar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                // No action needed here
+                // No action
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                // No action needed here
+                // No action
             }
 
             override fun afterTextChanged(s: Editable) {
@@ -381,8 +366,7 @@ class StocksFragment : Fragment() {
           displayedStocks.removeAll { it.ingredientId == ingredientId && it.providerId == providerId }
     }
 
-
-    fun fetchStocks(callback: (() -> Unit)? = null) {
+    fun fetchStocks() {
         val call = stockAPI.getStocks()
         call.enqueue(object : Callback<Map<String, List<Stock>>> {
             override fun onResponse(call: Call<Map<String, List<Stock>>>, response: Response<Map<String, List<Stock>>>) {
@@ -486,7 +470,7 @@ class StocksFragment : Fragment() {
                     val ingredients = response.body()
                     if (ingredients != null) {
                         ingredientNameToIdMap.clear()
-                        val ingredientNames = ingredients.map { it.name }.also { names ->
+                        val ingredientNames = ingredients.map { it.name }.also { _ ->
                             ingredients.forEach { ingredient ->
                                 ingredientNameToIdMap[ingredient.name] = ingredient.ingredientId
                             }
@@ -516,7 +500,7 @@ class StocksFragment : Fragment() {
                     val providers = response.body()
                     if (providers != null) {
                         providerNameToIdMap.clear()
-                        val providerNames = providers.map { it.name }.also { names ->
+                        val providerNames = providers.map { it.name }.also { _ ->
                             providers.forEach { provider ->
                                 providerNameToIdMap[provider.name] = provider.providerId
                             }
@@ -573,20 +557,20 @@ class StocksFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            val quantityInt: Int?
+            val priceDouble: Double?
+            val maxQuantityInt: Int?
+            val quantityPerPackageInt: Int?
+
             try {
-                val quantityInt = quantityString.toInt()
-                val price = priceString.toDouble()
-                val maxQuantity = maxQuantityString.toInt()
-                val quantityPerPackage = quantityPerPackageString.toInt()
+                 quantityInt = quantityString.toInt()
+                 priceDouble = priceString.toDouble()
+                 maxQuantityInt = maxQuantityString.toInt()
+                 quantityPerPackageInt = quantityPerPackageString.toInt()
             } catch (e: NumberFormatException) {
                 Toast.makeText(context, "Input number is too large", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
-            val quantityInt = quantityString.toInt()
-            val priceDouble = priceString.toDouble()
-            val maxQuantityInt = maxQuantityString.toInt()
-            val quantityPerPackageInt = quantityPerPackageString.toInt()
 
             val ingredientId = ingredientNameToIdMap[ingredientNameString]
             val providerId = providerNameToIdMap[providerNameString]

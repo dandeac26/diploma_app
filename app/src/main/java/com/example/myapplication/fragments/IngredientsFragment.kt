@@ -108,6 +108,7 @@ class IngredientsFragment : Fragment() {
             val stocksFragment = StocksFragment()
             (activity as MainActivity).switchFragment(stocksFragment)
         }
+
         fetchIngredients()
 
         val menuButton = view.findViewById<ImageButton>(R.id.menuButton)
@@ -206,6 +207,7 @@ class IngredientsFragment : Fragment() {
             Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
             return
         }
+
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_ingredient, null)
         val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -268,10 +270,12 @@ class IngredientsFragment : Fragment() {
             }
 
         }
+
         dialogView.findViewById<Button>(R.id.cancelButton).setOnClickListener {
             alertDialog.dismiss()
         }
     }
+
     private fun updateIngredient(ingredientId: String, updatedIngredient: IngredientDTO, callback: (String?) -> Unit) {
         val call = ingredientsAPI.updateIngredient(ingredientId, updatedIngredient)
         call.enqueue(object : Callback<Void> {
@@ -324,20 +328,22 @@ class IngredientsFragment : Fragment() {
             setMessage("Are you sure you want to delete all ingredients?")
 
             setPositiveButton("Yes") { dialog, _ ->
-            val call = ingredientsAPI.deleteAllIngredients()
-            call.enqueue(object : Callback<Void> {
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    if (response.isSuccessful) {
-                        fetchIngredients()
+                val call = ingredientsAPI.deleteAllIngredients()
+                call.enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        if (response.isSuccessful) {
+                            fetchIngredients()
+                        }
                     }
-                }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
-                    // Handle the error
-                }
-            })
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        // Handle the error
+                    }
+                })
+
                 dialog.dismiss()
             }
+
             setNegativeButton("No") { dialog, _ ->
                 dialog.dismiss()
             }

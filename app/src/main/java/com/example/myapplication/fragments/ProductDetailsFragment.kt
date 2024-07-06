@@ -151,8 +151,8 @@ class ProductDetailsFragment : Fragment() {
                     Log.d("API_RESPONSE", "Response Body: ${response.body()}")
 
                     val recipes = response.body()
+
                     if (!recipes.isNullOrEmpty()) {
-                        // Clear the existing rows in the table
                         recipeTable.removeAllViews()
 
                         for (recipe in recipes) {
@@ -188,6 +188,7 @@ class ProductDetailsFragment : Fragment() {
             Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show()
             return
         }
+
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_product, null)
         val builder = AlertDialog.Builder(requireContext())
             .setView(dialogView)
@@ -211,7 +212,6 @@ class ProductDetailsFragment : Fragment() {
             val price = priceString.toDouble()
             val imageUrl = dialogView.findViewById<EditText>(R.id.imageUrlInput).text.toString()
             val newProduct = ProductDTO(name, price, imageUrl)
-
 
             updateProduct(product.productId, newProduct) { errorMessage ->
                 if (errorMessage != null) {
@@ -401,7 +401,7 @@ class ProductDetailsFragment : Fragment() {
                         }
                     }
                     override fun onFailure(call: Call<Void>, t: Throwable) {
-                        // Handle the error
+                        // Handle error
                     }
                 })
                 dialog.dismiss()
@@ -426,7 +426,7 @@ class ProductDetailsFragment : Fragment() {
                         }
                     }
                     override fun onFailure(call: Call<Void>, t: Throwable) {
-                        // Handle the error
+                        // Handle error
                     }
                 })
                 dialog.dismiss()

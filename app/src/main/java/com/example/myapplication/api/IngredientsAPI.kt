@@ -2,7 +2,6 @@ package com.example.myapplication.api
 
 import com.example.myapplication.entity.IngredientDTO
 import com.example.myapplication.fragments.StocksFragment
-//import com.example.myapplication.fragments.IngredientsFragment
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE

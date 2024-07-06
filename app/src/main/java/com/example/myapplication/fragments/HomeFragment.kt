@@ -7,8 +7,6 @@ import android.graphics.Paint
 import android.graphics.pdf.PdfDocument
 import android.os.Bundle
 import android.os.CancellationSignal
-import android.os.Handler
-import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.print.PageRange
 import android.print.PrintAttributes
@@ -19,16 +17,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -56,7 +51,6 @@ class HomeFragment : Fragment() {
     private lateinit var shiftRecycleView: RecyclerView
     private lateinit var homeStocksRecyclerViewAdapter: NegativeStocksAdapter
     private var checkStockPredictions = true
-    private var notSwitchingShifts = true
     private var dataChanged = false
     private var isDataLoaded = false
 
@@ -66,7 +60,6 @@ class HomeFragment : Fragment() {
 
     private var isNoonShift = true
     private lateinit var loadingSpinner: ProgressBar
-
 
     class MyPrintDocumentAdapter(
         private val shiftDate: TextView,
@@ -127,6 +120,7 @@ class HomeFragment : Fragment() {
 
                     val headerPaint = Paint()
                     headerPaint.textSize = 20f
+
                     canvas.drawText(shiftTitle.text.toString(), x, y, headerPaint)
                     y += lineSpacing
                     canvas.drawText(shiftIndicator.text.toString(), x, y, headerPaint)
@@ -263,11 +257,8 @@ class HomeFragment : Fragment() {
 
         val loadStocksButton = view.findViewById<Button>(R.id.loadStocksButton)
         loadStocksButton.setOnClickListener {
-//            if (!isDataLoaded) {
-                checkStockPredictions = true
-                updateShiftRecycleView(shiftDate.text.toString())
-//                isDataLoaded = true // Data is now loaded
-//            }
+            checkStockPredictions = true
+            updateShiftRecycleView(shiftDate.text.toString())
         }
 
         val checkPredictionButton = view.findViewById<Button>(R.id.checkPredictionButton)
@@ -313,18 +304,17 @@ class HomeFragment : Fragment() {
 
      @SuppressLint("SetTextI18n")
      private fun updateShiftRecycleView(shiftDate: String){
-         if(dataChanged){
+        if(dataChanged){
              homeStocksRecyclerViewAdapter.updateData(listOf())
              isDataLoaded = false
              dataChanged = false
              return
-         }
+        }
 
-         sharedViewModel.fetchAllOrders(orderAPI)
+        sharedViewModel.fetchAllOrders(orderAPI)
 
         val homeStockTitle = view?.findViewById<TextView>(R.id.homeStockTitle)
         homeStockTitle?.text = "Stock Predictions ($shiftDate)"
-
 
         sharedViewModel.orders.observe(viewLifecycleOwner) { orders ->
             val vShiftDate = convertDateFormat(shiftDate)
@@ -355,7 +345,6 @@ class HomeFragment : Fragment() {
             Log.d("TotalShiftProducts", "$totalShiftProducts $totalDayProducts")
             updateEmployeeRecyclerView(calculateStaff(totalShiftProducts, totalDayProducts))
 
-
             /// ADD STOCK PREDICTIONS ///
             if(checkStockPredictions){
                 sharedViewModel.populateAllStocks(stockAPI)
@@ -364,7 +353,6 @@ class HomeFragment : Fragment() {
                     Log.d("FilteredOrders", "Shift Date: $vShiftDate")
 
                     val vCurrentDate = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Calendar.getInstance().time)
-
                     val removedPastOrders = orders.filter { it.completionDate >= vCurrentDate }
 
                     val allProductsTillDate = removedPastOrders.filter { it.completionDate <= vShiftDate }
@@ -385,10 +373,6 @@ class HomeFragment : Fragment() {
                 }
                 checkStockPredictions = false
             }
-//            else{
-//                homeStocksRecyclerViewAdapter.updateData(listOf())
-//            }
-
         }
     }
 
@@ -402,7 +386,7 @@ class HomeFragment : Fragment() {
     private fun calculateAndCollectNegativeRemainingStocks() {
         sharedViewModel._allStocks.observe(viewLifecycleOwner) {
             sharedViewModel.allIngredientQuantitiesTillDate.observe(viewLifecycleOwner) {
-                val negativeStockss = mutableListOf<NegativeStock>()
+                val negativeStocksList = mutableListOf<NegativeStock>()
 
                 sharedViewModel._allStocks.value?.forEach { stock ->
 
@@ -413,15 +397,14 @@ class HomeFragment : Fragment() {
                             val remainingQuantity = stock.quantity - (it / stock.quantityPerPackage)
 
                             if (remainingQuantity < 0) {
-                                negativeStockss.add(NegativeStock(stock.ingredientId, stock.ingredientName, remainingQuantity, stock.packaging))
+                                negativeStocksList.add(NegativeStock(stock.ingredientId, stock.ingredientName, remainingQuantity, stock.packaging))
                             }
                         }
                     }
                 }
-                homeStocksRecyclerViewAdapter.updateData(negativeStockss)
+                homeStocksRecyclerViewAdapter.updateData(negativeStocksList)
             }
         }
-
     }
 
     private fun updateEmployeeRecyclerView(recommendations: List<StaffRecommendation>) {
@@ -444,8 +427,7 @@ class HomeFragment : Fragment() {
             return recommendations
         }
 
-        var juniorPackagersNeeded = 0
-        juniorPackagersNeeded = if(totalDayProducts % 200 > 100) {
+        val juniorPackagersNeeded = if(totalDayProducts % 200 > 100) {
             2
         } else {
             1
@@ -473,17 +455,14 @@ class HomeFragment : Fragment() {
                     EmployeeSeniority.EXPERIENCED
                 )
             )
-
         }
         else{
-            var juniorCooksNeeded = 0
-            juniorCooksNeeded = if(totalShiftProducts % 100 > 50) {
+            val juniorCooksNeeded = if(totalShiftProducts % 100 > 50) {
                 2
             }else {
                 1
             }
             val experiencedCooksNeeded = totalShiftProducts / 100
-
 
             repeat(experiencedCooksNeeded) {
                 recommendations.add(StaffRecommendation(Role.COOK, EmployeeSeniority.EXPERIENCED))

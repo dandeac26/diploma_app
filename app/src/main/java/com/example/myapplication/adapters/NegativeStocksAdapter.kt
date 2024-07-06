@@ -25,8 +25,6 @@ class NegativeStocksAdapter(private var negativeStocks: List<HomeFragment.Negati
     override fun onBindViewHolder(holder: NegativeStockViewHolder, position: Int) {
         val negativeStock = negativeStocks[position]
         holder.ingredientIdTextView.text = negativeStock.ingredientName
-        // make remaining quantity positive
-
         holder.remainingQuantityTextView.text = "missing: ${kotlin.math.abs(negativeStock.remainingQuantity)} ${negativeStock.packaging}"
     }
 

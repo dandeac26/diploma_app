@@ -56,11 +56,9 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
     private lateinit var clientAPI: ClientAPI
     private lateinit var orderDetailsAPI: OrderAPI
 
-
     @SuppressLint("MissingInflatedId", "NotifyDataSetChanged")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.dialog_order, container, false)
-
 
         orderAPI = RetrofitInstance.getInstance("http://", requireContext(), 8000).create(OrderAPI::class.java)
         connectWebSocket()
@@ -78,7 +76,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         return view
     }
 
-
     @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     private fun mainHandleOrderCreate(view: View){
         val createOrderButton = view.findViewById<Button>(R.id.createOrderButton)
@@ -95,7 +92,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                 }
             }
 
-            // get the selected hour from spinner
             val hourSpinner = view.findViewById<Spinner>(R.id.hourSpinner)
             val selectedHour = convertHourToCompletionTime(hourSpinner.selectedItem.toString())
 
@@ -178,7 +174,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                         Toast.makeText(context, "Error adding client", Toast.LENGTH_SHORT).show()
                     }
                 }
-
             } else {
                 if(selectedClientId != null && selectedClientTextView.text.isNotEmpty()){
                     val order = OrderDTO(
@@ -197,7 +192,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                             // Handle the error
                             Log.e("OrderDialogFragment", "Error adding order: $error")
                         } else {
-
                             for (product in selectedProducts) {
                                 if(product.quantity > 0){
                                     Log.d("OrderDialogFragment", "Adding order detail for product: ${product.name}  for order $orderId")
@@ -273,8 +267,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         })
     }
 
-
-
     private fun hideKeyboard(view: View) {
         val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
         imm?.hideSoftInputFromWindow(view.windowToken, 0)
@@ -335,10 +327,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         webSocket?.send(orderJson)
     }
 
-//    private fun notifyServerAboutOrderDelete(orderId: String) {
-//        webSocket?.send(orderId)
-//    }
-
     private fun connectWebSocket() {
         val client = OkHttpClient()
         val retrofit = RetrofitInstance.getInstance("http://", requireContext(), 8000)
@@ -386,8 +374,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
         ////////////////////// END WATCH //////////////////////
     }
 
-
-
     @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
     private fun mainInitializeViewModelAndAdapter(view: View){
         ///////////// INIT SHARED VIEW MODEL //////////////////
@@ -432,7 +418,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
 
         //////////////////////
     }
-
 
     @SuppressLint("SetTextI18n")
     private fun mainInterfaceActions(view: View){
@@ -508,7 +493,6 @@ class OrderDialogFragment : DialogFragment(), ClientsFragment.ClientSelectionLis
                 })
             }
         }
-
 
         //////////// ADD BUTTON //////////////////
         val addProductsButton = view.findViewById<ImageButton>(R.id.addProductsButton)

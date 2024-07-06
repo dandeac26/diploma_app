@@ -39,11 +39,10 @@ class DateItemAdapter(private val dates: List<OrdersFragment.DateItem>, private 
     }
 
     @SuppressLint("SetTextI18n")
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holderView: RecyclerView.ViewHolder, position: Int) {
         if (getItemViewType(position) == TYPE_DATE) {
             val dateItem = dates[position]
-            val holder = holder as DateItemViewHolder
-
+            val holder = holderView as DateItemViewHolder
 
             val today = SimpleDateFormat("dd.MM.yy", Locale.getDefault()).format(Calendar.getInstance().time)
             if (dateItem.date == today) {
@@ -59,7 +58,7 @@ class DateItemAdapter(private val dates: List<OrdersFragment.DateItem>, private 
                 fragment.switchToDailyOrderFragment(dateItem.day + " " + dateItem.date)
             }
         } else {
-            (holder as LabelViewHolder).labelTextView.text = "Next Week:"
+            (holderView as LabelViewHolder).labelTextView.text = "Next Week:"
         }
     }
 

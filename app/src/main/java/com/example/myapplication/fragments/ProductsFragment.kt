@@ -42,7 +42,6 @@ import retrofit2.Response
 import java.io.Serializable
 
 
-
 class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
 
     private lateinit var productAdapter: ProductAdapter
@@ -58,7 +57,6 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
     private val allProducts = mutableListOf<Product>()
     private val displayedProducts = mutableListOf<Product>()
 
-
     interface ProductsSelectionListener {
         fun onProductSelected(product: ProductsFragment.Product)
     }
@@ -66,7 +64,6 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
     var isProductSelectionListenerActive: Boolean = false
 
     private var productSelectionListener: ProductsSelectionListener? = null
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -151,11 +148,11 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
         }
         searchBar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                // No action needed here
+                // No action needed
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                // No action needed here
+                // No action is needed here
             }
 
             override fun afterTextChanged(s: Editable) {
@@ -174,7 +171,6 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
         var price: Double,
         var imageUrl: String
     ):Serializable
-
 
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -287,7 +283,7 @@ class ProductsFragment : Fragment(), ProductAdapter.OnProductClickListener  {
                 }
             }
             override fun onFailure(call: Call<Void>, t: Throwable) {
-                // Handle the error
+                // error
             }
         })
     }

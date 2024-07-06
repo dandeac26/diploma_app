@@ -56,7 +56,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
     private lateinit var shimmerViewContainer: ShimmerFrameLayout
     private lateinit var orderRecyclerView: RecyclerView
     private lateinit var orderAdapter: OrderAdapter
-
     private lateinit var emptyView : ViewStub
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
@@ -84,10 +83,8 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
         orderAPI = RetrofitInstance.getInstance("http://", requireContext(), 8080).create(OrderAPI::class.java)
         connectWebSocket()
 
-
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
-
 
         dayTitle = view.findViewById(R.id.dayTitle)
 
@@ -102,7 +99,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             fetchDailyOrders()
         }
 
-        orderAdapter = OrderAdapter(orders, orderAPI, this, sharedViewModel)
+        orderAdapter = OrderAdapter(orders, this, sharedViewModel)
 
         orderRecyclerView = view.findViewById(R.id.ordersRecyclerView)
         emptyView = view.findViewById(R.id.emptyView)
@@ -111,8 +108,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
         sharedViewModel.refreshOrdersTrigger.observe(viewLifecycleOwner, Observer {
             orderRecyclerView.adapter = orderAdapter
         })
-
-
 
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
@@ -128,6 +123,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
                 fetchDailyOrders()
             }
         }
+
         sharedViewModel.onBackPressed.observe(viewLifecycleOwner) {
             val searchBar = view.findViewById<EditText>(R.id.searchBar)
             if (searchBar.isFocused) {
@@ -136,7 +132,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
                 inputMethodManager?.hideSoftInputFromWindow(searchBar.windowToken, 0)
             }
         }
-
 
         val addDayOrderButton: ImageButton = view.findViewById(R.id.addDayOrderButton)
         addDayOrderButton.setOnClickListener {
@@ -169,7 +164,7 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
         }
         searchBar.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                // No action needed here
+                // No action is needed here
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
@@ -219,7 +214,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
                     fetchDailyOrders()
                 }
                 else {
-
                     activity?.runOnUiThread {
                         Log.i("WebSocket", "Received message: $text")
                         val notificationId = 2
@@ -248,7 +242,6 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: okhttp3.Response?) {
                 Log.e("WebSocket", "Error: ${t.message}")
             }
-
         }
         client.newWebSocket(request, listener)
     }

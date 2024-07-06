@@ -65,7 +65,6 @@ class ProvidersFragment : Fragment() {
             alphaAnimation.repeatCount = 1
             alphaAnimation.repeatMode = Animation.REVERSE
 
-
             it.startAnimation(alphaAnimation)
             deleteAllProviders()
         }
@@ -84,7 +83,6 @@ class ProvidersFragment : Fragment() {
 
         val updateProviderButton = view.findViewById<ImageButton>(R.id.refreshButton)
         updateProviderButton.setOnClickListener {
-
             val alphaAnimation = AlphaAnimation(1.0f, 0.5f)
             alphaAnimation.duration = 200
             alphaAnimation.repeatCount = 1
@@ -98,7 +96,6 @@ class ProvidersFragment : Fragment() {
 
         val backButton = view.findViewById<ImageButton>(R.id.backButton)
         backButton.setOnClickListener {
-
             val alphaAnimation = AlphaAnimation(1.0f, 0.5f)
             alphaAnimation.duration = 200
             alphaAnimation.repeatCount = 1
@@ -117,7 +114,6 @@ class ProvidersFragment : Fragment() {
             alphaAnimation.duration = 200
             alphaAnimation.repeatCount = 1
             alphaAnimation.repeatMode = Animation.REVERSE
-
 
             it.startAnimation(alphaAnimation)
 
@@ -158,7 +154,9 @@ class ProvidersFragment : Fragment() {
     private fun fetchProviders() {
         val call = providersAPI.getProviders()
         call.enqueue(object : Callback<List<StocksFragment.Provider>> {
-            @SuppressLint("MissingInflatedId", "UseCompatLoadingForDrawables")
+            @SuppressLint("MissingInflatedId", "UseCompatLoadingForDrawables", "SetTextI18n",
+                "InflateParams"
+            )
             override fun onResponse(call: Call<List<StocksFragment.Provider>>, response: Response<List<StocksFragment.Provider>>) {
                 if (response.isSuccessful) {
                     val providers = response.body()
@@ -190,7 +188,7 @@ class ProvidersFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<List<StocksFragment.Provider>>, t: Throwable) {
-                // Handle the error
+                // Handle error
             }
         })
     }
@@ -259,12 +257,12 @@ class ProvidersFragment : Fragment() {
                     }
                 })
             }
-
         }
         dialogView.findViewById<Button>(R.id.cancelButton).setOnClickListener {
             alertDialog.dismiss()
         }
     }
+
     private fun updateProvider(providerId: String, updatedProvider: ProviderDTO, callback: (String?) -> Unit) {
         val call = providersAPI.updateProvider(providerId, updatedProvider)
         call.enqueue(object : Callback<Void> {

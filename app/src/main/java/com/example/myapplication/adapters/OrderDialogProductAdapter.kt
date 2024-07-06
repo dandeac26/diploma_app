@@ -24,7 +24,6 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
         val productName: TextView = itemView.findViewById(R.id.productName)
         val quantityEditText: EditText = itemView.findViewById(R.id.quantityEditText)
         val productImage: CircleImageView = itemView.findViewById(R.id.productImage)
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -40,14 +39,13 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
             .load(currentProduct.imageUrl)
             .into(holder.productImage)
 
-        // Create a new TextWatcher
         val textWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
-                // No action needed here
+                // No action is needed here
             }
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                // No action needed here
+                // No action
             }
 
             override fun afterTextChanged(s: Editable) {
@@ -58,11 +56,8 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
             }
         }
 
-        // Remove the TextWatcher before setting the text
         holder.quantityEditText.removeTextChangedListener(textWatcher)
-        // If the quantity is zero, set the text to an empty string. Otherwise, set it to the quantity.
         holder.quantityEditText.setText(if (currentProduct.quantity == 0) "" else currentProduct.quantity.toString())
-        // Add the TextWatcher back after setting the text
         holder.quantityEditText.addTextChangedListener(textWatcher)
 
         holder.itemView.setOnLongClickListener {
@@ -70,7 +65,6 @@ class OrderDialogProductAdapter(private val productList: MutableList<OrderDialog
             true
         }
     }
-
 
     private fun showDeleteConfirmationDialog(context: Context, position: Int) {
         AlertDialog.Builder(context).apply {

@@ -89,7 +89,6 @@ class ClientAdapter(private val clients: MutableList<Client>, private val client
             holder.btnOpenWaze.visibility = View.VISIBLE
         }
 
-        // Hide contactPersonTextView if empty
         if (holder.contactPersonTextView.text.toString().trim().isEmpty()) {
             holder.contactPersonTextView.visibility = View.GONE
             holder.contactLabel.visibility = View.GONE

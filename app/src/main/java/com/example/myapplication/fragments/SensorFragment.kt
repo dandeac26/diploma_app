@@ -43,7 +43,6 @@ class SensorFragment : Fragment() {
         recyclerView.adapter = SensorAdapter(sensors, sensorAPI, loadingProgressBar)
 
         swipeRefreshLayout.setOnRefreshListener {
-            // Refresh the sensor readings here
             recyclerView.adapter = SensorAdapter(sensors, sensorAPI, loadingProgressBar)
             swipeRefreshLayout.isRefreshing = false
         }

@@ -24,7 +24,6 @@ class OrderDetailsAdapter(private val orderDetails: List<OrdersFragment.OrderDet
     @SuppressLint("SetTextI18n", "DefaultLocale")
     override fun onBindViewHolder(holder: OrderDetailViewHolder, position: Int) {
         val orderDetail = orderDetails[position]
-
         holder.orderDetailsProductNameTextView.text = orderDetail.product.name
         holder.orderDetailsQuantityTextView.text = orderDetail.quantity.toString()
     }

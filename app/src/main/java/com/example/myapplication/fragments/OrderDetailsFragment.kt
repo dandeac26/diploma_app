@@ -32,7 +32,6 @@ import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
-import com.facebook.shimmer.ShimmerFrameLayout
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket
@@ -68,7 +67,6 @@ class OrderDetailsFragment : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
 
         sharedViewModel.selectedOrder.observe(viewLifecycleOwner) { order ->
-
             orderAPI = RetrofitInstance.getInstance("http://", requireContext(), 8000).create(OrderAPI::class.java)
             connectWebSocket()
             /// HEADER
@@ -146,11 +144,6 @@ class OrderDetailsFragment : Fragment() {
 
     }
 
-    private fun notifyOrderDeleted() {
-        webSocket?.send("Order deleted")
-    }
-
-
     private fun connectWebSocket() {
         val client = OkHttpClient()
         val retrofit = RetrofitInstance.getInstance("http://", requireContext(), 8000)
@@ -167,7 +160,7 @@ class OrderDetailsFragment : Fragment() {
             }
 
             override fun onMessage(webSocket: WebSocket, text: String) {
-                // Handle incoming messages
+                // incoming messages actions
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {

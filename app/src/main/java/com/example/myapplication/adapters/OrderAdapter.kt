@@ -8,13 +8,12 @@ import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
-import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.fragments.DailyOrderFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.views.SharedViewModel
 
 
-class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, private val orderAPI: OrderAPI,
+class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>,
                     private val fragment: DailyOrderFragment, private val sharedViewModel: SharedViewModel) : RecyclerView.Adapter<OrderAdapter.OrderViewHolder>() {
 
     var showCompleted = true
@@ -31,7 +30,7 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
         return OrderViewHolder(view)
     }
 
-    @SuppressLint("DefaultLocale")
+    @SuppressLint("DefaultLocale", "SetTextI18n")
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
         val order = orders[position]
         holder.orderClientNameTextView.text = order.clientName
@@ -49,11 +48,11 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
         holder.completeOrderButton.setOnClickListener {
             if (holder.itemView.alpha == 0.5f) {
                 fragment.updateOrderCompleted(order, false)
-                holder.completeOrderButton.isChecked = false;
+                holder.completeOrderButton.isChecked = false
                 holder.itemView.alpha = 1.0f
             } else {
                 fragment.updateOrderCompleted(order, true)
-                holder.completeOrderButton.isChecked = true;
+                holder.completeOrderButton.isChecked = true
                 holder.itemView.alpha = 0.5f
             }
         }
@@ -72,7 +71,6 @@ class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>, priva
         } else {
             orders.addAll(displayedOrders.filter { !it.completed })
         }
-//        orders.addAll(displayedOrders)
         notifyDataSetChanged()
     }
 }
