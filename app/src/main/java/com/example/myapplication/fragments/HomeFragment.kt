@@ -226,6 +226,8 @@ class HomeFragment : Fragment() {
                 val selectedDate = dateFormat.format(selectedCalendar.time)
                 shiftDate.text = selectedDate
                 shiftIndicator.text = "Orders for Selected Date"
+                checkStockPredictions = true
+                updateShift(shiftTitle, shiftImage, shiftDate, false)
                 dataChanged = true
                 isDataLoaded = false
                 updateShift(shiftTitle, shiftImage, shiftDate, false)
@@ -260,18 +262,12 @@ class HomeFragment : Fragment() {
         } /// END PRINTING ///
 
         val loadStocksButton = view.findViewById<Button>(R.id.loadStocksButton)
-//        loadStocksButton.setOnClickListener {
-//            checkStockPredictions = true
-//            dataChanged = false
-//            updateShiftRecycleView(shiftDate.text.toString())
-//        }
-
         loadStocksButton.setOnClickListener {
-            if (!isDataLoaded) {
+//            if (!isDataLoaded) {
                 checkStockPredictions = true
                 updateShiftRecycleView(shiftDate.text.toString())
-                isDataLoaded = true // Data is now loaded
-            }
+//                isDataLoaded = true // Data is now loaded
+//            }
         }
 
         val checkPredictionButton = view.findViewById<Button>(R.id.checkPredictionButton)
