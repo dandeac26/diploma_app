@@ -215,6 +215,9 @@ class SharedViewModel : ViewModel() {
                 }
             })
         }
+        if(_allProductsTillDate.value.isNullOrEmpty()){
+            allIngredientQuantitiesTillDate.value = quantities
+        }
     }
 
 

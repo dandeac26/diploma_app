@@ -317,20 +317,14 @@ class HomeFragment : Fragment() {
 
      @SuppressLint("SetTextI18n")
      private fun updateShiftRecycleView(shiftDate: String){
-//         if(dataChanged &&!checkStockPredictions){
-//             homeStocksRecyclerViewAdapter.updateData(listOf()) // Clear RecyclerView
-//             return // Exit the method to prevent loading data until "Load" is pressed
-//         }
-
          if(dataChanged){
-             homeStocksRecyclerViewAdapter.updateData(listOf()) // Clear RecyclerView
-             isDataLoaded = false // Ensure flag is reset since data is cleared
-             dataChanged = false // Reset dataChanged flag as well
+             homeStocksRecyclerViewAdapter.updateData(listOf())
+             isDataLoaded = false
+             dataChanged = false
              return
          }
 
          sharedViewModel.fetchAllOrders(orderAPI)
-
 
         val homeStockTitle = view?.findViewById<TextView>(R.id.homeStockTitle)
         homeStockTitle?.text = "Stock Predictions ($shiftDate)"
@@ -373,7 +367,11 @@ class HomeFragment : Fragment() {
                 if (vShiftDate != null) {
                     Log.d("FilteredOrders", "Shift Date: $vShiftDate")
 
-                    val allProductsTillDate = orders.filter { it.completionDate <= vShiftDate }
+                    val vCurrentDate = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Calendar.getInstance().time)
+
+                    val removedPastOrders = orders.filter { it.completionDate >= vCurrentDate }
+
+                    val allProductsTillDate = removedPastOrders.filter { it.completionDate <= vShiftDate }
                         .flatMap { it.orderDetails }
                         .groupBy { it.product }
                         .map { (product, orderDetails) ->
@@ -382,6 +380,7 @@ class HomeFragment : Fragment() {
                                 orderDetails.sumOf { it.quantity })
                         }
 
+                    Log.d("AllProductsTillDate", allProductsTillDate.toString())
                     sharedViewModel.setAllProductsTillDate(allProductsTillDate)
 
                     sharedViewModel.calculateAllIngredientQuantitiesTillDate(recipeAPI)
