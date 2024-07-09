@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.DateItemAdapter
@@ -35,6 +36,7 @@ class OrdersFragment : Fragment() {
     private val dates = mutableListOf<DateItem>()
     private lateinit var emptyView : ViewStub
     private lateinit var dateItemAdapter: DateItemAdapter
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,6 +58,11 @@ class OrdersFragment : Fragment() {
         emptyView = view.findViewById(R.id.emptyView)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = dateItemAdapter
+
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
+        swipeRefreshLayout.setOnRefreshListener {
+            dates.addAll(generateDateItems())
+        }
 
         dates.addAll(generateDateItems())
 
@@ -137,6 +144,7 @@ class OrdersFragment : Fragment() {
 
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
+        swipeRefreshLayout.isRefreshing = false
         return dates
     }
 
