@@ -1,6 +1,6 @@
 package com.example.myapplication.api
 
-import com.example.myapplication.entity.RecipeDTO
+import com.example.myapplication.dtos.RecipeDTO
 import com.example.myapplication.fragments.ProductDetailsFragment
 import retrofit2.Call
 import retrofit2.http.Body

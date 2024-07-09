@@ -23,7 +23,7 @@ import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.api.ProviderAPI
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.entity.ProviderDTO
+import com.example.myapplication.dtos.ProviderDTO
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

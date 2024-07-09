@@ -1,6 +1,6 @@
 package com.example.myapplication.api
 
-import com.example.myapplication.entity.StockDTO
+import com.example.myapplication.dtos.StockDTO
 import com.example.myapplication.fragments.StocksFragment
 import retrofit2.Call
 import retrofit2.http.Body

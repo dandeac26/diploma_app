@@ -1,6 +1,6 @@
 package com.example.myapplication.api
 
-import com.example.myapplication.entity.ClientDTO
+import com.example.myapplication.dtos.ClientDTO
 import com.example.myapplication.fragments.ClientsFragment
 
 import retrofit2.Call

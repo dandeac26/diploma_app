@@ -24,8 +24,8 @@ import com.example.myapplication.adapters.OrderDialogProductAdapter
 import com.example.myapplication.api.ClientAPI
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.entity.ClientDTO
-import com.example.myapplication.entity.OrderDTO
+import com.example.myapplication.dtos.ClientDTO
+import com.example.myapplication.dtos.OrderDTO
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.google.gson.Gson

@@ -34,7 +34,7 @@ import com.example.myapplication.R
 import com.example.myapplication.adapters.OrderAdapter
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.entity.OrderDTO
+import com.example.myapplication.dtos.OrderDTO
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.facebook.shimmer.ShimmerFrameLayout

@@ -40,7 +40,7 @@ import com.example.myapplication.api.ProviderAPI
 import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.api.StockAPI
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.entity.StockDTO
+import com.example.myapplication.dtos.StockDTO
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
 import com.facebook.shimmer.ShimmerFrameLayout

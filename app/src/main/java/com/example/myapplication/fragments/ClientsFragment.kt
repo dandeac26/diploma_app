@@ -37,7 +37,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.R
 import com.example.myapplication.adapters.ClientAdapter
 import com.example.myapplication.api.ClientAPI
-import com.example.myapplication.entity.ClientDTO
+import com.example.myapplication.dtos.ClientDTO
 import com.example.myapplication.views.SharedViewModel
 import com.facebook.shimmer.ShimmerFrameLayout
 import retrofit2.Call

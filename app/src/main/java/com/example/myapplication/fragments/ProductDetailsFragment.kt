@@ -26,8 +26,8 @@ import com.example.myapplication.api.BakeryAPI
 import com.example.myapplication.api.IngredientsAPI
 import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.entity.ProductDTO
-import com.example.myapplication.entity.RecipeDTO
+import com.example.myapplication.dtos.ProductDTO
+import com.example.myapplication.dtos.RecipeDTO
 import com.example.myapplication.fragments.ProductsFragment.Product
 import retrofit2.Call
 import retrofit2.Callback
