@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.fragments.OrdersFragment
-import com.example.myapplication.views.SharedViewModel
+import com.example.myapplication.shared.SharedViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale

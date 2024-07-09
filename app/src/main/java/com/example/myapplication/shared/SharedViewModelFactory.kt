@@ -1,4 +1,4 @@
-package com.example.myapplication.views
+package com.example.myapplication.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

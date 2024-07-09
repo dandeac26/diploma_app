@@ -1,4 +1,4 @@
-package com.example.myapplication.views
+package com.example.myapplication.shared
 
 import android.util.Log
 import androidx.lifecycle.LiveData

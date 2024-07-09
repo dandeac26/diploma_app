@@ -37,8 +37,8 @@ import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.api.RecipeAPI
 import com.example.myapplication.api.StockAPI
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.views.SharedViewModel
-import com.example.myapplication.views.SharedViewModelFactory
+import com.example.myapplication.shared.SharedViewModel
+import com.example.myapplication.shared.SharedViewModelFactory
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat

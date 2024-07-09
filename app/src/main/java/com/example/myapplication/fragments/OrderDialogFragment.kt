@@ -26,8 +26,8 @@ import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.dtos.ClientDTO
 import com.example.myapplication.dtos.OrderDTO
-import com.example.myapplication.views.SharedViewModel
-import com.example.myapplication.views.SharedViewModelFactory
+import com.example.myapplication.shared.SharedViewModel
+import com.example.myapplication.shared.SharedViewModelFactory
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request

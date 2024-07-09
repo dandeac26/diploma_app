@@ -25,8 +25,8 @@ import com.example.myapplication.R
 import com.example.myapplication.adapters.DateItemAdapter
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.views.SharedViewModel
-import com.example.myapplication.views.SharedViewModelFactory
+import com.example.myapplication.shared.SharedViewModel
+import com.example.myapplication.shared.SharedViewModelFactory
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

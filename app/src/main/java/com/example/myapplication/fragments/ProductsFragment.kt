@@ -33,8 +33,8 @@ import com.example.myapplication.adapters.ProductAdapter
 import com.example.myapplication.api.BakeryAPI
 import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.dtos.ProductDTO
-import com.example.myapplication.views.SharedViewModel
-import com.example.myapplication.views.SharedViewModelFactory
+import com.example.myapplication.shared.SharedViewModel
+import com.example.myapplication.shared.SharedViewModelFactory
 import com.facebook.shimmer.ShimmerFrameLayout
 import retrofit2.Call
 import retrofit2.Callback

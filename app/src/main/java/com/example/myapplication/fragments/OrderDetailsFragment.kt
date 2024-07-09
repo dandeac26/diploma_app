@@ -30,8 +30,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.MainActivity
 import com.example.myapplication.api.OrderAPI
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.views.SharedViewModel
-import com.example.myapplication.views.SharedViewModelFactory
+import com.example.myapplication.shared.SharedViewModel
+import com.example.myapplication.shared.SharedViewModelFactory
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket

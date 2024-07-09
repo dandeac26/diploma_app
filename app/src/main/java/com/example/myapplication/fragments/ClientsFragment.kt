@@ -38,7 +38,7 @@ import com.example.myapplication.R
 import com.example.myapplication.adapters.ClientAdapter
 import com.example.myapplication.api.ClientAPI
 import com.example.myapplication.dtos.ClientDTO
-import com.example.myapplication.views.SharedViewModel
+import com.example.myapplication.shared.SharedViewModel
 import com.facebook.shimmer.ShimmerFrameLayout
 import retrofit2.Call
 import retrofit2.Callback
@@ -46,7 +46,7 @@ import retrofit2.Response
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.MainActivity
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.views.SharedViewModelFactory
+import com.example.myapplication.shared.SharedViewModelFactory
 
 
 class ClientsFragment : Fragment(), ClientAdapter.OnClientClickListener {

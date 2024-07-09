@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.fragments.DailyOrderFragment
 import com.example.myapplication.fragments.OrdersFragment
-import com.example.myapplication.views.SharedViewModel
+import com.example.myapplication.shared.SharedViewModel
 
 
 class OrderAdapter (private val orders: MutableList<OrdersFragment.Order>,

@@ -33,8 +33,8 @@ import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.fragments.SensorFragment
 import com.example.myapplication.fragments.StocksFragment
 import com.example.myapplication.fragments.SettingsFragment
-import com.example.myapplication.views.SharedViewModel
-import com.example.myapplication.views.SharedViewModelFactory
+import com.example.myapplication.shared.SharedViewModel
+import com.example.myapplication.shared.SharedViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import okhttp3.OkHttpClient
