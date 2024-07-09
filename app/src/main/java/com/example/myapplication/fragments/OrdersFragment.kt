@@ -13,6 +13,8 @@ import android.view.animation.Animation
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.PopupMenu
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,8 +23,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.DateItemAdapter
+import com.example.myapplication.api.OrderAPI
+import com.example.myapplication.config.RetrofitInstance
 import com.example.myapplication.views.SharedViewModel
 import com.example.myapplication.views.SharedViewModelFactory
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 import java.io.Serializable
 import java.text.SimpleDateFormat
@@ -37,6 +44,7 @@ class OrdersFragment : Fragment() {
     private lateinit var emptyView : ViewStub
     private lateinit var dateItemAdapter: DateItemAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var orderAPI: OrderAPI
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +56,8 @@ class OrdersFragment : Fragment() {
     @SuppressLint("DefaultLocale")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        orderAPI = RetrofitInstance.getInstance("http://", requireContext(), 8000).create(OrderAPI::class.java)
 
         val factory = SharedViewModelFactory()
         sharedViewModel = ViewModelProvider(requireActivity(), factory)[SharedViewModel::class.java]
@@ -79,7 +89,8 @@ class OrdersFragment : Fragment() {
             popupMenu.menuInflater.inflate(R.menu.orders_action_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
-                    R.id.showCompleted -> {
+                    R.id.clear_all -> {
+                        deleteAllOrders()
                         true
                     }
                     R.id.history -> {
@@ -146,6 +157,33 @@ class OrdersFragment : Fragment() {
         }
         swipeRefreshLayout.isRefreshing = false
         return dates
+    }
+
+    private fun deleteAllOrders(){
+        AlertDialog.Builder(requireContext()).apply {
+            setTitle("Delete All Clients")
+            setMessage("Are you sure you want to delete all clients?")
+
+            setPositiveButton("Yes") { dialog, _ ->
+                orderAPI.deleteAllOrders().enqueue(
+                    object : Callback<Void> {
+                        override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                            Log.d("OrdersFragment", "All orders deleted")
+                            Toast.makeText(context, "All orders deleted", Toast.LENGTH_SHORT).show()
+                        }
+
+                        override fun onFailure(call: Call<Void>, t: Throwable) {
+                            Log.e("OrdersFragment", "Failed to delete all orders", t)
+                        }
+                    }
+                )
+                dialog.dismiss()
+            }
+
+            setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+        }.create().show()
     }
 
     data class DateItem(

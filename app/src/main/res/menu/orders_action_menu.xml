@@ -3,8 +3,8 @@
         android:id="@+id/history"
         android:title="History" />
     <item
-        android:id="@+id/showCompleted"
-        android:title="Show Completed" />
+        android:id="@+id/clear_all"
+        android:title="Clear All" />
     <item
         android:id="@+id/centralizator"
         android:title="Centralizator" />
