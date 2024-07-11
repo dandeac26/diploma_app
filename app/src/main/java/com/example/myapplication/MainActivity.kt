@@ -9,8 +9,8 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.os.Build
-import com.example.myapplication.fragments.HomeFragment
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -24,15 +24,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.myapplication.config.NetworkChangeReceiver
 import com.example.myapplication.config.RetrofitInstance
-import com.example.myapplication.fragments.ClientsFragment.ClientSelectionListener
 import com.example.myapplication.fragments.ClientsFragment
+import com.example.myapplication.fragments.ClientsFragment.ClientSelectionListener
 import com.example.myapplication.fragments.DailyOrderFragment
+import com.example.myapplication.fragments.HomeFragment
 import com.example.myapplication.fragments.OrdersFragment
 import com.example.myapplication.fragments.ProductDetailsFragment
 import com.example.myapplication.fragments.ProductsFragment
 import com.example.myapplication.fragments.SensorFragment
-import com.example.myapplication.fragments.StocksFragment
 import com.example.myapplication.fragments.SettingsFragment
+import com.example.myapplication.fragments.StocksFragment
 import com.example.myapplication.shared.SharedViewModel
 import com.example.myapplication.shared.SharedViewModelFactory
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -160,15 +161,25 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         val listener = object : WebSocketListener() {
+            private val handler: Handler = Handler()
             override fun onOpen(webSocket: WebSocket, response: okhttp3.Response) {
                 Log.i("WebSocket", "Connection opened")
                 this@MainActivity.webSocket = webSocket
+                handler.postDelayed(object : Runnable {
+                    override fun run() {
+                        webSocket.send("ping")
+                        handler.postDelayed(this, 25000) // Ping every 25 seconds
+                    }
+                }, 25000)
             }
 
             @SuppressLint("MissingPermission")
             override fun onMessage(webSocket: WebSocket, text: String) {
                 if (text == "Refetch orders") {
                     DailyOrderFragment().fetchDailyOrders()
+                } else if(text == "ping"){
+                    webSocket.send("pong")
+                    Log.d("WebSocket", "Received ping, sending pong")
                 } else {
                     runOnUiThread {
                         Log.i("WebSocket", "Received message: $text")

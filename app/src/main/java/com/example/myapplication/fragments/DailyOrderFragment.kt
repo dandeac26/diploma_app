@@ -212,8 +212,10 @@ class DailyOrderFragment : Fragment(), ClientsFragment.ClientSelectionListener {
             override fun onMessage(webSocket: WebSocket, text: String) {
                 if (text == "Refetch orders") {
                     fetchDailyOrders()
-                }
-                else {
+                }else if(text == "ping"){
+                    webSocket.send("pong")
+                    Log.d("WebSocket", "Received ping, sending pong")
+                } else {
                     activity?.runOnUiThread {
                         Log.i("WebSocket", "Received message: $text")
                         val notificationId = 2
