@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
@@ -157,12 +158,14 @@ class SensorAdapter(
                         loadingProgressBar.visibility = View.GONE
                     }
                     else{
+                        loadingProgressBar.visibility = View.GONE
+                        Toast.makeText(holder.itemView.context, "No data available for sensor ${holder.sensorName.text}", Toast.LENGTH_SHORT).show()
                         Log.e("SensorAdapter", "sensordata is null")
                     }
 
                 }
                 else{
-                    // Handle the error here
+                    loadingProgressBar.visibility = View.GONE
 
                     Log.e("SensorAdapter", "Failed to get sensor data")
                 }
