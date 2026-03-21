@@ -2,6 +2,9 @@
 
 A full-featured Android bakery management application built as a diploma project. Manages the complete bakery workflow — products, recipes, clients, orders, inventory, and staffing — with real-time synchronization and predictive analytics.
 
+&nbsp;&nbsp;
+<img src="docs/img/order_centralization_in_home_screen.png" width="22%" alt="Order Management Dashboard"/>
+
 ---
 
 ## Key Highlights
@@ -13,6 +16,21 @@ A full-featured Android bakery management application built as a diploma project
 - **RESTful API integration** with Retrofit2 across 3 backend services (8 API interfaces)
 - **IoT sensor monitoring** for bakery environment (temperature/humidity)
 - **Modern Android stack**: Kotlin, Coroutines, Material Design, Glide, Shimmer
+
+---
+
+## Screenshots
+
+<p align="center">
+  <img src="docs/img/products_page.png" width="22%" alt="Products Page"/>
+  &nbsp;&nbsp;
+  <img src="docs/img/stocks.png" width="22%" alt="Stock Inventory"/>
+  &nbsp;&nbsp;
+  <img src="docs/img/warehouse_sensor_readings_and_notification.png" width="22%" alt="Warehouse Sensor & Notifications"/>
+</p>
+<p align="center">
+  <em>Products catalog &nbsp;|&nbsp; Stock inventory &nbsp;|&nbsp; Sensor readings & push notifications</em>
+</p>
 
 ---
 
